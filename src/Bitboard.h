@@ -105,10 +105,8 @@ namespace ChessEngine::Bitboard_Util {
     /* Pawn attacks                                        */
     /*******************************************************/
 
-    /* Generate the attack moves of a pawn at the given position based on its color */
-    constexpr Bitboard GetPawnAttacks(uint8_t file, uint8_t rank, Color color){
-        Bitboard board = SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
-
+    /* Generate the attack moves of all pawns at the given bitboard based on color */
+    constexpr Bitboard GetPawnAttacks(Bitboard board, Color color){
         Bitboard leftAttack = BITBOARD_EMPTY , rightAttack = BITBOARD_EMPTY;
         if(color == Color::white) {
             leftAttack = ShiftUpLeft(board) & notH_Mask;
@@ -122,6 +120,12 @@ namespace ChessEngine::Bitboard_Util {
         // opposite direction producing faulty moves. The inverted fileMasks
         // handle those 2 cases.
         return leftAttack | rightAttack;
+    }
+
+    /* Generate the attack moves of a pawn at the given position based on its color */
+    constexpr Bitboard GetPawnAttacks(uint8_t file, uint8_t rank, Color color){
+        Bitboard board = SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
+        return GetPawnAttacks(board, color);
     }
 
     /* Generate all the attack moves for each board position and color */
