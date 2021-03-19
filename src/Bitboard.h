@@ -28,7 +28,7 @@ namespace ChessEngine::Bitboard_Util {
         return board | (BIT_MASK << index);
     }
 
-    constexpr uint8_t SquareIndex(uint8_t file, uint8_t rank){
+    constexpr uint8_t GetSquareIndex(uint8_t file, uint8_t rank){
         return rank * 8 + file;
     }
 
@@ -71,21 +71,57 @@ namespace ChessEngine::Bitboard_Util {
         return board << 1ULL;
     }
 
+    /*******************************************************/
+    /* Basic masks                                         */
+    /*******************************************************/
+
+    constexpr Bitboard GetFileMask(uint8_t file){
+        Bitboard board = BITBOARD_EMPTY;
+
+        for (int rank = 0; rank < 8; rank++) {
+            board = SetBit(board, GetSquareIndex(file, rank));
+        }
+
+        return board;
+    }
+
+    constexpr auto GenerateFileMasks(){
+        std::array<Bitboard, 8> masks = {};
+
+        for (int file = 0; file < 8; file++) {
+            masks[file] = GetFileMask(file);
+        }
+
+        return masks;
+    }
+
+    // An array containing masks for each file.
+    constexpr auto fileMasks = GenerateFileMasks();
+    // Made into variables for easy access.
+    constexpr Bitboard notA_Mask = ~fileMasks[File::A];
+    constexpr Bitboard notH_Mask = ~fileMasks[File::H];
 
     /*******************************************************/
     /* Pawn attacks                                        */
     /*******************************************************/
 
     /* Generate the attack moves of a pawn at the given position based on its color */
-    constexpr Bitboard GeneratePawnAttacks(uint8_t file, uint8_t rank, Color color){
-        Bitboard board = SetBit(BITBOARD_EMPTY, SquareIndex(file, rank));
+    constexpr Bitboard GetPawnAttacks(uint8_t file, uint8_t rank, Color color){
+        Bitboard board = SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
 
-        if(color == Color::white)
-            board |= ShiftUpLeft(board) | ShiftUpRight(board);
-        else
-            board |= ShiftDownLeft(board) | ShiftDownRight(board);
+        Bitboard leftAttack = BITBOARD_EMPTY , rightAttack = BITBOARD_EMPTY;
+        if(color == Color::white) {
+            leftAttack = ShiftUpLeft(board) & notH_Mask;
+            rightAttack = ShiftUpRight(board) & notA_Mask;
+        }else {
+            leftAttack = ShiftDownLeft(board) & notA_Mask;
+            rightAttack = ShiftDownRight(board) & notH_Mask;
+        }
 
-        return board;
+        // When overflowing / underflowing in files A,H we may end up in the
+        // opposite direction producing faulty moves. The inverted fileMasks
+        // handle those 2 cases.
+        return leftAttack | rightAttack;
     }
 
     /* Generate all the attack moves for each board position and color */
@@ -94,10 +130,10 @@ namespace ChessEngine::Bitboard_Util {
 
         for (uint8_t rank = 0; rank < 8; rank++) {
             for (uint8_t file = 0; file < 8; file++) {
-                uint8_t squareIndex = SquareIndex(file, rank);
+                uint8_t squareIndex = GetSquareIndex(file, rank);
 
-                attacks[Color::white][squareIndex] = GeneratePawnAttacks(file, rank, Color::white);
-                attacks[Color::black][squareIndex] = GeneratePawnAttacks(file, rank, Color::black);
+                attacks[Color::white][squareIndex] = GetPawnAttacks(file, rank, Color::white);
+                attacks[Color::black][squareIndex] = GetPawnAttacks(file, rank, Color::black);
             }
         }
 

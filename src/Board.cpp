@@ -7,7 +7,7 @@ using namespace ChessEngine::Bitboard_Util;
 void ChessEngine::Board::Draw(){
     for (uint8_t rank = 0; rank < 8; rank++) {
         for (uint8_t file = 0; file < 8; file++) {
-            uint8_t square = SquareIndex(file, 8 - rank - 1);
+            uint8_t square = GetSquareIndex(file, 8 - rank - 1);
 
             bool hasBit = GetBit(bitboard, square);
             std::cout << (hasBit ? '1' : '0') << "  ";

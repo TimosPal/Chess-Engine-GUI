@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Board.h"
 #include "Bitboard.h"
 
@@ -5,14 +7,13 @@ using namespace ChessEngine;
 using namespace ChessEngine::Bitboard_Util;
 
 int main() {
-    Bitboard bb = BITBOARD_EMPTY;
-    bb = SetBit(bb, SquareIndex(0,0));
-    bb = SetBit(bb, SquareIndex(1,0));
-    bb = SetBit(bb, SquareIndex(2,0));
 
-
-    Board board(ShiftUp(bb));
-    board.Draw();
+    for (uint8_t rank = 0; rank < 8; rank++) {
+        for (uint8_t file = 0; file < 8; file++) {
+            Board(pawnAttacks[1][GetSquareIndex(file, rank)]).Draw();
+            getchar();
+        }
+    }
 
     return 0;
 }
