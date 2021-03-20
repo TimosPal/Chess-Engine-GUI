@@ -10,6 +10,9 @@ namespace ChessEngine{
         // Use Color / PieceType for indexing
         Bitboard_Util::Bitboard pieceBoards[2][6];
 
+        // Indicates whose turn is it.
+        Color turnOf;
+
         // TODO: castling rights , etc should be included here.
     };
 

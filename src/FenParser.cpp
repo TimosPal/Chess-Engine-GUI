@@ -12,6 +12,7 @@ using namespace ChessEngine;
 /* Private functions                                   */
 /*******************************************************/
 
+/* Translate a char token to a {pieceType, Color} */
 static bool TokenToPiece(char fenToken, std::tuple<PieceType, Color>& pieceInfo){
     PieceType type;
     switch(tolower(fenToken)){
@@ -30,6 +31,7 @@ static bool TokenToPiece(char fenToken, std::tuple<PieceType, Color>& pieceInfo)
     return true;
 }
 
+/* Translate a string representing piece positions */
 static bool ParseFenPlacement(const std::string& placement, BoardState& state){
     // Rank are separated by a '/'.
     // numbers mean consecutive empty spaces.
@@ -71,11 +73,24 @@ static bool ParseFenPlacement(const std::string& placement, BoardState& state){
     return rank == Rank::R1 - 1; // All 8 rank were described (no more or less).
 }
 
+/* Translate a string to a team Color , representing the turn color */
+static bool ParseFenTurn(const std::string& turn, BoardState& state){
+    if(turn.size() == 1){ // Should be just a single char
+        switch(turn[0]){
+            case 'w': state.turnOf = Color::White; return true;
+            case 'b': state.turnOf = Color::Black; return true;
+            default: return false; // Wrong token.
+        }
+    }else{
+        return false;
+    }
+}
+
 /*******************************************************/
 /* Public functions                                    */
 /*******************************************************/
 
-bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state){ // TODO: error checking.
+bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state){
     BoardState tempState = state;
     std::stringstream stream(fenString);
 
@@ -85,7 +100,7 @@ bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state
         // A fen string is split into 6 parts.
         switch(count){
             case 0: if(!ParseFenPlacement(subString, tempState)) return false; break;
-            case 1: break;
+            case 1: if(!ParseFenTurn(subString, tempState)) return false; break;
             case 2: break; // TODO: castling
             case 3: break; // TODO: en passant
             case 4: break; // TODO: half move number.
