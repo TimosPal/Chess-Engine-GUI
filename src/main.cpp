@@ -1,12 +1,12 @@
 #include <iostream>
 
-#include "Attacks.h"
 #include "Board.h"
 
 using namespace ChessEngine;
-using namespace ChessEngine::Attacks;
 
 int main() {
+    Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    board.Draw();
 
     return 0;
 }

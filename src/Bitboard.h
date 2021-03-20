@@ -2,6 +2,7 @@
 #define BITBOARD_H
 
 #include <array>
+#include <tuple>
 
 #include "EngineUtil.h"
 
@@ -22,16 +23,21 @@ namespace ChessEngine::Bitboard_Util {
     /* Basic functions                                     */
     /*******************************************************/
 
-    constexpr Bitboard GetBit(Bitboard board, uint8_t index){
+    constexpr Bitboard GetBit(const Bitboard& board, uint8_t index){
         return board & (BIT_MASK << index);
     }
 
-    constexpr Bitboard SetBit(Bitboard board, uint8_t index){
+    constexpr Bitboard SetBit(const Bitboard& board, uint8_t index){
         return board | (BIT_MASK << index);
     }
 
     constexpr uint8_t GetSquareIndex(uint8_t file, uint8_t rank){
         return rank * 8 + file;
+    }
+
+    /* Returns file , rank in a tuple based opn the given square index */
+    constexpr std::tuple<uint8_t,uint8_t> GetCoordinates(uint8_t squareIndex){
+        return {squareIndex % 8, squareIndex / 8};
     }
 
     /*******************************************************/
@@ -41,35 +47,35 @@ namespace ChessEngine::Bitboard_Util {
     /* NOTE: each rank is printed in a Little endian
      * fashion. The origin is located at the bottom left */
 
-    constexpr Bitboard ShiftUp(Bitboard board){
+    constexpr Bitboard ShiftUp(const Bitboard& board){
         return board << 8ULL;
     }
 
-    constexpr Bitboard ShiftUpLeft(Bitboard board){
+    constexpr Bitboard ShiftUpLeft(const Bitboard& board){
         return board << 7ULL;
     }
 
-    constexpr Bitboard ShiftUpRight(Bitboard board){
+    constexpr Bitboard ShiftUpRight(const Bitboard& board){
         return board << 9ULL;
     }
 
-    constexpr Bitboard ShiftDown(Bitboard board){
+    constexpr Bitboard ShiftDown(const Bitboard& board){
         return board >> 8ULL;
     }
 
-    constexpr Bitboard ShiftDownLeft(Bitboard board){
+    constexpr Bitboard ShiftDownLeft(const Bitboard& board){
         return board >> 7ULL;
     }
 
-    constexpr Bitboard ShiftDownRight(Bitboard board){
+    constexpr Bitboard ShiftDownRight(const Bitboard& board){
         return board >> 9ULL;
     }
 
-    constexpr Bitboard ShiftLeft(Bitboard board){
+    constexpr Bitboard ShiftLeft(const Bitboard& board){
         return board >> 1ULL;
     }
 
-    constexpr Bitboard ShiftRight(Bitboard board){
+    constexpr Bitboard ShiftRight(const Bitboard& board){
         return board << 1ULL;
     }
 
