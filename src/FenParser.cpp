@@ -29,16 +29,30 @@ static std::tuple<PieceType, Color> TokenToPiece(char fenToken){
     return {type, color};
 }
 
-static void ParseFenPlacement(const std::string& placement, BoardState& state){
-    int count = 0;
-    for(char token : placement){
-        if(token == '/') continue; // '/' separates ranks.
+static void ParseFenPlacement(const std::string& placement, BoardState& state){ // TODO: error checking.
+    // Rank are separated by a '/'.
+    // numbers mean consecutive empty spaces.
+    // letters correspond to piece types.
 
-        auto [type, color] = TokenToPiece(token);
-        Bitboard_Util::Bitboard& currPieceBoard = state.pieceBoards[color][type];
-        currPieceBoard |= Bitboard_Util::SetBit(currPieceBoard, count);
-
-        count++;
+    std::stringstream stream(placement);
+    std::string subString;
+    int rank = Rank::R8; // Fen strings start from rank 8 going towards rank 1.
+    while (getline(stream, subString, '/')) { // Iterate over each rank.
+        int file = 0;
+        for (char token : subString) {
+            if(isdigit(token)){ // Need to only update the file counter.
+                int emptySquares = token - '0'; // Convert from ascii to int.
+                file += emptySquares;
+            }else {
+                // Update appropriate bitboard with the piece position.
+                auto[type, color] = TokenToPiece(token);
+                Bitboard_Util::Bitboard &currPieceBoard = state.pieceBoards[color][type];
+                uint8_t squareIndex = Bitboard_Util::GetSquareIndex(file, rank);
+                currPieceBoard |= Bitboard_Util::SetBit(currPieceBoard, squareIndex);
+            }
+            file++;
+        }
+        rank--;
     }
 }
 
@@ -46,16 +60,15 @@ static void ParseFenPlacement(const std::string& placement, BoardState& state){
 /* Public functions                                    */
 /*******************************************************/
 
-bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state){
-    // A form of tokenizing fenString with a space delimiter.
-    auto iss = std::istringstream{fenString};
+bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state){ // TODO: error checking.
+    std::stringstream stream(fenString);
 
     int count = 0;
-    auto subStr = std::string{};
-    while (iss >> subStr) {
+    std::string subString;
+    while (getline(stream, subString, ' ')) {
         // A fen string is split into 6 parts.
         switch(count){
-            case 0: ParseFenPlacement(subStr, state); break;
+            case 0: ParseFenPlacement(subString, state); break;
             case 1: break;
             case 2: break; // TODO: castling
             case 3: break; // TODO: en passant
