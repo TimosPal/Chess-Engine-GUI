@@ -6,11 +6,19 @@
 #include "BoardState.h"
 #include "FenParser.h"
 
+#include <iostream>
+
 namespace ChessEngine {
 
     class Board {
     public:
-        explicit Board(const std::string& fenString) { ParseFenString(fenString, state); }
+        explicit Board(const std::string& fenString) {
+            if(ParseFenString(fenString, state)){
+                std::cout << "Correct" << std::endl;
+            }else{
+                std::cout << "Incorrect" << std::endl;
+            }
+        }
 
         void Draw(); // Prints the Board on the console.
     private:

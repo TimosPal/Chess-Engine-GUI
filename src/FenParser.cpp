@@ -12,7 +12,7 @@ using namespace ChessEngine;
 /* Private functions                                   */
 /*******************************************************/
 
-static std::tuple<PieceType, Color> TokenToPiece(char fenToken){
+static bool TokenToPiece(char fenToken, std::tuple<PieceType, Color>& pieceInfo){
     PieceType type;
     switch(tolower(fenToken)){
         case 'p': type = PieceType::Pawn; break;
@@ -21,15 +21,16 @@ static std::tuple<PieceType, Color> TokenToPiece(char fenToken){
         case 'k': type = PieceType::King; break;
         case 'q': type = PieceType::Queen; break;
         case 'b': type = PieceType::Bishop; break;
-        default: return {}; // Wrong fen format. // TODO: handle that case in higher calls.
+        default: return false; // Wrong fen token.
     }
 
     // Lowercase is Black , whereas uppercase is White.
     Color color = islower(fenToken) ? Color::Black : Color::White;
-    return {type, color};
+    pieceInfo = {type, color};
+    return true;
 }
 
-static void ParseFenPlacement(const std::string& placement, BoardState& state){ // TODO: error checking.
+static bool ParseFenPlacement(const std::string& placement, BoardState& state){
     // Rank are separated by a '/'.
     // numbers mean consecutive empty spaces.
     // letters correspond to piece types.
@@ -40,20 +41,34 @@ static void ParseFenPlacement(const std::string& placement, BoardState& state){ 
     while (getline(stream, subString, '/')) { // Iterate over each rank.
         int file = 0;
         for (char token : subString) {
-            if(isdigit(token)){ // Need to only update the file counter.
-                int emptySquares = token - '0'; // Convert from ascii to int.
-                file += emptySquares - 1; // -1 due to the file++ at the end of the loop.
+            if(isdigit(token)){ // Skip the empty squares - 1 (due to file++)
+                int emptySquares = token - '0';
+                file += emptySquares - 1;
             }else {
+                // Get the piece info based on the fen token.
+                std::tuple<PieceType, Color> pieceInfo;
+                if(!TokenToPiece(token, pieceInfo))
+                    return false;
+                auto [type, color] = pieceInfo;
+
                 // Update appropriate bitboard with the piece position.
-                auto[type, color] = TokenToPiece(token);
                 Bitboard_Util::Bitboard &currPieceBoard = state.pieceBoards[color][type];
                 uint8_t squareIndex = Bitboard_Util::GetSquareIndex(file, rank);
                 currPieceBoard |= Bitboard_Util::SetBit(currPieceBoard, squareIndex);
             }
             file++;
+
+            if(file > File::H + 1) // Check for possible overshoots.
+                return false;
         }
+
+        if(file < File::H + 1) // If a rank isn't fully described.
+            return false;
+
         rank--;
     }
+
+    return rank == Rank::R1 - 1; // All 8 rank were described (no more or less).
 }
 
 /*******************************************************/
@@ -61,6 +76,7 @@ static void ParseFenPlacement(const std::string& placement, BoardState& state){ 
 /*******************************************************/
 
 bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state){ // TODO: error checking.
+    BoardState tempState = state;
     std::stringstream stream(fenString);
 
     int count = 0;
@@ -68,7 +84,7 @@ bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state
     while (getline(stream, subString, ' ')) {
         // A fen string is split into 6 parts.
         switch(count){
-            case 0: ParseFenPlacement(subString, state); break;
+            case 0: if(!ParseFenPlacement(subString, tempState)) return false; break;
             case 1: break;
             case 2: break; // TODO: castling
             case 3: break; // TODO: en passant
@@ -80,5 +96,10 @@ bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state
         count++;
     }
 
-    return count == 6; // We got less than 6 parts.
+    if(count == 6) { // We got all 6 parts of the fen format.
+        state = tempState; // Only alter the state if the string was successfully parsed.
+        return true;
+    }else{
+        return false;
+    }
 }
