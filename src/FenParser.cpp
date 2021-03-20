@@ -42,7 +42,7 @@ static void ParseFenPlacement(const std::string& placement, BoardState& state){ 
         for (char token : subString) {
             if(isdigit(token)){ // Need to only update the file counter.
                 int emptySquares = token - '0'; // Convert from ascii to int.
-                file += emptySquares;
+                file += emptySquares - 1; // -1 due to the file++ at the end of the loop.
             }else {
                 // Update appropriate bitboard with the piece position.
                 auto[type, color] = TokenToPiece(token);
