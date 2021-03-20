@@ -4,11 +4,15 @@
 namespace ChessEngine {
 
     enum Color {
-        white, black
+        White, Black
     };
 
     enum File{
         A, B, C, D, E, F, G, H
+    };
+
+    enum PieceType{
+        Pawn, Rook, Bishop, Knight, King, Queen
     };
 
 }

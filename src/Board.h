@@ -9,11 +9,11 @@ namespace ChessEngine {
     class Board {
     public:
 
-        explicit Board(ChessEngine::Bitboard_Util::Bitboard init) : bitboard(init) {} // NOTE: temp constructor
-
         void Draw(); // Prints the Board on the console.
     private:
-        ChessEngine::Bitboard_Util::Bitboard bitboard;
+        // A board with 6 bitboards for each color , 1 bitboard per unique piece type.
+        // Use Color / PieceType for indexing
+        Bitboard_Util::Bitboard pieceBoards[2][6];
     };
 
 }

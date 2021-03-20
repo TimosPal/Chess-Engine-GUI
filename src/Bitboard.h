@@ -10,6 +10,8 @@
 
 #define BITBOARD_EMPTY 0x0ULL
 
+/* TODO: split pawn attacks to 2 arrays for each direction. */
+
 namespace ChessEngine::Bitboard_Util {
 
     /* We are gonna represent our chess board with bitboards , a 64 bit
@@ -100,53 +102,6 @@ namespace ChessEngine::Bitboard_Util {
     // Made into variables for easy access.
     constexpr Bitboard notA_Mask = ~fileMasks[File::A];
     constexpr Bitboard notH_Mask = ~fileMasks[File::H];
-
-    /*******************************************************/
-    /* Pawn attacks                                        */
-    /*******************************************************/
-
-    /* Generate the attack moves of all pawns at the given bitboard based on color */
-    constexpr Bitboard GetPawnAttacks(Bitboard board, Color color){
-        Bitboard leftAttack = BITBOARD_EMPTY , rightAttack = BITBOARD_EMPTY;
-        if(color == Color::white) {
-            leftAttack = ShiftUpLeft(board) & notH_Mask;
-            rightAttack = ShiftUpRight(board) & notA_Mask;
-        }else {
-            leftAttack = ShiftDownLeft(board) & notA_Mask;
-            rightAttack = ShiftDownRight(board) & notH_Mask;
-        }
-
-        // When overflowing / underflowing in files A,H we may end up in the
-        // opposite direction producing faulty moves. The inverted fileMasks
-        // handle those 2 cases.
-        return leftAttack | rightAttack;
-    }
-
-    /* Generate the attack moves of a pawn at the given position based on its color */
-    constexpr Bitboard GetPawnAttacks(uint8_t file, uint8_t rank, Color color){
-        Bitboard board = SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
-        return GetPawnAttacks(board, color);
-    }
-
-    /* Generate all the attack moves for each board position and color */
-    constexpr auto GeneratePawnsAttacks(){
-        std::array<std::array<Bitboard, 64>, 2> attacks = {};
-
-        for (uint8_t rank = 0; rank < 8; rank++) {
-            for (uint8_t file = 0; file < 8; file++) {
-                uint8_t squareIndex = GetSquareIndex(file, rank);
-
-                attacks[Color::white][squareIndex] = GetPawnAttacks(file, rank, Color::white);
-                attacks[Color::black][squareIndex] = GetPawnAttacks(file, rank, Color::black);
-            }
-        }
-
-        return attacks;
-    }
-
-    // An [team color][square index] array.
-    constexpr auto pawnAttacks = GeneratePawnsAttacks();
-
 
 }
 
