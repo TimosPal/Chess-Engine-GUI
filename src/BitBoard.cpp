@@ -12,4 +12,5 @@ void ChessEngine::Bitboard_Util::DrawBitBoard(Bitboard board){
         }
         std::cout << std::endl;
     }
+    std::cout << std::endl;
 }

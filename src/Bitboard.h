@@ -29,6 +29,10 @@ namespace ChessEngine::Bitboard_Util {
         return board | (BIT_MASK << index);
     }
 
+    constexpr Bitboard PopBit(const Bitboard& board, uint8_t index){
+        return board ^ GetBit(board, index);
+    }
+
     constexpr Bitboard GetLSB(const Bitboard& board){
         return board & -board;
     }
@@ -47,7 +51,7 @@ namespace ChessEngine::Bitboard_Util {
                 25, 14, 19,  9, 13,  8,  7,  6
         };
 
-        return index64[(board * debruijn64) >> 58];
+        return index64[(GetLSB(board) * debruijn64) >> 58];
     }
 
     constexpr uint8_t GetSquareIndex(uint8_t file, uint8_t rank){

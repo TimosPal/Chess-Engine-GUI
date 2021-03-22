@@ -12,14 +12,7 @@ namespace ChessEngine::MoveGeneration {
         uint8_t toSquareIndex : 3;
     };
 
-    void GenerateMoves(Bitboard_Util::Bitboard board, Color color, PieceType type){
-        // iterate over the bitboard , for each isolated bit find the corresponding moves.
-        while(board != 0){
-
-            board ^= Bitboard_Util::GetLSB(board);
-        }
-    }
-
+    void GenerateMoves(Bitboard_Util::Bitboard pieceBoard, Color color);
 
 }
 

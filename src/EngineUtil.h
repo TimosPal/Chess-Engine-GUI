@@ -1,6 +1,8 @@
 #ifndef ENGINEUTIL_H
 #define ENGINEUTIL_H
 
+#include <string>
+
 namespace ChessEngine {
 
     enum Color {
@@ -18,6 +20,9 @@ namespace ChessEngine {
     enum PieceType{
         Pawn, Rook, Bishop, Knight, King, Queen
     };
+
+    std::string FileToString(File file);
+    std::string RankToString(Rank file);
 
 }
 

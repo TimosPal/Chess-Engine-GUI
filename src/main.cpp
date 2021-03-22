@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Board.h"
+#include "MoveGeneration.h"
 
 using namespace ChessEngine;
 
@@ -13,7 +14,9 @@ int main() {
     }
 
     Board board(state);
-    board.Draw(Color::White, PieceType::Pawn);
+    //board.Draw(Color::White, PieceType::Pawn);
+
+    MoveGeneration::GenerateMoves(Bitboard_Util::SetBit(BITBOARD_EMPTY, Bitboard_Util::GetSquareIndex(File::H, Rank::R6)), White);
 
     return 0;
 }
