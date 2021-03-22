@@ -12,15 +12,9 @@ namespace ChessEngine {
 
     class Board {
     public:
-        explicit Board(const std::string& fenString) {
-            if(ParseFenString(fenString, state)){
-                std::cout << "Correct" << std::endl;
-            }else{
-                std::cout << "Incorrect" << std::endl;
-            }
-        }
+        explicit Board(const BoardState& state) : state(state) {}
 
-        void Draw(); // Prints the Board on the console.
+        void Draw(Color color, PieceType type);
     private:
 
         BoardState state{};

@@ -35,7 +35,7 @@ namespace ChessEngine::Attacks {
     }
 
     /* Generate all the attack moves for each board position and color */
-    constexpr auto GeneratePawnsAttacks() {
+    constexpr std::array<std::array<Bitboard, 64>, 2> GeneratePawnsAttacks() {
         std::array<std::array<Bitboard, 64>, 2> attacks = {};
 
         for (uint8_t rank = 0; rank < 8; rank++) {
@@ -51,7 +51,7 @@ namespace ChessEngine::Attacks {
     }
 
     // An [team color][square index] array.
-    constexpr auto pawnAttacks = GeneratePawnsAttacks();
+    constexpr std::array<std::array<Bitboard, 64>, 2> pawnAttacks = GeneratePawnsAttacks();
 
 }
 

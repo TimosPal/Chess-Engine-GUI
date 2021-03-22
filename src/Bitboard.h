@@ -11,8 +11,6 @@
 
 #define BITBOARD_EMPTY 0x0ULL
 
-/* TODO: split pawn attacks to 2 arrays for each direction. */
-
 namespace ChessEngine::Bitboard_Util {
 
     /* We are gonna represent our chess board with bitboards , a 64 bit
@@ -31,6 +29,27 @@ namespace ChessEngine::Bitboard_Util {
         return board | (BIT_MASK << index);
     }
 
+    constexpr Bitboard GetLSB(const Bitboard& board){
+        return board & -board;
+    }
+
+    constexpr uint8_t GetLSBIndex(const Bitboard& board){ // NOTE: maybe use built_in_ffs (?)
+        /* De Bruijn bitscan algorithm */
+        const uint64_t debruijn64 = 0x03f79d71b4cb0a89;
+        const uint8_t index64[64] = {
+                0,  1, 48,  2, 57, 49, 28,  3,
+                61, 58, 50, 42, 38, 29, 17,  4,
+                62, 55, 59, 36, 53, 51, 43, 22,
+                45, 39, 33, 30, 24, 18, 12,  5,
+                63, 47, 56, 27, 60, 41, 37, 16,
+                54, 35, 52, 21, 44, 32, 23, 11,
+                46, 26, 40, 15, 34, 20, 31, 10,
+                25, 14, 19,  9, 13,  8,  7,  6
+        };
+
+        return index64[(board * debruijn64) >> 58];
+    }
+
     constexpr uint8_t GetSquareIndex(uint8_t file, uint8_t rank){
         return rank * 8 + file;
     }
@@ -39,6 +58,9 @@ namespace ChessEngine::Bitboard_Util {
     constexpr std::tuple<uint8_t,uint8_t> GetCoordinates(uint8_t squareIndex){
         return {squareIndex % 8, squareIndex / 8};
     }
+
+    /* Draw the bitboard in a square like form , with 1 and 0s. */
+    void DrawBitBoard(Bitboard board);
 
     /*******************************************************/
     /* Directional shifting                                */
@@ -93,7 +115,7 @@ namespace ChessEngine::Bitboard_Util {
         return board;
     }
 
-    constexpr auto GenerateFileMasks(){
+    constexpr std::array<Bitboard, 8> GenerateFileMasks(){
         std::array<Bitboard, 8> masks = {};
 
         for (int file = 0; file < 8; file++) {
@@ -104,7 +126,7 @@ namespace ChessEngine::Bitboard_Util {
     }
 
     // An array containing masks for each file.
-    constexpr auto fileMasks = GenerateFileMasks();
+    constexpr std::array<Bitboard, 8> fileMasks = GenerateFileMasks();
     // Made into variables for easy access.
     constexpr Bitboard notA_Mask = ~fileMasks[File::A];
     constexpr Bitboard notH_Mask = ~fileMasks[File::H];

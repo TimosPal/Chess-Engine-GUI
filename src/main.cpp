@@ -5,8 +5,15 @@
 using namespace ChessEngine;
 
 int main() {
-    Board board("0rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    //board.Draw();
+    BoardState state = {};
+    std::string fenPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    if(!ParseFenString(fenPosition, state)){
+        std::cout << "Incorrect fen string" << std::endl;
+        return -1;
+    }
+
+    Board board(state);
+    board.Draw(Color::White, PieceType::Pawn);
 
     return 0;
 }
