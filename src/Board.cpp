@@ -1,7 +1,5 @@
 #include "Board.h"
 
-#include <iostream>
-
 using namespace ChessEngine::Bitboard_Util;
 
 void ChessEngine::Board::Draw(Color color, PieceType type){

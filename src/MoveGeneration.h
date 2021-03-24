@@ -12,7 +12,7 @@ namespace ChessEngine::MoveGeneration {
         uint8_t toSquareIndex : 3;
     };
 
-    void GenerateMoves(Bitboard_Util::Bitboard pieceBoard, Color color, Bitboard_Util::Bitboard enemyOccupancies);
+    void GenerateAttacks(Bitboard_Util::Bitboard pieceBoard, Color color, Bitboard_Util::Bitboard enemyOccupancies);
 
 }
 

@@ -13,8 +13,8 @@ namespace ChessEngine {
     class Board {
     public:
         explicit Board(const BoardState& state) : state(state) {
-            UpdateOccupancies(Color::White);
-            UpdateOccupancies(Color::Black);
+            InitOccupancies(Color::White);
+            InitOccupancies(Color::Black);
         }
 
         void Draw(Color color, PieceType type);
@@ -34,7 +34,10 @@ namespace ChessEngine {
         // Occupancy bitboards for both colors.
         Bitboard_Util::Bitboard occupancies[2]{};
 
-        void UpdateOccupancies(Color color){
+        /* Initialize the 2 occupancy bitboards
+         * NOTE:Should be called only once at the start.
+         * Further updates should be done based on the executed move. */
+        void InitOccupancies(Color color){
             Bitboard_Util::Bitboard temp = BITBOARD_EMPTY;
             for (int i = 0; i < 6; i++) {
                 temp |= state.pieceBoards[color][i];

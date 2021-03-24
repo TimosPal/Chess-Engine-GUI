@@ -3,9 +3,6 @@
 #include <tuple>
 #include <sstream>
 
-#include "EngineUtil.h"
-#include "Bitboard.h"
-
 using namespace ChessEngine;
 
 /*******************************************************/
