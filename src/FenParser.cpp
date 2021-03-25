@@ -91,7 +91,7 @@ static bool ParseCastlingRights(const std::string& rightsString, BoardState& sta
     int stringLen = rightsString.length();
     if(stringLen == 0 || stringLen > 4)
         return false;
-    if(stringLen == 1 && rightsString[0] == '-'){
+    if(rightsString == "-"){
         state.kingSideCastling[Color::White] = false;
         state.kingSideCastling[Color::Black] = false;
         state.queenSideCastling[Color::White] = false;
@@ -125,7 +125,7 @@ static bool ParseCastlingRights(const std::string& rightsString, BoardState& sta
     return true;
 }
 
-/* Translate half move or full move strings */
+/* Translates half move or full move strings */
 static bool ParseMoveCounter(const std::string& counterString, BoardState& state, bool forHalf){
     // create an input stream with your string.
     // NOTE: number concat with another string still passes!
@@ -148,6 +148,24 @@ static bool ParseMoveCounter(const std::string& counterString, BoardState& state
     return true;
 }
 
+/* Translates en passant strings */
+static bool ParseEnPassant(const std::string& enPassantString, BoardState& state){
+    if(enPassantString == "-"){
+        state.enPassantBoard = BITBOARD_EMPTY;
+        return true;
+    }
+
+    std::tuple<File, Rank> coords;
+    if(!StringToCoord(enPassantString, coords))
+        return false;
+
+    auto [file, rank] = coords;
+    uint8_t squareIndex = Bitboard_Util::GetSquareIndex(file, rank);
+    state.enPassantBoard = Bitboard_Util::SetBit(BITBOARD_EMPTY, squareIndex);
+
+    return true;
+}
+
 /*******************************************************/
 /* Public functions                                    */
 /*******************************************************/
@@ -164,7 +182,7 @@ bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state
             case 0: if(!ParseFenPlacement(subString, tempState)) return false; break;
             case 1: if(!ParseFenTurn(subString, tempState)) return false; break;
             case 2: if(!ParseCastlingRights(subString, tempState)) return false; break;
-            case 3: break; // TODO: en passant
+            case 3: if(!ParseEnPassant(subString, tempState)) return false; break;
             case 4: if(!ParseMoveCounter(subString, tempState, true)) return false; break;
             case 5: if(!ParseMoveCounter(subString, tempState, false)) return false; break;
             default: return false; // We got more than 6 parts.

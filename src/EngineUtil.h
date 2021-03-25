@@ -2,6 +2,7 @@
 #define ENGINEUTIL_H
 
 #include <string>
+#include <tuple>
 
 namespace ChessEngine {
 
@@ -23,6 +24,8 @@ namespace ChessEngine {
 
     std::string FileToString(File file);
     std::string RankToString(Rank file);
+
+    bool StringToCoord(const std::string& str, std::tuple<File, Rank>& coords);
 
     Color InvertColor(Color color);
 

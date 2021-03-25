@@ -23,6 +23,10 @@ namespace ChessEngine{
         int fullMoves = 1;
 
         // TODO: en pasant
+        // En passant
+        // Represents the position behind the pawn.
+        Bitboard_Util::Bitboard enPassantBoard = 0;
+
     };
 
 }
