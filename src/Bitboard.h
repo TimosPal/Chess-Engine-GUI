@@ -109,6 +109,8 @@ namespace ChessEngine::Bitboard_Util {
     /* Basic masks                                         */
     /*******************************************************/
 
+    // TODO: clean up functions.
+
     constexpr Bitboard GetFileMask(uint8_t file){
         Bitboard board = BITBOARD_EMPTY;
 
@@ -129,11 +131,37 @@ namespace ChessEngine::Bitboard_Util {
         return masks;
     }
 
+    constexpr Bitboard GetRankMask(uint8_t rank){
+        Bitboard board = BITBOARD_EMPTY;
+
+        for (int file = 0; file < 8; file++) {
+            board = SetBit(board, GetSquareIndex(file, rank));
+        }
+
+        return board;
+    }
+
+    constexpr std::array<Bitboard, 8> GenerateRankMasks(){
+        std::array<Bitboard, 8> masks = {};
+
+        for (int rank = 0; rank < 8; rank++) {
+            masks[rank] = GetRankMask(rank);
+        }
+
+        return masks;
+    }
+
+
     // An array containing masks for each file.
     constexpr std::array<Bitboard, 8> fileMasks = GenerateFileMasks();
+    // An array containing masks for each rank.
+    constexpr std::array<Bitboard, 8> rankMasks = GenerateRankMasks();
+
     // Made into variables for easy access.
     constexpr Bitboard notA_Mask = ~fileMasks[File::A];
     constexpr Bitboard notH_Mask = ~fileMasks[File::H];
+    constexpr Bitboard r2_Mask = rankMasks[Rank::R2];
+    constexpr Bitboard r7_Mask = rankMasks[Rank::R7];
 
 }
 

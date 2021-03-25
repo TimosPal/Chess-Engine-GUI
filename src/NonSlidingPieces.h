@@ -60,10 +60,10 @@ namespace ChessEngine::NonSlidingPieces {
     constexpr Bitboard GetDoublePawnPushes(Bitboard board, Bitboard occupancies, Color color) {
         Bitboard pushes = BITBOARD_EMPTY;
         if(color == Color::White) {
-            pushes = ShiftUp(board & Rank::R2) & ~occupancies;
+            pushes = ShiftUp(board & r2_Mask) & ~occupancies;
             pushes = ShiftUp(pushes);
         }else{
-            pushes = ShiftDown(board & Rank::R7) & ~occupancies;
+            pushes = ShiftDown(board & r7_Mask) & ~occupancies;
             pushes = ShiftDown(pushes);
         }
         return pushes;
