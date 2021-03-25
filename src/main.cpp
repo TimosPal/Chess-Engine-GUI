@@ -8,7 +8,7 @@ using namespace ChessEngine;
 
 int main() {
     BoardState state = {};
-    std::string fenPosition = "8/8/8/8/2pP4/1p6/PPP5/8 w - - 0 1";
+    std::string fenPosition = "6r1/3P1PP1/8/2p5/2pP4/1p6/PPP5/8 w - - 0 1";
     if(!ParseFenString(fenPosition, state)){
         std::cout << "Incorrect fen string" << std::endl;
         return -1;

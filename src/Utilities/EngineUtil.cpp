@@ -1,13 +1,16 @@
+#include <cassert>
 #include "EngineUtil.h"
 
 using namespace ChessEngine;
 
 std::string ChessEngine::FileToString(File file){
+    assert(file >= 0 && file <= 7);
     return std::string(1, 'a' + file);
 }
 
-std::string ChessEngine::RankToString(Rank file){
-    return std::string(1, file + 1 + '0');
+std::string ChessEngine::RankToString(Rank rank){
+    assert(rank >= 0 && rank <= 7);
+    return std::string(1, rank + 1 + '0');
 }
 
 Color ChessEngine::InvertColor(Color color) { return (Color)((color + 1) % 2); }
