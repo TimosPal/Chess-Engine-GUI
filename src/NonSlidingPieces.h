@@ -31,10 +31,6 @@ namespace ChessEngine::NonSlidingPieces {
     /* Pawn                                                */
     /*******************************************************/
 
-    /***************/
-    /* Attacks     */
-    /***************/
-
     // When overflowing / underflowing in files A,H we may end up in the
     // opposite direction producing faulty moves. The inverted fileMasks
     // handle those 2 cases.
@@ -65,10 +61,6 @@ namespace ChessEngine::NonSlidingPieces {
     /*******************************************************/
     /* Knight                                              */
     /*******************************************************/
-
-    /***************/
-    /* Attacks     */
-    /***************/
 
     /* Generate the attack moves of all pawns at the given bitboard based on color */
     constexpr Bitboard GetKnightAttacks(Bitboard board) {

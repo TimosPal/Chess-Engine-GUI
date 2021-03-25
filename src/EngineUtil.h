@@ -24,6 +24,8 @@ namespace ChessEngine {
     std::string FileToString(File file);
     std::string RankToString(Rank file);
 
+    Color InvertColor(Color color) { return (Color)((color + 1) % 2); }
+
 }
 
 #endif

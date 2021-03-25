@@ -17,8 +17,8 @@ int main() {
     //board.Draw(Color::White, PieceType::Pawn);
 
     //Bitboard_Util::DrawBitBoard(board.GetOccupancyBitBoard(Color::White));
-    MoveGeneration::GenerateAttacks(board.GetPieceBitBoard(Color::White, PieceType::Pawn), White,
-                                    board.GetOccupancyBitBoard(Color::Black));
+    MoveGeneration::GenerateMoves(board.GetPieceBitBoard(Color::White, PieceType::Pawn), White,
+                                  board.GetOccupancyBitBoard(Color::Black));
 
     return 0;
 }

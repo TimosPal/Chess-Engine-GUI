@@ -1,35 +1,52 @@
 #include "MoveGeneration.h"
 
+#include <list>
+
 #include "NonSlidingPieces.h"
 
+using namespace ChessEngine;
 using namespace ChessEngine::Bitboard_Util;
+using namespace ChessEngine::MoveGeneration;
 
-void ChessEngine::MoveGeneration::GenerateAttacks(Bitboard_Util::Bitboard pieceBoard, Color color, Bitboard_Util::Bitboard enemyOccupancies) {
+static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, MoveType type){
+    std::list<Move> moveList;
+
     // iterate over the bitboard , for each isolated bit find the corresponding moves.
-    while(pieceBoard != 0){
-        uint8_t fromSquareIndex = GetLSBIndex(pieceBoard);
+    while(moves != 0){
+        uint8_t toSquareIndex = GetLSBIndex(moves);
 
-        // Get pre calculated attack bitboard for the current position.
-        Bitboard attacks = NonSlidingPieces::pawnAttacks[color][fromSquareIndex] & enemyOccupancies;
-        while(attacks != 0){
-            uint8_t toSquareIndex = GetLSBIndex(attacks);
+        Move move = {.fromSquareIndex = fromSquareIndex,
+                     .toSquareIndex = toSquareIndex,
+                     .type = type};
+        moveList.emplace_back(move);
 
-            Move move = {.fromSquareIndex = fromSquareIndex, .toSquareIndex = toSquareIndex};
-
-            auto [xf , yf] = GetCoordinates(fromSquareIndex);
-            auto [xt , yt] = GetCoordinates(toSquareIndex);
-
-
-            printf("[%s%s]->[%s%s]\n",
-                    FileToString((File)xf).c_str(),
-                    RankToString((Rank)yf).c_str(),
-                    FileToString((File)xt).c_str(),
-                    RankToString((Rank)yt).c_str());
-
-            attacks = PopBit(attacks, toSquareIndex);
-        }
-
-        pieceBoard = PopBit(pieceBoard, fromSquareIndex);
+        moves = PopBit(moves, toSquareIndex);
     }
+
+    return moveList;
+}
+
+void ChessEngine::MoveGeneration::GenerateMoves(BoardState& state, Color color, Bitboard_Util::Bitboard occupancies[2]) {
+    Color enemyColor = InvertColor(color);
+
+    // Pawns.
+    Bitboard pawnsBoard = state.pieceBoards[color][PieceType::Pawn];
+    while(pawnsBoard != 0){
+        uint8_t fromSquareIndex = GetLSBIndex(pawnsBoard);
+
+        // Quiet moves
+
+        // Captures
+        Bitboard attacks = NonSlidingPieces::pawnAttacks[color][fromSquareIndex];
+        auto m = ExtractMoves(attacks & occupancies[enemyColor], fromSquareIndex, MoveType::Capture);
+
+        pawnsBoard = PopBit(pawnsBoard, fromSquareIndex);
+    }
+
+    // Knight / King.
+
+
+    // Queen / rook / bishop.
+
 
 }

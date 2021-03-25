@@ -7,12 +7,17 @@
 
 namespace ChessEngine::MoveGeneration {
 
-    struct Move{
-        uint8_t fromSquareIndex : 3;
-        uint8_t toSquareIndex : 3;
+    enum class MoveType {
+        Quiet, Capture
     };
 
-    void GenerateAttacks(Bitboard_Util::Bitboard pieceBoard, Color color, Bitboard_Util::Bitboard enemyOccupancies);
+    struct Move {
+        uint8_t fromSquareIndex: 3;
+        uint8_t toSquareIndex: 3;
+        MoveType type: 1;
+    };
+
+    void GenerateMoves(BoardState &state, Color color, Bitboard_Util::Bitboard occupancies[2]);
 
 }
 
