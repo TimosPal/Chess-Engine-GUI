@@ -17,3 +17,5 @@ std::string ChessEngine::FileToString(File file){
 std::string ChessEngine::RankToString(Rank file){
     return std::string(1, file + 1 + '0');
 }
+
+ChessEngine::Color ChessEngine::InvertColor(Color color) { return (Color)((color + 1) % 2); }

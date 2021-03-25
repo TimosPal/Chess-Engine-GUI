@@ -15,16 +15,17 @@ namespace ChessEngine {
         explicit Board(const BoardState& state) : state(state) {
             InitOccupancies(Color::White);
             InitOccupancies(Color::Black);
+            occupancies[Color::Both] = occupancies[Color::White] | occupancies[Color::Black];
         }
 
         void Draw(Color color, PieceType type);
 
-        Bitboard_Util::Bitboard GetPieceBitBoard(Color color, PieceType type){ //NOTE: For testing only.
-            return state.pieceBoards[color][type];
+        BoardState GetState(){ //NOTE: For testing only.
+            return state;
         }
 
-        Bitboard_Util::Bitboard GetOccupancyBitBoard(Color color){ //NOTE: For testing only.
-            return occupancies[color];
+        Bitboard_Util::Bitboard* GetOccupancies(){ //NOTE: For testing only.
+            return occupancies;
         }
 
     private:
@@ -32,7 +33,7 @@ namespace ChessEngine {
         BoardState state{};
 
         // Occupancy bitboards for both colors.
-        Bitboard_Util::Bitboard occupancies[2]{};
+        Bitboard_Util::Bitboard occupancies[3]{};
 
         /* Initialize the 2 occupancy bitboards
          * NOTE:Should be called only once at the start.

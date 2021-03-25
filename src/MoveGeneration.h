@@ -17,7 +17,7 @@ namespace ChessEngine::MoveGeneration {
         MoveType type: 1;
     };
 
-    void GenerateMoves(BoardState &state, Color color, Bitboard_Util::Bitboard occupancies[2]);
+    void GenerateMoves(const BoardState &state, Color color, const Bitboard_Util::Bitboard* occupancies);
 
 }
 

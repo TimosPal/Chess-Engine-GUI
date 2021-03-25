@@ -38,25 +38,42 @@ namespace ChessEngine::NonSlidingPieces {
     // NOTE: having 2 functions per color helps InitMoveTable while also removing
     // the need for a branch inside said functions.
 
-    /* Generate the attack moves of white pawns */
-    constexpr Bitboard GetWhitePawnAttacks(Bitboard board) {
+    /* Generate the attack moves of pawns */
+    constexpr Bitboard GetPawnAttacks(Bitboard board, Color color) {
         Bitboard leftAttack = BITBOARD_EMPTY, rightAttack = BITBOARD_EMPTY;
-        leftAttack = ShiftUpLeft(board) & notH_Mask;
-        rightAttack = ShiftUpRight(board) & notA_Mask;
+        if(color == Color::White) {
+            leftAttack = ShiftUpLeft(board) & notH_Mask;
+            rightAttack = ShiftUpRight(board) & notA_Mask;
+        }else{
+            leftAttack = ShiftDownLeft(board) & notA_Mask;
+            rightAttack = ShiftDownRight(board) & notH_Mask;
+        }
         return leftAttack | rightAttack;
     }
 
-    /* Generate the attack moves of black pawns */
-    constexpr Bitboard GetBlackPawnAttacks(Bitboard board) {
-        Bitboard leftAttack = BITBOARD_EMPTY, rightAttack = BITBOARD_EMPTY;
-        leftAttack = ShiftDownLeft(board) & notA_Mask;
-        rightAttack = ShiftDownRight(board) & notH_Mask;
-        return leftAttack | rightAttack;
+    /* Generate the push moves of pawns */
+    constexpr Bitboard GetPawnPushes(Bitboard board, Color color) {
+        return (color == Color::White) ? ShiftUp(board) : ShiftDown(board);
+    }
+
+    /* Generate the double push moves of pawns , check for occupancy only on the first move. */
+    constexpr Bitboard GetDoublePawnPushes(Bitboard board, Bitboard occupancies, Color color) {
+        Bitboard pushes = BITBOARD_EMPTY;
+        if(color == Color::White) {
+            pushes = ShiftUp(board & Rank::R2) & ~occupancies;
+            pushes = ShiftUp(pushes);
+        }else{
+            pushes = ShiftDown(board & Rank::R7) & ~occupancies;
+            pushes = ShiftDown(pushes);
+        }
+        return pushes;
     }
 
     // [team color][square index].
-    constexpr std::array<std::array<Bitboard, 64>, 2> pawnAttacks = {InitMoveTable(GetWhitePawnAttacks),
-                                                                     InitMoveTable(GetBlackPawnAttacks)};
+    // NOTE: lambdas are used since InitMoveTable expects no color argument. (Only pawns move differ based on color)
+    constexpr std::array<std::array<Bitboard, 64>, 2> pawnAttacks =
+            {InitMoveTable([](auto board) { return GetPawnAttacks(board, Color::White); }),
+             InitMoveTable([](auto board) { return GetPawnAttacks(board, Color::Black); })};
 
     /*******************************************************/
     /* Knight                                              */

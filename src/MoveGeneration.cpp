@@ -20,14 +20,26 @@ static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, Mov
                      .type = type};
         moveList.emplace_back(move);
 
+        auto [xf , yf] = GetCoordinates(fromSquareIndex);
+        auto [xt , yt] = GetCoordinates(toSquareIndex);
+
+        printf("[%s%s]->[%s%s]\n",
+               FileToString((File)xf).c_str(),
+               RankToString((Rank)yf).c_str(),
+               FileToString((File)xt).c_str(),
+               RankToString((Rank)yt).c_str());
+
         moves = PopBit(moves, toSquareIndex);
     }
 
     return moveList;
 }
 
-void ChessEngine::MoveGeneration::GenerateMoves(BoardState& state, Color color, Bitboard_Util::Bitboard occupancies[2]) {
+void ChessEngine::MoveGeneration::GenerateMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies) {
     Color enemyColor = InvertColor(color);
+    Bitboard enemyOccupancies = occupancies[enemyColor];
+    Bitboard teamOccupancies = occupancies[color];
+    Bitboard globalOccupancies = occupancies[Color::Both];
 
     // Pawns.
     Bitboard pawnsBoard = state.pieceBoards[color][PieceType::Pawn];
@@ -35,10 +47,13 @@ void ChessEngine::MoveGeneration::GenerateMoves(BoardState& state, Color color, 
         uint8_t fromSquareIndex = GetLSBIndex(pawnsBoard);
 
         // Quiet moves
+        Bitboard pushes = NonSlidingPieces::GetPawnPushes(pawnsBoard, color);
+        //pushes |= NonSlidingPieces::GetDoublePawnPushes(pawnsBoard, enemyOccupancies, color);
+        auto m1 = ExtractMoves(pushes & ~globalOccupancies, fromSquareIndex, MoveType::Capture);
 
         // Captures
         Bitboard attacks = NonSlidingPieces::pawnAttacks[color][fromSquareIndex];
-        auto m = ExtractMoves(attacks & occupancies[enemyColor], fromSquareIndex, MoveType::Capture);
+        auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, MoveType::Capture);
 
         pawnsBoard = PopBit(pawnsBoard, fromSquareIndex);
     }
