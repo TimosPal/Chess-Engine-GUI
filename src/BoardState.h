@@ -8,16 +8,21 @@ namespace ChessEngine{
     struct BoardState{
         // A board with 6 bitboards for each color , 1 bitboard per unique piece type.
         // Use Color / PieceType for indexing
-        Bitboard_Util::Bitboard pieceBoards[2][6];
+        Bitboard_Util::Bitboard pieceBoards[2][6]{};
 
         // Indicates whose turn is it.
-        Color turnOf;
+        Color turnOf = Color::White;
 
         // Castling rights. Index via color.
-        bool queenSideCastling[2];
-        bool kingSideCastling[2];
+        bool queenSideCastling[2]{};
+        bool kingSideCastling[2]{};
 
-        // TODO: en pasant , turn counters.
+        // Half moves helps the 50 move rule.
+        // Full moves should start at 1 and is updated every Black's turn.
+        int halfMoves = 0;
+        int fullMoves = 1;
+
+        // TODO: en pasant
     };
 
 }

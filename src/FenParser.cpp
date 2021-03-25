@@ -125,6 +125,29 @@ static bool ParseCastlingRights(const std::string& rightsString, BoardState& sta
     return true;
 }
 
+/* Translate half move or full move strings */
+static bool ParseMoveCounter(const std::string& counterString, BoardState& state, bool forHalf){
+    // create an input stream with your string.
+    // NOTE: number concat with another string still passes!
+    int counter;
+    std::istringstream iss (counterString);
+    iss >> counter;
+    if (iss.fail()) {
+        return false;
+    }
+    if(counter < 0){
+        return false;
+    }
+
+    if(forHalf){
+        state.halfMoves = counter;
+    }else{
+        state.fullMoves = counter;
+    }
+
+    return true;
+}
+
 /*******************************************************/
 /* Public functions                                    */
 /*******************************************************/
@@ -142,8 +165,8 @@ bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state
             case 1: if(!ParseFenTurn(subString, tempState)) return false; break;
             case 2: if(!ParseCastlingRights(subString, tempState)) return false; break;
             case 3: break; // TODO: en passant
-            case 4: break; // TODO: half move number.
-            case 5: break; // TODO: Full move number.
+            case 4: if(!ParseMoveCounter(subString, tempState, true)) return false; break;
+            case 5: if(!ParseMoveCounter(subString, tempState, false)) return false; break;
             default: return false; // We got more than 6 parts.
         }
 
