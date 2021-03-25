@@ -83,6 +83,48 @@ static bool ParseFenTurn(const std::string& turn, BoardState& state){
     }
 }
 
+/* Translate the castling rights */
+static bool ParseCastlingRights(const std::string& rightsString, BoardState& state){
+    // KQkq means every castling move is available , - none.
+    // NOTE: doesn't decline strings with wrong ordering (eg: qKQk)
+
+    int stringLen = rightsString.length();
+    if(stringLen == 0 || stringLen > 4)
+        return false;
+    if(stringLen == 1 && rightsString[0] == '-'){
+        state.kingSideCastling[Color::White] = false;
+        state.kingSideCastling[Color::Black] = false;
+        state.queenSideCastling[Color::White] = false;
+        state.queenSideCastling[Color::Black] = false;
+        return true;
+    }
+
+    for(char token : rightsString) {
+        std::tuple<PieceType, Color> pieceInfo;
+        if(!TokenToPiece(token, pieceInfo))
+            return false;
+        auto [type, color] = pieceInfo;
+
+        switch (type) {
+            case PieceType::King:
+                if(!state.kingSideCastling[color])
+                    state.kingSideCastling[color] = true;
+                else
+                    return false; // Already set.
+                break;
+            case PieceType::Queen:
+                if(!state.queenSideCastling[color])
+                    state.queenSideCastling[color] = true;
+                else
+                    return false; // Already set.
+                break;
+            default: return false; // Wrong token.
+        }
+    }
+
+    return true;
+}
+
 /*******************************************************/
 /* Public functions                                    */
 /*******************************************************/
@@ -98,7 +140,7 @@ bool ChessEngine::ParseFenString(const std::string& fenString, BoardState& state
         switch(count){
             case 0: if(!ParseFenPlacement(subString, tempState)) return false; break;
             case 1: if(!ParseFenTurn(subString, tempState)) return false; break;
-            case 2: break; // TODO: castling
+            case 2: if(!ParseCastlingRights(subString, tempState)) return false; break;
             case 3: break; // TODO: en passant
             case 4: break; // TODO: half move number.
             case 5: break; // TODO: Full move number.

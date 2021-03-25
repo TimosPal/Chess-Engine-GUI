@@ -57,13 +57,19 @@ void ChessEngine::MoveGeneration::GenerateMoves(const BoardState& state, Color c
         Bitboard attacks = NonSlidingPieces::pawnAttacks[color][fromSquareIndex];
         auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, MoveType::Capture);
 
+        // En passant
+        // TODO:
+
+        // Promotion
+        // TODO:
+
         pawnsBoard = PopBit(pawnsBoard, fromSquareIndex);
     }
 
     // Knight / King.
-
+    // TODO:
 
     // Queen / rook / bishop.
-
+    // TODO:
 
 }

@@ -13,7 +13,11 @@ namespace ChessEngine{
         // Indicates whose turn is it.
         Color turnOf;
 
-        // TODO: castling rights , etc should be included here.
+        // Castling rights. Index via color.
+        bool queenSideCastling[2];
+        bool kingSideCastling[2];
+
+        // TODO: en pasant , turn counters.
     };
 
 }
