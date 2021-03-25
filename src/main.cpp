@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "Board.h"
-#include "MoveGeneration.h"
-#include "NonSlidingPieces.h"
+#include "Board/Board.h"
+#include "MoveGeneration/MoveGeneration.h"
+#include "MoveGeneration/NonSlidingPieces.h"
 
 using namespace ChessEngine;
 

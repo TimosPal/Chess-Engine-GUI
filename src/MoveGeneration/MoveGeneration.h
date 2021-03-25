@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "BoardState.h"
+#include "../Board/BoardState.h"
 
 namespace ChessEngine::MoveGeneration {
 

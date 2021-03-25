@@ -1,7 +1,7 @@
 #ifndef NONSLIDINGPIECES_H
 #define NONSLIDINGPIECES_H
 
-#include "Bitboard.h"
+#include "../Board/Bitboard.h"
 
 namespace ChessEngine::NonSlidingPieces {
 

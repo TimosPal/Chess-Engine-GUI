@@ -3,4 +3,4 @@ project(Chess_engine)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(Chess_engine src/main.cpp src/Board.cpp src/Board.h src/Bitboard.h src/EngineUtil.h src/NonSlidingPieces.h src/MoveGeneration.h src/FenParser.h src/FenParser.cpp src/BoardState.h src/BitBoard.cpp src/MoveGeneration.cpp src/EngineUtil.cpp)
+add_executable(Chess_engine src/main.cpp src/Board/Board.cpp src/Board/Board.h src/Board/Bitboard.h src/Utilities/EngineUtil.h src/MoveGeneration/NonSlidingPieces.h src/MoveGeneration/MoveGeneration.h src/FenParser/FenParser.h src/FenParser/FenParser.cpp src/Board/BoardState.h src/Board/BitBoard.cpp src/MoveGeneration/MoveGeneration.cpp src/Utilities/EngineUtil.cpp)
