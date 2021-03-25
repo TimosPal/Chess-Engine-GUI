@@ -17,13 +17,16 @@ namespace ChessEngine::MoveGeneration {
     struct Move {
         uint8_t fromSquareIndex: 3;
         uint8_t toSquareIndex: 3;
-        MoveType type: 2;
+        MoveType flags: 4;
     };
 
-    bool IsOfMoveType(MoveType flags, MoveType type);
 
     void GenerateMoves(const BoardState &state, Color color, const Bitboard_Util::Bitboard* occupancies);
 
+    bool IsOfMoveType(MoveType flags, MoveType type);
+    std::string MoveTypeToString(MoveType type);
+    std::ostream& operator<<(std::ostream& out, MoveType value);
+    std::ostream& operator<<(std::ostream& out, Move value);
 }
 
 #endif

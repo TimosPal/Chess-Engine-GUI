@@ -4,6 +4,8 @@
 
 #include "NonSlidingPieces.h"
 
+#include <iostream>
+
 using namespace ChessEngine;
 using namespace ChessEngine::Bitboard_Util;
 using namespace ChessEngine::MoveGeneration;
@@ -11,6 +13,52 @@ using namespace ChessEngine::MoveGeneration;
 bool ChessEngine::MoveGeneration::IsOfMoveType(MoveType flags, MoveType type){
     return flags & type;
 }
+
+std::string ChessEngine::MoveGeneration::MoveTypeToString(MoveType type){
+    switch (type) {
+        case MoveType::None: return "None";
+        case MoveType::Quiet: return "Quiet";
+        case MoveType::Capture: return "Capture";
+        case MoveType::Promotion: return "Promotion";
+        default: return "Error";
+    }
+}
+
+std::ostream& ChessEngine::MoveGeneration::operator<<(std::ostream& out, const MoveType value){
+    if(value == MoveType::None){
+        out << "None";
+    }else{
+        uint8_t flags = value;
+        while(flags != 0) { // Print each flag based on the bits
+            uint8_t lsbIndex = Bitboard_Util::GetLSBIndex(flags);
+            MoveType tempFlag = (MoveType)Bitboard_Util::SetBit(0, lsbIndex);
+
+            flags = Bitboard_Util::PopBit(flags, lsbIndex);
+            out << MoveTypeToString(tempFlag);
+            if(flags != 0) // Dont print final space.
+                out << " ";
+        }
+    }
+
+    return out;
+}
+
+std::ostream& ChessEngine::MoveGeneration::operator<<(std::ostream& out, Move value){
+    auto [xf , yf] = GetCoordinates(value.fromSquareIndex);
+    auto [xt , yt] = GetCoordinates(value.toSquareIndex);
+
+    out << value.flags
+        << " ["
+        << FileToString((File)xf)
+        << RankToString((Rank)yf)
+        << "]->["
+        << FileToString((File)xt)
+        << RankToString((Rank)yt)
+        << "]";
+
+    return out;
+}
+
 
 static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, MoveType flags){
     std::list<Move> moveList;
@@ -21,27 +69,10 @@ static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, Mov
 
         Move move = {.fromSquareIndex = fromSquareIndex,
                      .toSquareIndex = toSquareIndex,
-                     .type = flags};
+                     .flags = flags};
         moveList.emplace_back(move);
 
-        auto [xf , yf] = GetCoordinates(fromSquareIndex);
-        auto [xt , yt] = GetCoordinates(toSquareIndex);
-
-        if(IsOfMoveType(flags, MoveType::Promotion)){
-            printf("Promotion ");
-        }
-        if(IsOfMoveType(flags, MoveType::Capture)){
-            printf("Capture ");
-        }
-        if(IsOfMoveType(flags, MoveType::Quiet)){
-            printf("Quiet ");
-        }
-
-        printf("[%s%s]->[%s%s]\n",
-               FileToString((File)xf).c_str(),
-               RankToString((Rank)yf).c_str(),
-               FileToString((File)xt).c_str(),
-               RankToString((Rank)yt).c_str());
+        std::cout << move << std::endl;
 
         moves = PopBit(moves, toSquareIndex);
     }
