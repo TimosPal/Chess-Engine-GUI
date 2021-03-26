@@ -22,6 +22,8 @@ std::string ChessEngine::MoveGeneration::MoveTypeToString(MoveType type){
         case MoveType::Capture: return "Capture";
         case MoveType::Promotion: return "Promotion";
         case MoveType::EnPassant: return "EnPassant";
+        case MoveType::KingSideCastling: return "KingSideCastling";
+        case MoveType::QueenSideCastling: return "QueenSideCastling";
         default: return "Error";
     }
 }
@@ -80,9 +82,8 @@ static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, Mov
     return moveList;
 }
 
-void ChessEngine::MoveGeneration::GenerateMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies) {
+void ChessEngine::MoveGeneration::GeneratePseudoPawnMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies){
     Color enemyColor = InvertColor(color);
-    Bitboard teamOccupancies = occupancies[color];
     Bitboard enemyOccupancies = occupancies[enemyColor];
     Bitboard globalOccupancies = occupancies[Color::Both];
 
@@ -97,7 +98,7 @@ void ChessEngine::MoveGeneration::GenerateMoves(const BoardState& state, Color c
         // attacking will lead to a promotion
         MoveType promotionFlag = MoveType::None;
         if((color == Color::White && tempPieceBoard & r7_Mask) ||
-            (color == Color::Black && tempPieceBoard & r2_Mask)){
+           (color == Color::Black && tempPieceBoard & r2_Mask)){
             promotionFlag = MoveType::Promotion;
         }
 
@@ -129,9 +130,38 @@ void ChessEngine::MoveGeneration::GenerateMoves(const BoardState& state, Color c
 
         pawnsBoard = PopBit(pawnsBoard, fromSquareIndex);
     }
+}
+
+void ChessEngine::MoveGeneration::GeneratePseudoCastlingMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies){
+    // Check whether or not there are pieces between the king and the rook.
+    Bitboard globalOccupancies = occupancies[Color::Both];
+    Bitboard colorMask = (color == Color::White) ? Rank::R1 : Rank::R8;
+
+    if(state.kingSideCastling[color]){
+        bool emptyKingSide = (colorMask & kingSideCastling_Mask & globalOccupancies) == 0;
+        if(emptyKingSide){
+            Move move = {.fromSquareIndex = kingStartingPosBoard, .toSquareIndex = kingCastlePosBoard, .flags = MoveType::KingSideCastling};
+            std::cout << move << std::endl;
+        }
+    }
+    if(state.queenSideCastling[color]){
+        bool emptyQueenSide = (colorMask & queenSideCastling_Mask & globalOccupancies) == 0;
+        if(emptyQueenSide){
+            Move move = {.fromSquareIndex = kingStartingPosBoard, .toSquareIndex = queenCastlePosBoard, .flags = MoveType::QueenSideCastling};
+            std::cout << move << std::endl;
+        }
+    }
+}
+
+void ChessEngine::MoveGeneration::GeneratePseudoMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies) {
+    // Pawns.
+    GeneratePseudoPawnMoves(state, color, occupancies);
 
     // Knight / King.
     // TODO:
+
+    // Castling.
+    GeneratePseudoCastlingMoves(state, color, occupancies);
 
     // Queen / rook / bishop.
     // TODO:

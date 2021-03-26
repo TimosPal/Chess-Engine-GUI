@@ -151,6 +151,19 @@ namespace ChessEngine::Bitboard_Util {
         return masks;
     }
 
+    /* From should be smaller than to */
+    constexpr Bitboard GetCastlingMask(File from, File to){
+        Bitboard temp = BITBOARD_EMPTY;
+
+        while(from <= to){
+            temp = SetBit(temp, GetSquareIndex(from, Rank::R1));
+            temp = SetBit(temp, GetSquareIndex(from, Rank::R8));
+
+            from = (File)(from + 1);
+        }
+
+        return temp;
+    }
 
     // An array containing masks for each file.
     constexpr std::array<Bitboard, 8> fileMasks = GenerateFileMasks();
@@ -160,8 +173,17 @@ namespace ChessEngine::Bitboard_Util {
     // Made into variables for easy access.
     constexpr Bitboard notA_Mask = ~fileMasks[File::A];
     constexpr Bitboard notH_Mask = ~fileMasks[File::H];
+
     constexpr Bitboard r2_Mask = rankMasks[Rank::R2];
     constexpr Bitboard r7_Mask = rankMasks[Rank::R7];
+
+    constexpr Bitboard kingSideCastling_Mask = GetCastlingMask(File::F, File::G);
+    constexpr Bitboard queenSideCastling_Mask = GetCastlingMask(File::B, File::D);
+
+    constexpr Bitboard kingStartingPosBoard = GetSquareIndex(File::E, Rank::R1);
+    constexpr Bitboard kingCastlePosBoard = GetSquareIndex(File::G, Rank::R1);
+    constexpr Bitboard queenCastlePosBoard = GetSquareIndex(File::C, Rank::R1);
+
 
 }
 
