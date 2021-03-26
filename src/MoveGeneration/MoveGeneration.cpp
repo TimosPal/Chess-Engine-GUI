@@ -160,6 +160,29 @@ void ChessEngine::MoveGeneration::GeneratePseudoCastlingMoves(const BoardState& 
     }
 }
 
+void ChessEngine::MoveGeneration::GeneratePseudoKnightMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies){
+    Color enemyColor = InvertColor(color);
+    Bitboard enemyOccupancies = occupancies[enemyColor];
+    Bitboard globalOccupancies = occupancies[Color::Both];
+
+    // Pawns.
+    Bitboard knightsBoard = state.pieceBoards[color][PieceType::Knight];
+    while(knightsBoard != 0){
+        uint8_t fromSquareIndex = GetLSBIndex(knightsBoard);
+        Bitboard tempPieceBoard = SetBit(BITBOARD_EMPTY, fromSquareIndex);
+
+        Bitboard moves = LeaperPieces::knightMoves[fromSquareIndex];
+
+        // Quiet moves
+        auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet);
+
+        // Captures
+        auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture);
+
+        knightsBoard = PopBit(knightsBoard, fromSquareIndex);
+    }
+}
+
 void ChessEngine::MoveGeneration::GeneratePseudoKingMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies) {
     Color enemyColor = InvertColor(color);
     Bitboard enemyOccupancies = occupancies[enemyColor];
@@ -167,25 +190,30 @@ void ChessEngine::MoveGeneration::GeneratePseudoKingMoves(const BoardState& stat
 
     Bitboard kingBoard = state.pieceBoards[color][PieceType::King];
 
-    uint8_t fromSquareIndex = GetLSBIndex(kingBoard);
-    Bitboard moves = LeaperPieces::kingMoves[fromSquareIndex];
+    if(kingBoard != 0) {
+        uint8_t fromSquareIndex = GetLSBIndex(kingBoard);
+        Bitboard moves = LeaperPieces::kingMoves[fromSquareIndex];
 
-    // Quiet moves
-    auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet);
+        // Quiet moves
+        auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet);
 
-    // Captures
-    auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture);
+        // Captures
+        auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture);
+    }
 }
 
 void ChessEngine::MoveGeneration::GeneratePseudoMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies) {
     // Pawns.
-    //GeneratePseudoPawnMoves(state, color, occupancies);
+    GeneratePseudoPawnMoves(state, color, occupancies);
 
-    // Knight / King.
+    // King.
     GeneratePseudoKingMoves(state, color, occupancies);
 
+    // Knight
+    GeneratePseudoKnightMoves(state, color, occupancies);
+
     // Castling.
-    //GeneratePseudoCastlingMoves(state, color, occupancies);
+    GeneratePseudoCastlingMoves(state, color, occupancies);
 
     // Queen / rook / bishop.
     // TODO:
