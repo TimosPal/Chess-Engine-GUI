@@ -176,13 +176,20 @@ namespace ChessEngine::Bitboard_Util {
 
     constexpr Bitboard r2_Mask = rankMasks[Rank::R2];
     constexpr Bitboard r7_Mask = rankMasks[Rank::R7];
+    constexpr Bitboard r1_Mask = rankMasks[Rank::R1];
+    constexpr Bitboard r8_Mask = rankMasks[Rank::R8];
 
+    // Used in castling.
     constexpr Bitboard kingSideCastling_Mask = GetCastlingMask(File::F, File::G);
     constexpr Bitboard queenSideCastling_Mask = GetCastlingMask(File::B, File::D);
 
-    constexpr Bitboard kingStartingPosBoard = GetSquareIndex(File::E, Rank::R1);
-    constexpr Bitboard kingCastlePosBoard = GetSquareIndex(File::G, Rank::R1);
-    constexpr Bitboard queenCastlePosBoard = GetSquareIndex(File::C, Rank::R1);
+    // Mixed boards , need to mask with appropriate color rank.
+    constexpr Bitboard kingsStartingPosBoard = SetBit(BITBOARD_EMPTY, GetSquareIndex(File::E, Rank::R1)) |
+                                               SetBit(BITBOARD_EMPTY, GetSquareIndex(File::E, Rank::R8));
+    constexpr Bitboard kingsCastlePosBoard = SetBit(BITBOARD_EMPTY, GetSquareIndex(File::G, Rank::R1)) |
+                                             SetBit(BITBOARD_EMPTY, GetSquareIndex(File::G, Rank::R8));
+    constexpr Bitboard queenCastlePosBoard = SetBit(BITBOARD_EMPTY, GetSquareIndex(File::C, Rank::R1)) |
+                                             SetBit(BITBOARD_EMPTY, GetSquareIndex(File::C, Rank::R8));
 
 
 }
