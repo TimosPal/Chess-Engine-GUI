@@ -6,7 +6,6 @@
 
 #include "../Utilities/EngineUtil.h"
 
-#define BYTE_MASK 0xffULL
 #define BIT_MASK 0x1ULL
 
 #define BITBOARD_EMPTY 0x0ULL
@@ -109,48 +108,6 @@ namespace ChessEngine::Bitboard_Util {
     /* Basic masks                                         */
     /*******************************************************/
 
-    // TODO: clean up functions.
-
-    constexpr Bitboard GetFileMask(uint8_t file){
-        Bitboard board = BITBOARD_EMPTY;
-
-        for (int rank = 0; rank < 8; rank++) {
-            board = SetBit(board, GetSquareIndex(file, rank));
-        }
-
-        return board;
-    }
-
-    constexpr std::array<Bitboard, 8> GenerateFileMasks(){
-        std::array<Bitboard, 8> masks = {};
-
-        for (int file = 0; file < 8; file++) {
-            masks[file] = GetFileMask(file);
-        }
-
-        return masks;
-    }
-
-    constexpr Bitboard GetRankMask(uint8_t rank){
-        Bitboard board = BITBOARD_EMPTY;
-
-        for (int file = 0; file < 8; file++) {
-            board = SetBit(board, GetSquareIndex(file, rank));
-        }
-
-        return board;
-    }
-
-    constexpr std::array<Bitboard, 8> GenerateRankMasks(){
-        std::array<Bitboard, 8> masks = {};
-
-        for (int rank = 0; rank < 8; rank++) {
-            masks[rank] = GetRankMask(rank);
-        }
-
-        return masks;
-    }
-
     /* From should be smaller than to */
     constexpr Bitboard GetCastlingMask(File from, File to){
         Bitboard temp = BITBOARD_EMPTY;
@@ -165,19 +122,26 @@ namespace ChessEngine::Bitboard_Util {
         return temp;
     }
 
-    // An array containing masks for each file.
-    constexpr std::array<Bitboard, 8> fileMasks = GenerateFileMasks();
-    // An array containing masks for each rank.
-    constexpr std::array<Bitboard, 8> rankMasks = GenerateRankMasks();
+    // File masks.
+    constexpr Bitboard fileA_Mask = 0x0101010101010101ULL;
+    constexpr Bitboard fileB_Mask = fileA_Mask << 1;
+    constexpr Bitboard fileG_Mask = fileA_Mask << 6;
+    constexpr Bitboard fileH_Mask = fileA_Mask << 7;
 
-    // Made into variables for easy access.
-    constexpr Bitboard notA_Mask = ~fileMasks[File::A];
-    constexpr Bitboard notH_Mask = ~fileMasks[File::H];
+    // Not file masks.
+    constexpr Bitboard not_FileA_Mask = ~fileA_Mask;
+    constexpr Bitboard not_FileB_Mask = ~fileB_Mask;
+    constexpr Bitboard not_FileG_Mask = ~fileG_Mask;
+    constexpr Bitboard not_FileH_Mask = ~fileH_Mask;
 
-    constexpr Bitboard r2_Mask = rankMasks[Rank::R2];
-    constexpr Bitboard r7_Mask = rankMasks[Rank::R7];
-    constexpr Bitboard r1_Mask = rankMasks[Rank::R1];
-    constexpr Bitboard r8_Mask = rankMasks[Rank::R8];
+    constexpr Bitboard not_FileAB_Mask = ~(fileA_Mask | fileB_Mask);
+    constexpr Bitboard not_FileGH_Mask = ~(fileH_Mask | fileG_Mask);
+
+    // Rank masks.
+    constexpr Bitboard r1_Mask = 0xff;
+    constexpr Bitboard r2_Mask = r1_Mask << (8 * 1);
+    constexpr Bitboard r7_Mask = r1_Mask << (8 * 6);
+    constexpr Bitboard r8_Mask = r1_Mask << (8 * 7);
 
     // Used in castling.
     constexpr Bitboard kingSideCastling_Mask = GetCastlingMask(File::F, File::G);

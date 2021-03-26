@@ -8,7 +8,7 @@ void ChessEngine::Bitboard_Util::DrawBitBoard(Bitboard board){
             uint8_t square = GetSquareIndex(file, 8 - rank - 1);
 
             bool hasBit = GetBit(board, square);
-            std::cout << (hasBit ? '1' : '0') << "  ";
+            std::cout << (hasBit ? '1' : '-') << "  ";
         }
         std::cout << std::endl;
     }

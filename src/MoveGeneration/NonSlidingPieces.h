@@ -42,11 +42,11 @@ namespace ChessEngine::NonSlidingPieces {
     constexpr Bitboard GetPawnAttacks(Bitboard board, Color color) {
         Bitboard leftAttack = BITBOARD_EMPTY, rightAttack = BITBOARD_EMPTY;
         if(color == Color::White) {
-            leftAttack = ShiftUpLeft(board) & notH_Mask;
-            rightAttack = ShiftUpRight(board) & notA_Mask;
+            leftAttack = ShiftUpLeft(board) & not_FileH_Mask;
+            rightAttack = ShiftUpRight(board) & not_FileA_Mask;
         }else{
-            leftAttack = ShiftDownLeft(board) & notA_Mask;
-            rightAttack = ShiftDownRight(board) & notH_Mask;
+            leftAttack = ShiftDownLeft(board) & not_FileA_Mask;
+            rightAttack = ShiftDownRight(board) & not_FileH_Mask;
         }
         return leftAttack | rightAttack;
     }
@@ -80,12 +80,24 @@ namespace ChessEngine::NonSlidingPieces {
     /*******************************************************/
 
     /* Generate the attack moves of all pawns at the given bitboard based on color */
-    constexpr Bitboard GetKnightAttacks(Bitboard board) {
-        return 0;
+    constexpr Bitboard GetKnightMoves(Bitboard board) {
+        Bitboard moves = BITBOARD_EMPTY;
+
+        moves |= (board << 15) & not_FileH_Mask; // Up left.
+        moves |= (board << 17) & not_FileA_Mask; // Up right.
+        moves |= (board << 6) & not_FileGH_Mask; // Left up.
+        moves |= (board << 10) & not_FileAB_Mask; // Right up.
+
+        moves |= (board >> 17) & not_FileH_Mask; // Down left.
+        moves |= (board >> 15) & not_FileA_Mask; // Down right.
+        moves |= (board >> 10) & not_FileGH_Mask; // Left down.
+        moves |= (board >> 6) & not_FileAB_Mask; // Right down.
+
+        return moves;
     }
 
     // [square index] only. Black and white have the same attacks.
-    constexpr std::array<Bitboard, 64> knightAttacks = InitMoveTable(GetKnightAttacks);
+    constexpr std::array<Bitboard, 64> knightMoves = InitMoveTable(GetKnightMoves);
 
 }
 
