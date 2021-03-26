@@ -2,7 +2,7 @@
 
 #include <list>
 
-#include "NonSlidingPieces.h"
+#include "LeaperPieces.h"
 
 #include <iostream>
 #include <cassert>
@@ -107,14 +107,14 @@ void ChessEngine::MoveGeneration::GeneratePseudoPawnMoves(const BoardState& stat
 
         // Quiet moves
         auto quietMoveFlags = (MoveType)(MoveType::Quiet | promotionFlag);
-        Bitboard pushes = NonSlidingPieces::GetPawnPushes(tempPieceBoard, color);
-        pushes |= NonSlidingPieces::GetDoublePawnPushes(tempPieceBoard, globalOccupancies, color);
+        Bitboard pushes = LeaperPieces::GetPawnPushes(tempPieceBoard, color);
+        pushes |= LeaperPieces::GetDoublePawnPushes(tempPieceBoard, globalOccupancies, color);
 
         auto m1 = ExtractMoves(pushes & ~globalOccupancies, fromSquareIndex, quietMoveFlags);
 
         // Captures
         auto attackMoveFlags = (MoveType)(MoveType::Capture | promotionFlag);
-        Bitboard attacks = NonSlidingPieces::pawnAttacks[color][fromSquareIndex];
+        Bitboard attacks = LeaperPieces::pawnAttacks[color][fromSquareIndex];
         auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, attackMoveFlags);
 
         // En passant

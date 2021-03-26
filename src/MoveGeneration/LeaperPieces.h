@@ -1,11 +1,14 @@
-#ifndef NONSLIDINGPIECES_H
-#define NONSLIDINGPIECES_H
+#ifndef LEAPERPIECES_H
+#define LEAPERPIECES_H
 
 #include "../Board/Bitboard.h"
 
-namespace ChessEngine::NonSlidingPieces {
+namespace ChessEngine::LeaperPieces {
 
     using namespace Bitboard_Util;
+
+    // NOTE: performance isn't crucial for these functions
+    // since they are run once when producing the tables.
 
     /*******************************************************/
     /* General                                             */
@@ -98,6 +101,31 @@ namespace ChessEngine::NonSlidingPieces {
 
     // [square index] only. Black and white have the same attacks.
     constexpr std::array<Bitboard, 64> knightMoves = InitMoveTable(GetKnightMoves);
+
+    /*******************************************************/
+    /* King                                                */
+    /*******************************************************/
+
+    /* Generate the attack moves of all pawns at the given bitboard based on color */
+    constexpr Bitboard GetKingMoves(Bitboard board) {
+        Bitboard moves = BITBOARD_EMPTY;
+
+        moves |= ShiftUp(board);
+        moves |= ShiftDown(board);
+
+        moves |= ShiftLeft(board) & not_FileH_Mask;
+        moves |= ShiftUpLeft(board) & not_FileH_Mask;
+        moves |= ShiftDownLeft(board) & not_FileA_Mask;
+
+        moves |= ShiftRight(board) & not_FileA_Mask;
+        moves |= ShiftUpRight(board) & not_FileA_Mask;
+        moves |= ShiftDownRight(board) & not_FileH_Mask;
+
+        return moves;
+    }
+
+    // [square index] only. Black and white have the same attacks.
+    constexpr std::array<Bitboard, 64> kingMoves = InitMoveTable(GetKingMoves);
 
 }
 

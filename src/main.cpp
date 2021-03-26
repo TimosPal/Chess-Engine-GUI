@@ -2,7 +2,7 @@
 
 #include "Board/Board.h"
 #include "MoveGeneration/MoveGeneration.h"
-#include "MoveGeneration/NonSlidingPieces.h"
+#include "MoveGeneration/LeaperPieces.h"
 
 using namespace ChessEngine;
 
@@ -17,6 +17,11 @@ int main() {
     Board board(state);
 
     MoveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
+
+    for (int i = 0; i < 64; i++) {
+        Bitboard_Util::DrawBitBoard(LeaperPieces::knightMoves[i]);
+    }
+
 
     return 0;
 }
