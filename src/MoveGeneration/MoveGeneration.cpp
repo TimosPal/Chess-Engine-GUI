@@ -5,6 +5,7 @@
 #include "NonSlidingPieces.h"
 
 #include <iostream>
+#include <cassert>
 
 using namespace ChessEngine;
 using namespace ChessEngine::Bitboard_Util;
@@ -20,6 +21,7 @@ std::string ChessEngine::MoveGeneration::MoveTypeToString(MoveType type){
         case MoveType::Quiet: return "Quiet";
         case MoveType::Capture: return "Capture";
         case MoveType::Promotion: return "Promotion";
+        case MoveType::EnPassant: return "EnPassant";
         default: return "Error";
     }
 }
@@ -67,9 +69,7 @@ static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, Mov
     while(moves != 0){
         uint8_t toSquareIndex = GetLSBIndex(moves);
 
-        Move move = {.fromSquareIndex = fromSquareIndex,
-                     .toSquareIndex = toSquareIndex,
-                     .flags = flags};
+        Move move = {.fromSquareIndex = fromSquareIndex, .toSquareIndex = toSquareIndex, .flags = flags};
         moveList.emplace_back(move);
 
         std::cout << move << std::endl;
@@ -113,11 +113,22 @@ void ChessEngine::MoveGeneration::GenerateMoves(const BoardState& state, Color c
         Bitboard attacks = NonSlidingPieces::pawnAttacks[color][fromSquareIndex];
         auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, attackMoveFlags);
 
+        // En passant
+        // NOTE: slightly waste full to check for every pawn (Only 2 needed)
+        if(state.enPassantBoard != BITBOARD_EMPTY) {
+            // Previous move enabled en passant.
+
+            // NOTE: it is possible to en passant your own piece only if
+            // something is wrong with the turns!
+            assert(!(attacks & state.enPassantBoard & r2_Mask && color == Color::White) ||
+                   !(attacks & state.enPassantBoard & r7_Mask && color == Color::Black));
+
+            auto enPassantMoveFlags = (MoveType)(MoveType::Capture | MoveType::EnPassant);
+            auto m3 = ExtractMoves(attacks & state.enPassantBoard, fromSquareIndex, enPassantMoveFlags);
+        }
+
         pawnsBoard = PopBit(pawnsBoard, fromSquareIndex);
     }
-
-    // En passant
-    //state.enPassantBoard
 
     // Knight / King.
     // TODO:

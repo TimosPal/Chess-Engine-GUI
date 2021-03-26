@@ -8,7 +8,7 @@ using namespace ChessEngine;
 
 int main() {
     BoardState state = {};
-    std::string fenPosition = "6r1/3P1PP1/8/2p5/2pP4/1p6/PPP5/8 w - - 0 1";
+    std::string fenPosition = "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 1 1";
     if(!ParseFenString(fenPosition, state)){
         std::cout << "Incorrect fen string" << std::endl;
         return -1;
@@ -17,7 +17,6 @@ int main() {
     Board board(state);
 
     MoveGeneration::GenerateMoves(board.GetState(), Color::White, board.GetOccupancies());
-    //Bitboard_Util::DrawBitBoard(NonSlidingPieces::GetPawnPushes(1, Color::White));
 
     return 0;
 }

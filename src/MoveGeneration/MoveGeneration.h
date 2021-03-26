@@ -11,13 +11,14 @@ namespace ChessEngine::MoveGeneration {
         None = 0,
         Quiet = 1 << 0,
         Capture = 1 << 1,
-        Promotion = 1 << 2
+        Promotion = 1 << 2,
+        EnPassant = 1 << 3
     };
 
     struct Move {
-        uint8_t fromSquareIndex: 3;
-        uint8_t toSquareIndex: 3;
-        MoveType flags: 4;
+        uint8_t fromSquareIndex;
+        uint8_t toSquareIndex;
+        MoveType flags: 5;
     };
 
 

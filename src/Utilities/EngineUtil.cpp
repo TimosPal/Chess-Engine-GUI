@@ -20,12 +20,12 @@ bool ChessEngine::StringToCoord(const std::string& str, std::tuple<File, Rank>& 
         return false;
 
     // Is a number between 0-7
-    int fileTemp = str[1] - '0' - 1;
-    if(fileTemp < 0 || fileTemp > 7)
+    int rankTemp = str[1] - '0' - 1;
+    if(rankTemp < 0 || rankTemp > 7)
         return false;
 
-    int rankTemp = str[0] - 'a';
-    if(rankTemp < 0 || rankTemp > 7)
+    int fileTemp = str[0] - 'a';
+    if(fileTemp < 0 || fileTemp > 7)
         return false;
 
     // Safe cast to Enums.
