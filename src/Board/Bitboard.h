@@ -62,6 +62,31 @@ namespace ChessEngine::Bitboard_Util {
         return {squareIndex % 8, squareIndex / 8};
     }
 
+    /* Given a board we generate it's index-th permutation. */
+    constexpr Bitboard GetPermutation(Bitboard board, int permutationIndex){
+        // permutationIndex is some sort of mask that helps us permutate the board.
+        // eg: permutationIndex = 101 , 1st mask bit = 1 , 2nd mask bit = 0 etc.
+        // It's like projecting permutationIndex on the board map.
+        // This works because by increasing permutationIndex we get all the binary
+        // permutations just flattened out.
+
+        Bitboard permutation = BITBOARD_EMPTY;
+        int i = 0; // i points to the current i-th bit of the permutationIndex.
+        while(board != 0){
+            int lsbIndex = GetLSB(board);
+
+            if(permutationIndex & i){
+                // project the i-th bit on the board.
+                permutation |= SetBit(BITBOARD_EMPTY, lsbIndex);
+            }
+
+            board = PopBit(board, lsbIndex);
+            i++;
+        }
+
+        return permutation;
+    }
+
     /* Draw the bitboard in a square like form , with 1 and 0s. */
     void DrawBitBoard(Bitboard board);
 
