@@ -15,7 +15,7 @@ int main() {
     }
 
     Board board(state);
-    board.Draw();
+    //board.Draw();
 
     //oveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
 

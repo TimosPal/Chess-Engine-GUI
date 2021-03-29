@@ -73,9 +73,9 @@ namespace ChessEngine::Bitboard_Util {
         Bitboard permutation = BITBOARD_EMPTY;
         int i = 0; // i points to the current i-th bit of the permutationIndex.
         while(board != 0){
-            int lsbIndex = GetLSB(board);
+            int lsbIndex = GetLSBIndex(board);
 
-            if(permutationIndex & i){
+            if(permutationIndex & SetBit(BITBOARD_EMPTY, i)){
                 // project the i-th bit on the board.
                 permutation |= SetBit(BITBOARD_EMPTY, lsbIndex);
             }
