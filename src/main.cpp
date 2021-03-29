@@ -20,7 +20,7 @@ int main() {
     //board.Draw();
 
     //oveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
-    DrawBitBoard(SlidingPieces::rookAttackMasks[GetSquareIndex(3,4)]);
+    DrawBitBoard(SlidingPieces::bishopAttackMasks[GetSquareIndex(3,4)]);
 
     return 0;
 }

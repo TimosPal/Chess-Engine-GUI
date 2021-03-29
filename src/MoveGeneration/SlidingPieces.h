@@ -14,36 +14,49 @@ namespace ChessEngine::SlidingPieces {
     /* General                                             */
     /*******************************************************/
 
-    constexpr Bitboard GetRookMask(File file, Rank rank){
+    constexpr Bitboard GetDirectionalMask(File file, Rank rank, int8_t dirX, int8_t dirY){
         Bitboard mask = BITBOARD_EMPTY;
-        for (int i = 1; i < 7; i++) {
-            if(i == file)
-                continue;
-            mask |= SetBit(BITBOARD_EMPTY, GetSquareIndex(i, rank));
-        }
-        for (int i = 1; i < 7; i++) {
-            if(i == rank)
-                continue;
-            mask |= SetBit(BITBOARD_EMPTY, GetSquareIndex(file, i));
+        int x = file, y = rank;
+        while(x > 0 && x < 7 && y > 0 && y < 7) {
+            mask |= SetBit(BITBOARD_EMPTY, GetSquareIndex(x, y));
+            x += dirX;
+            y += dirY;
         }
 
         return mask;
+    }
+
+    constexpr Bitboard GetRookMask(File file, Rank rank){
+        Bitboard mask = BITBOARD_EMPTY;
+
+        mask |= GetDirectionalMask(file, rank, 0, 1);
+        mask |= GetDirectionalMask(file, rank, 0, -1);
+        mask |= GetDirectionalMask(file, rank, 1, 0);
+        mask |= GetDirectionalMask(file, rank, -1, 0);
+
+        // Exclude self.
+        return mask ^ SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
     }
 
     constexpr Bitboard GetBishopMask(File file, Rank rank){
         Bitboard mask = BITBOARD_EMPTY;
 
-        return mask;
+        mask |= GetDirectionalMask(file, rank, 1, 1);
+        mask |= GetDirectionalMask(file, rank, 1, -1);
+        mask |= GetDirectionalMask(file, rank, -1, 1);
+        mask |= GetDirectionalMask(file, rank, -1, -1);
+
+        // Exclude self.
+        return mask ^ SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
     }
 
     /* Generate a move table based on the given function for each board position. */
-    constexpr std::array<Bitboard, 64> InitMasksTable(Bitboard getMask(File file, Rank rank)) {
+    constexpr std::array<Bitboard, 64> InitMasksTable(Bitboard getMask(File, Rank)) {
         std::array<Bitboard, 64> mask = {};
 
         for (uint8_t rank = 0; rank < 8; rank++) {
             for (uint8_t file = 0; file < 8; file++) {
                 uint8_t squareIndex = GetSquareIndex(file, rank);
-                Bitboard board = SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
                 mask[squareIndex] = getMask((File)file, (Rank)rank);
             }
         }
