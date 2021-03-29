@@ -11,35 +11,12 @@ namespace ChessEngine::LeaperPieces {
     // since they are run once when producing the tables.
 
     /*******************************************************/
-    /* General                                             */
-    /*******************************************************/
-
-    /* Generate a move table based on the given function for each board position. */
-    constexpr std::array<Bitboard, 64> InitMoveTable(Bitboard GetMoves(Bitboard)) {
-        std::array<Bitboard, 64> movesTable = {};
-
-        for (uint8_t rank = 0; rank < 8; rank++) {
-            for (uint8_t file = 0; file < 8; file++) {
-                uint8_t squareIndex = GetSquareIndex(file, rank);
-
-                Bitboard board = SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
-                movesTable[squareIndex] = GetMoves(board);
-            }
-        }
-
-        return movesTable;
-    }
-
-    /*******************************************************/
     /* Pawn                                                */
     /*******************************************************/
 
     // When overflowing / underflowing in files A,H we may end up in the
     // opposite direction producing faulty moves. The inverted fileMasks
     // handle those 2 cases.
-
-    // NOTE: having 2 functions per color helps InitMoveTable while also removing
-    // the need for a branch inside said functions.
 
     /* Generate the attack moves of pawns */
     constexpr Bitboard GetPawnAttacks(Bitboard board, Color color) {
@@ -72,12 +49,6 @@ namespace ChessEngine::LeaperPieces {
         return pushes;
     }
 
-    // [team color][square index].
-    // NOTE: lambdas are used since InitMoveTable expects no color argument. (Only pawns move differ based on color)
-    constexpr std::array<std::array<Bitboard, 64>, 2> pawnAttacks =
-            {InitMoveTable([](auto board) { return GetPawnAttacks(board, Color::White); }),
-             InitMoveTable([](auto board) { return GetPawnAttacks(board, Color::Black); })};
-
     /*******************************************************/
     /* Knight                                              */
     /*******************************************************/
@@ -98,9 +69,6 @@ namespace ChessEngine::LeaperPieces {
 
         return moves;
     }
-
-    // [square index] only. Black and white have the same attacks.
-    constexpr std::array<Bitboard, 64> knightMoves = InitMoveTable(GetKnightMoves);
 
     /*******************************************************/
     /* King                                                */
@@ -123,9 +91,6 @@ namespace ChessEngine::LeaperPieces {
 
         return moves;
     }
-
-    // [square index] only. Black and white have the same attacks.
-    constexpr std::array<Bitboard, 64> kingMoves = InitMoveTable(GetKingMoves);
 
 }
 

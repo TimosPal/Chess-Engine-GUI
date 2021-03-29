@@ -11,8 +11,10 @@ namespace ChessEngine::LeaperPieces {
     // since they are run once when producing the tables.
 
     /*******************************************************/
-    /* General                                             */
+    /* Rook                                                */
     /*******************************************************/
+
+    constexpr std::array<Bitboard, 64> kingMoves = InitMoveTable(GetKingMoves);
 
 
 }
