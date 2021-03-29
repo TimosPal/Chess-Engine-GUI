@@ -169,7 +169,6 @@ void ChessEngine::MoveGeneration::GeneratePseudoKnightMoves(const BoardState& st
     Bitboard knightsBoard = state.pieceBoards[color][PieceType::Knight];
     while(knightsBoard != 0){
         uint8_t fromSquareIndex = GetLSBIndex(knightsBoard);
-        Bitboard tempPieceBoard = SetBit(BITBOARD_EMPTY, fromSquareIndex);
 
         Bitboard moves = LeaperPieces::knightMoves[fromSquareIndex];
 

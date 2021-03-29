@@ -33,3 +33,41 @@ bool ChessEngine::StringToCoord(const std::string& str, std::tuple<File, Rank>& 
 
     return true;
 }
+
+const char* ChessEngine::PieceTypeToAscii(PieceType type, Color color){
+    if(color == Color::White) {
+        switch (type) {
+            case PieceType::Pawn:
+                return "P";
+            case PieceType::Rook:
+                return "R";
+            case PieceType::Knight:
+                return "N";
+            case PieceType::King:
+                return "K";
+            case PieceType::Queen:
+                return "Q";
+            case PieceType::Bishop:
+                return "B";
+            default:
+                return "-";
+        }
+    }else{
+        switch (type) {
+            case PieceType::Pawn:
+                return "p";
+            case PieceType::Rook:
+                return "r";
+            case PieceType::Knight:
+                return "n";
+            case PieceType::King:
+                return "k";
+            case PieceType::Queen:
+                return "q";
+            case PieceType::Bishop:
+                return "b";
+            default:
+                return "-";
+        }
+    }
+}

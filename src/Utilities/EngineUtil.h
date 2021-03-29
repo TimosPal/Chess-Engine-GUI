@@ -6,6 +6,8 @@
 
 namespace ChessEngine {
 
+    /* NOTE: Not using eum classes for easy indexing */
+
     enum Color {
         White, Black, Both
     };
@@ -28,6 +30,8 @@ namespace ChessEngine {
     bool StringToCoord(const std::string& str, std::tuple<File, Rank>& coords);
 
     Color InvertColor(Color color);
+
+    const char* PieceTypeToAscii(PieceType type, Color color);
 
 }
 

@@ -20,7 +20,7 @@ namespace ChessEngine::MoveGeneration {
     struct Move {
         uint8_t fromSquareIndex;
         uint8_t toSquareIndex;
-        MoveType flags: 6;
+        MoveType flags;
     };
 
     /* The pseudo moves should be checked for validity afterwards. */
