@@ -9,7 +9,7 @@ ChessEngine::Board::Board(const BoardState& state) : state(state) {
 }
 
 void ChessEngine::Board::Draw(){
-    for (int rank = 0; rank < 8; rank++) {
+    for (int rank = 7; rank >= 0; rank--) {
         for (int file = 0; file < 8; file++) {
             // Iterate bitboards.
             bool found = false;
