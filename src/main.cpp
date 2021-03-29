@@ -3,8 +3,10 @@
 #include "Board/Board.h"
 #include "MoveGeneration/MoveGeneration.h"
 #include "MoveGeneration/LeaperPieces.h"
+#include "MoveGeneration/SlidingPieces.h"
 
 using namespace ChessEngine;
+using namespace ChessEngine::Bitboard_Util;
 
 int main() {
     BoardState state = {};
@@ -18,6 +20,7 @@ int main() {
     //board.Draw();
 
     //oveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
+    DrawBitBoard(SlidingPieces::rookAttackMasks[GetSquareIndex(3,4)]);
 
     return 0;
 }
