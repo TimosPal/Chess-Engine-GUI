@@ -16,7 +16,7 @@ namespace ChessEngine::SlidingPieces {
 
     constexpr Bitboard GetDirectionalMask(File file, Rank rank, int8_t dirX, int8_t dirY){
         Bitboard mask = BITBOARD_EMPTY;
-        int x = file, y = rank;
+        int x = file + dirX, y = rank + dirY;
         while(x > 0 && x < 7 && y > 0 && y < 7) {
             mask |= SetBit(BITBOARD_EMPTY, GetSquareIndex(x, y));
             x += dirX;
@@ -35,7 +35,7 @@ namespace ChessEngine::SlidingPieces {
         mask |= GetDirectionalMask(file, rank, -1, 0);
 
         // Exclude self.
-        return mask ^ SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
+        return mask;
     }
 
     constexpr Bitboard GetBishopMask(File file, Rank rank){
@@ -47,7 +47,7 @@ namespace ChessEngine::SlidingPieces {
         mask |= GetDirectionalMask(file, rank, -1, -1);
 
         // Exclude self.
-        return mask ^ SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
+        return mask;
     }
 
     /* Generate a move table based on the given function for each board position. */

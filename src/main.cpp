@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unistd.h>
 
 #include "Board/Board.h"
 #include "MoveGeneration/MoveGeneration.h"
@@ -19,8 +20,12 @@ int main() {
     Board board(state);
     //board.Draw();
 
-    //oveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
-    DrawBitBoard(SlidingPieces::bishopAttackMasks[GetSquareIndex(3,4)]);
+    //MoveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
+    Bitboard b = SlidingPieces::rookAttackMasks[GetSquareIndex(File::D, Rank::R4)];
+    for (int i = 0; i < 100; i++) {
+        DrawBitBoard(GetPermutation(b, i));
+        sleep(1);
+    }
 
     return 0;
 }
