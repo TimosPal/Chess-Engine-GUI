@@ -112,7 +112,7 @@ void ChessEngine::MoveGeneration::GeneratePseudoPawnMoves(const BoardState& stat
 
         // Captures
         auto attackMoveFlags = (MoveType)(MoveType::Capture | promotionFlag);
-        Bitboard attacks = MoveTables::pawnAttacks[color][fromSquareIndex];
+        Bitboard attacks = MoveTables::GetPrecalculated_PawnAttacks(color, fromSquareIndex);
         auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, attackMoveFlags);
 
         // En passant
@@ -168,7 +168,7 @@ void ChessEngine::MoveGeneration::GeneratePseudoKnightMoves(const BoardState& st
     while(knightsBoard != 0){
         uint8_t fromSquareIndex = GetLSBIndex(knightsBoard);
 
-        Bitboard moves = MoveTables::knightMoves[fromSquareIndex];
+        Bitboard moves = MoveTables::GetPrecalculated_KnightMoves(fromSquareIndex);
 
         // Quiet moves
         auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet);
@@ -189,7 +189,7 @@ void ChessEngine::MoveGeneration::GeneratePseudoKingMoves(const BoardState& stat
 
     if(kingBoard != 0) {
         uint8_t fromSquareIndex = GetLSBIndex(kingBoard);
-        Bitboard moves = MoveTables::kingMoves[fromSquareIndex];
+        Bitboard moves = MoveTables::GetPrecalculated_KingMoves(fromSquareIndex);
 
         // Quiet moves
         auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet);

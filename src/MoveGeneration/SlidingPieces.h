@@ -120,6 +120,7 @@ namespace ChessEngine::SlidingPieces {
     /* Attack masks                                        */
     /*******************************************************/
 
+    // Blocker masks , to be used in magic bitboards.
     constexpr std::array<Bitboard, 64> rookMasks = InitMasksTable(GetRookBlockerMask);
     constexpr std::array<Bitboard, 64> bishopMasks = InitMasksTable(GetBishopBlockerMask);
 

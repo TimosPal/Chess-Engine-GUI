@@ -39,6 +39,10 @@ namespace ChessEngine::MoveTables {
             {InitMoveTable([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::White); }),
              InitMoveTable([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::Black); })};
 
+    constexpr Bitboard GetPrecalculated_PawnAttacks(Color color, uint8_t index){
+        return pawnAttacks[color][index];
+    }
+
     /*******************************************************/
     /* Knight                                              */
     /*******************************************************/
@@ -46,12 +50,20 @@ namespace ChessEngine::MoveTables {
     // [square index] only. Black and white have the same attacks.
     constexpr std::array<Bitboard, 64> knightMoves = InitMoveTable(LeaperPieces::GetKnightMoves);
 
+    constexpr Bitboard GetPrecalculated_KnightMoves(uint8_t index){
+        return knightMoves[index];
+    }
+
     /*******************************************************/
     /* King                                                */
     /*******************************************************/
 
     // [square index] only. Black and white have the same attacks.
     constexpr std::array<Bitboard, 64> kingMoves = InitMoveTable(LeaperPieces::GetKingMoves);
+
+    constexpr Bitboard GetPrecalculated_KingMoves(uint8_t index){
+        return kingMoves[index];
+    }
 
 }
 
