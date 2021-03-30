@@ -21,11 +21,8 @@ int main() {
     //board.Draw();
 
     //MoveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
-    Bitboard b = SlidingPieces::rookAttackMasks[GetSquareIndex(File::D, Rank::R4)];
-    for (int i = 0; i < 100; i++) {
-        DrawBitBoard(GetPermutation(b, i));
-        sleep(1);
-    }
+    //Bitboard b = SlidingPieces::rookMasks[GetSquareIndex(File::D, Rank::R4)];
+    Bitboard b = SlidingPieces::GetRookMoves(File::D, Rank::R4, rand());
 
     return 0;
 }

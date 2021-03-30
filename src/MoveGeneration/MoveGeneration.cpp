@@ -62,7 +62,6 @@ std::ostream& ChessEngine::MoveGeneration::operator<<(std::ostream& out, Move va
     return out;
 }
 
-
 static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, MoveType flags){
     std::list<Move> moveList;
 
