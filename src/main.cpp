@@ -4,8 +4,7 @@
 #include "FenParser/FenParser.h"
 #include "Board/Board.h"
 #include "MoveGeneration/MoveGeneration.h"
-#include "MoveGeneration/LeaperPieces.h"
-#include "MoveGeneration/SlidingPieces.h"
+#include "MoveGeneration/MoveTables.h"
 
 using namespace ChessEngine;
 using namespace ChessEngine::Bitboard_Util;
@@ -21,9 +20,9 @@ int main() {
     Board board(state);
     //board.Draw();
 
-    MoveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
-    //Bitboard b = SlidingPieces::rookMasks[GetSquareIndex(File::D, Rank::R4)];
-    //Bitboard b = SlidingPieces::GetRookMoves(File::D, Rank::R4, rand());
+    Bitboard a = MoveTables::GetQueenMoves(GetSquareIndex(File::E, Rank::R3) , board.GetOccupancies()[2]);
+    DrawBitBoard(a);
+
 
     return 0;
 }

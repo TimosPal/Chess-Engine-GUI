@@ -53,7 +53,7 @@ static std::array<Bitboard, permutations> slidingMoves = InitSlidingMoves();
 /* Rook                                                */
 /*******************************************************/
 
-Bitboard ChessEngine::MoveTables::GetPrecalculated_RookAttacks(uint8_t index, Bitboard_Util::Bitboard occupancies){
+Bitboard ChessEngine::MoveTables::GetRookMoves(uint8_t index, Bitboard_Util::Bitboard occupancies){
     Bitboard blockerMask = rookMasks[index];
     uint8_t bitCount = GetBitCount(blockerMask);
     return slidingMoves[RookMagicHash(occupancies, index, bitCount)];
@@ -63,7 +63,7 @@ Bitboard ChessEngine::MoveTables::GetPrecalculated_RookAttacks(uint8_t index, Bi
 /* Bishop                                              */
 /*******************************************************/
 
-Bitboard ChessEngine::MoveTables::GetPrecalculated_BishopAttacks(uint8_t index, Bitboard_Util::Bitboard occupancies){
+Bitboard ChessEngine::MoveTables::GetBishopMoves(uint8_t index, Bitboard_Util::Bitboard occupancies){
     Bitboard blockerMask = bishopMasks[index];
     uint8_t bitCount = GetBitCount(blockerMask);
     return slidingMoves[BishopMagicHash(occupancies, index, bitCount)];
@@ -73,8 +73,8 @@ Bitboard ChessEngine::MoveTables::GetPrecalculated_BishopAttacks(uint8_t index, 
 /* Queen                                               */
 /*******************************************************/
 
-Bitboard ChessEngine::MoveTables::GetPrecalculated_QueenAttacks(uint8_t index, Bitboard_Util::Bitboard occupancies){
-    return GetPrecalculated_BishopAttacks(index, occupancies) || GetPrecalculated_RookAttacks(index, occupancies);
+Bitboard ChessEngine::MoveTables::GetQueenMoves(uint8_t index, Bitboard_Util::Bitboard occupancies){
+    return GetBishopMoves(index, occupancies) || GetRookMoves(index, occupancies);
 }
 
 /*******************************************************/
@@ -87,7 +87,7 @@ static constexpr std::array<std::array<Bitboard, 64>, 2> pawnAttacks =
         {InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::White); }),
          InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::Black); })};
 
-Bitboard ChessEngine::MoveTables::GetPrecalculated_PawnAttacks(Color color, uint8_t index){
+Bitboard ChessEngine::MoveTables::GetPawnAttacks(Color color, uint8_t index){
     return pawnAttacks[color][index];
 }
 
@@ -98,7 +98,7 @@ Bitboard ChessEngine::MoveTables::GetPrecalculated_PawnAttacks(Color color, uint
 // [square index] only. Black and white have the same attacks.
 static constexpr std::array<Bitboard, 64> knightMoves = InitLeaperMoves(LeaperPieces::GetKnightMoves);
 
-Bitboard ChessEngine::MoveTables::GetPrecalculated_KnightMoves(uint8_t index){
+Bitboard ChessEngine::MoveTables::GetKnightMoves(uint8_t index){
     return knightMoves[index];
 }
 
@@ -109,6 +109,6 @@ Bitboard ChessEngine::MoveTables::GetPrecalculated_KnightMoves(uint8_t index){
 // [square index] only. Black and white have the same attacks.
 static constexpr std::array<Bitboard, 64> kingMoves = InitLeaperMoves(LeaperPieces::GetKingMoves);
 
-Bitboard ChessEngine::MoveTables::GetPrecalculated_KingMoves(uint8_t index){
+Bitboard ChessEngine::MoveTables::GetKingMoves(uint8_t index){
     return kingMoves[index];
 }

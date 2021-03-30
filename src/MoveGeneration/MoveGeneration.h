@@ -24,11 +24,11 @@ namespace ChessEngine::MoveGeneration {
     };
 
     /* The pseudo moves should be checked for validity afterwards. */
-    void GeneratePseudoMoves(const BoardState &state, Color color, const Bitboard_Util::Bitboard* occupancies);
-    void GeneratePseudoPawnMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies);
-    void GeneratePseudoKingMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies);
-    void GeneratePseudoCastlingMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies);
-    void GeneratePseudoKnightMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies);
+    void GetPseudoMoves(const BoardState &state, Color color, const Bitboard_Util::Bitboard* occupancies);
+    void GetPseudoPawnMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies);
+    void GetPseudoKingMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies);
+    void GetPseudoCastlingMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies);
+    void GetPseudoKnightMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies);
 
     bool IsOfMoveType(MoveType flags, MoveType type);
     std::string MoveTypeToString(MoveType type); /* Should contain a single flag */
