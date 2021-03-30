@@ -1,5 +1,7 @@
 #include "MoveTables.h"
 
+#include "LeaperPieces.h"
+
 using namespace ChessEngine;
 using namespace ChessEngine::Bitboard_Util;
 using namespace ChessEngine::LeaperPieces;

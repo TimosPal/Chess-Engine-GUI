@@ -1,9 +1,7 @@
 #ifndef MOVETABLES_H
 #define MOVETABLES_H
 
-
 #include "../Board/Bitboard.h"
-#include "LeaperPieces.h"
 
 namespace ChessEngine::MoveTables {
 

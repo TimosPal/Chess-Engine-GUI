@@ -4,7 +4,6 @@
 #include <cstdint>
 
 #include "BoardState.h"
-#include "../FenParser/FenParser.h"
 
 #include <iostream>
 

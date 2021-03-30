@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "FenParser/FenParser.h"
 #include "Board/Board.h"
 #include "MoveGeneration/MoveGeneration.h"
 #include "MoveGeneration/LeaperPieces.h"
