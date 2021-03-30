@@ -20,9 +20,9 @@ int main() {
     Board board(state);
     //board.Draw();
 
-    //MoveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
+    MoveGeneration::GeneratePseudoMoves(board.GetState(), Color::White, board.GetOccupancies());
     //Bitboard b = SlidingPieces::rookMasks[GetSquareIndex(File::D, Rank::R4)];
-    Bitboard b = SlidingPieces::GetRookMoves(File::D, Rank::R4, rand());
+    //Bitboard b = SlidingPieces::GetRookMoves(File::D, Rank::R4, rand());
 
     return 0;
 }
