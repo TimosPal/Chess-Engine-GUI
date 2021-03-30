@@ -58,8 +58,8 @@ namespace ChessEngine::Bitboard_Util {
     }
 
     /* Returns file , rank in a tuple based opn the given square index */
-    constexpr std::tuple<uint8_t,uint8_t> GetCoordinates(uint8_t squareIndex){
-        return {squareIndex % 8, squareIndex / 8};
+    constexpr std::tuple<File,Rank> GetCoordinates(uint8_t squareIndex){
+        return {(File)(squareIndex % 8), (Rank)(squareIndex / 8)};
     }
 
     /* Given a board we generate it's index-th permutation. */
@@ -87,7 +87,16 @@ namespace ChessEngine::Bitboard_Util {
         return permutation;
     }
 
-    /* Draw the bitboard in a square like form , with 1 and 0s. */
+    constexpr uint8_t GetBitCount(Bitboard board) {
+        uint8_t count = 0;
+        while (board) {
+            count++;
+            board &= board - 1;
+        }
+        return count;
+    }
+
+        /* Draw the bitboard in a square like form , with 1 and 0s. */
     void DrawBitBoard(Bitboard board);
 
     /*******************************************************/

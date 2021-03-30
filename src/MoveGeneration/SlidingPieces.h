@@ -1,11 +1,13 @@
 #ifndef SLIDINGPIECES_H
 #define SLIDINGPIECES_H
 
+#include "MagicNumbers.h"
 #include "../Board/Bitboard.h"
 
 namespace ChessEngine::SlidingPieces {
 
     using namespace Bitboard_Util;
+    using namespace MagicNumbers;
 
     // NOTE: performance isn't crucial for these functions
     // since they are run once when producing the tables.
@@ -116,6 +118,23 @@ namespace ChessEngine::SlidingPieces {
         return mask;
     }
 
+    constexpr void InitMovesForSquare(std::array<Bitboard, permutations>& slidingMoves, uint8_t squareIndex, bool forBishop){
+        auto [file, rank] = GetCoordinates(squareIndex);
+        Bitboard blockerMask = forBishop ? GetBishopBlockerMask(file, rank) :
+                                           GetRookBlockerMask(file, rank);
+        uint8_t bitCount = GetBitCount(blockerMask);
+
+        for (int permutationIndex = 0; permutationIndex < 1 << bitCount; permutationIndex++) {
+            Bitboard occupanciesPermutation = GetPermutation(blockerMask, permutationIndex);
+            uint64_t index = forBishop ? BishopMagicHash(blockerMask, squareIndex, bitCount) :
+                                         RookMagicHash(blockerMask, squareIndex, bitCount);
+            Bitboard attacks = GetBishopMoves(file, rank, occupanciesPermutation);
+
+            slidingMoves[index] = attacks;
+        }
+    }
+
+
     /*******************************************************/
     /* Attack masks                                        */
     /*******************************************************/
@@ -123,7 +142,6 @@ namespace ChessEngine::SlidingPieces {
     // Blocker masks , to be used in magic bitboards.
     constexpr std::array<Bitboard, 64> rookMasks = InitMasksTable(GetRookBlockerMask);
     constexpr std::array<Bitboard, 64> bishopMasks = InitMasksTable(GetBishopBlockerMask);
-
 
 }
 
