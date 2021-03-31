@@ -5,7 +5,7 @@
 
 namespace ChessEngine::MoveTables {
 
-    using namespace Bitboard_Util;
+    using namespace BitboardUtil;
 
     // Access precalculated moves from compile time initialized arrays.
 
@@ -13,9 +13,9 @@ namespace ChessEngine::MoveTables {
     Bitboard GetKnightMoves(uint8_t index);
     Bitboard GetKingMoves(uint8_t index);
 
-    Bitboard GetRookMoves(uint8_t index, Bitboard_Util::Bitboard occupancies);
-    Bitboard GetBishopMoves(uint8_t index, Bitboard_Util::Bitboard occupancies);
-    Bitboard GetQueenMoves(uint8_t index, Bitboard_Util::Bitboard occupancies);
+    Bitboard GetRookMoves(uint8_t index, BitboardUtil::Bitboard occupancies);
+    Bitboard GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies);
+    Bitboard GetQueenMoves(uint8_t index, BitboardUtil::Bitboard occupancies);
 
 
 }

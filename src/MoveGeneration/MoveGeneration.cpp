@@ -8,7 +8,7 @@
 #include "LeaperPieces.h"
 
 using namespace ChessEngine;
-using namespace ChessEngine::Bitboard_Util;
+using namespace ChessEngine::BitboardUtil;
 using namespace ChessEngine::MoveGeneration;
 
 bool ChessEngine::MoveGeneration::IsOfMoveType(MoveType flags, MoveType type){
@@ -34,10 +34,10 @@ std::ostream& ChessEngine::MoveGeneration::operator<<(std::ostream& out, const M
     }else{
         uint8_t flags = value;
         while(flags != 0) { // Print each flag based on the bits
-            uint8_t lsbIndex = Bitboard_Util::GetLSBIndex(flags);
-            MoveType tempFlag = (MoveType)Bitboard_Util::SetBit(0, lsbIndex);
+            uint8_t lsbIndex = BitboardUtil::GetLSBIndex(flags);
+            MoveType tempFlag = (MoveType)BitboardUtil::SetBit(0, lsbIndex);
 
-            flags = Bitboard_Util::PopBit(flags, lsbIndex);
+            flags = BitboardUtil::PopBit(flags, lsbIndex);
             out << MoveTypeToString(tempFlag);
             if(flags != 0) // Dont print final space.
                 out << " ";
@@ -84,7 +84,7 @@ static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, Mov
     return moveList;
 }
 
-void ChessEngine::MoveGeneration::GetPseudoPawnMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies){
+void ChessEngine::MoveGeneration::GetPseudoPawnMoves(const BoardState& state, Color color, const BitboardUtil::Bitboard* occupancies){
     Color enemyColor = InvertColor(color);
     Bitboard enemyOccupancies = occupancies[enemyColor];
     Bitboard globalOccupancies = occupancies[Color::Both];
@@ -134,7 +134,7 @@ void ChessEngine::MoveGeneration::GetPseudoPawnMoves(const BoardState& state, Co
     }
 }
 
-void ChessEngine::MoveGeneration::GetPseudoCastlingMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies){
+void ChessEngine::MoveGeneration::GetPseudoCastlingMoves(const BoardState& state, Color color, const BitboardUtil::Bitboard* occupancies){
     // Check whether or not there are pieces between the king and the rook.
     Bitboard globalOccupancies = occupancies[Color::Both];
     Bitboard colorMask = (color == Color::White) ? r1_Mask : r8_Mask;
@@ -159,7 +159,7 @@ void ChessEngine::MoveGeneration::GetPseudoCastlingMoves(const BoardState& state
     }
 }
 
-void ChessEngine::MoveGeneration::GetPseudoKnightMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies){
+void ChessEngine::MoveGeneration::GetPseudoKnightMoves(const BoardState& state, Color color, const BitboardUtil::Bitboard* occupancies){
     Color enemyColor = InvertColor(color);
     Bitboard enemyOccupancies = occupancies[enemyColor];
     Bitboard globalOccupancies = occupancies[Color::Both];
@@ -181,7 +181,7 @@ void ChessEngine::MoveGeneration::GetPseudoKnightMoves(const BoardState& state, 
     }
 }
 
-void ChessEngine::MoveGeneration::GetPseudoKingMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies) {
+void ChessEngine::MoveGeneration::GetPseudoKingMoves(const BoardState& state, Color color, const BitboardUtil::Bitboard* occupancies) {
     Color enemyColor = InvertColor(color);
     Bitboard enemyOccupancies = occupancies[enemyColor];
     Bitboard globalOccupancies = occupancies[Color::Both];
@@ -200,7 +200,7 @@ void ChessEngine::MoveGeneration::GetPseudoKingMoves(const BoardState& state, Co
     }
 }
 
-void ChessEngine::MoveGeneration::GetPseudoMoves(const BoardState& state, Color color, const Bitboard_Util::Bitboard* occupancies) {
+void ChessEngine::MoveGeneration::GetPseudoMoves(const BoardState& state, Color color, const BitboardUtil::Bitboard* occupancies) {
     // Pawns.
     GetPseudoPawnMoves(state, color, occupancies);
 

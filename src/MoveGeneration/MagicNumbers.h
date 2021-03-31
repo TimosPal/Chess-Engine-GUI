@@ -155,12 +155,12 @@ namespace ChessEngine::MagicNumbers {
                     { 0x0001ffff9dffa333u,  14826 }
             };
 
-    constexpr uint64_t BishopMagicHash(Bitboard_Util::Bitboard board, uint8_t squareIndex, uint8_t bitCount){
+    constexpr uint64_t BishopMagicHash(BitboardUtil::Bitboard board, uint8_t squareIndex, uint8_t bitCount){
         auto squareInfo = bishopMagics[squareIndex];
         return ((board * squareInfo.magicNumber) >> (64 - bitCount)) + squareInfo.mainTableOffset;
     }
 
-    constexpr uint64_t RookMagicHash(Bitboard_Util::Bitboard board, uint8_t squareIndex, uint8_t bitCount){
+    constexpr uint64_t RookMagicHash(BitboardUtil::Bitboard board, uint8_t squareIndex, uint8_t bitCount){
         auto squareInfo = rookMagics[squareIndex];
         return ((board * squareInfo.magicNumber) >> (64 - bitCount)) + squareInfo.mainTableOffset;
     }

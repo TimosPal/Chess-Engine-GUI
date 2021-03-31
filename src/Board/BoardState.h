@@ -8,7 +8,7 @@ namespace ChessEngine{
     struct BoardState{
         // A board with 6 bitboards for each color , 1 bitboard per unique piece flags.
         // Use Color / PieceType for indexing
-        Bitboard_Util::Bitboard pieceBoards[2][6]{};
+        BitboardUtil::Bitboard pieceBoards[2][6]{};
 
         // Indicates whose turn is it.
         Color turnOf = Color::White;
@@ -25,7 +25,7 @@ namespace ChessEngine{
         // En passant
         // Represents the position behind the pawn.
         // Is EMPTY when there is no en passant available
-        Bitboard_Util::Bitboard enPassantBoard = BITBOARD_EMPTY;
+        BitboardUtil::Bitboard enPassantBoard = BITBOARD_EMPTY;
 
     };
 

@@ -19,7 +19,7 @@ namespace ChessEngine {
             return state;
         }
 
-        Bitboard_Util::Bitboard* GetOccupancies(){ //NOTE: For testing only.
+        BitboardUtil::Bitboard* GetOccupancies(){ //NOTE: For testing only.
             return occupancies;
         }
 
@@ -28,7 +28,7 @@ namespace ChessEngine {
         BoardState state{};
 
         // Occupancy bitboards for both colors.
-        Bitboard_Util::Bitboard occupancies[3]{};
+        BitboardUtil::Bitboard occupancies[3]{};
 
         /* Initialize the 2 occupancy bitboards
          * NOTE:Should be called only once at the start.

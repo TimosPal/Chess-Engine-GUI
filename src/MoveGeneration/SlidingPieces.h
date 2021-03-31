@@ -6,7 +6,7 @@
 
 namespace ChessEngine::SlidingPieces {
 
-    using namespace Bitboard_Util;
+    using namespace BitboardUtil;
     using namespace MagicNumbers;
 
     // NOTE: performance isn't crucial for these functions

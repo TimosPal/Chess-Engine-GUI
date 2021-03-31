@@ -4,7 +4,7 @@
 #include "SlidingPieces.h"
 
 using namespace ChessEngine;
-using namespace ChessEngine::Bitboard_Util;
+using namespace ChessEngine::BitboardUtil;
 using namespace ChessEngine::LeaperPieces;
 using namespace ChessEngine::SlidingPieces;
 using namespace ChessEngine::MoveTables;
@@ -53,7 +53,7 @@ static constexpr std::array<Bitboard, permutations> slidingMoves = InitSlidingMo
 /* Rook                                                */
 /*******************************************************/
 
-Bitboard ChessEngine::MoveTables::GetRookMoves(uint8_t index, Bitboard_Util::Bitboard occupancies){
+Bitboard ChessEngine::MoveTables::GetRookMoves(uint8_t index, BitboardUtil::Bitboard occupancies){
     Bitboard blockerMask = rookMasks[index];
     DrawBitBoard(blockerMask);
     uint8_t bitCount = rookMaskBitCounts[index];
@@ -64,7 +64,7 @@ Bitboard ChessEngine::MoveTables::GetRookMoves(uint8_t index, Bitboard_Util::Bit
 /* Bishop                                              */
 /*******************************************************/
 
-Bitboard ChessEngine::MoveTables::GetBishopMoves(uint8_t index, Bitboard_Util::Bitboard occupancies){
+Bitboard ChessEngine::MoveTables::GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies){
     Bitboard blockerMask = bishopMasks[index];
     uint8_t bitCount = bishopMaskBitCounts[index];
     return slidingMoves[BishopMagicHash(occupancies, index, bitCount)];
@@ -74,7 +74,7 @@ Bitboard ChessEngine::MoveTables::GetBishopMoves(uint8_t index, Bitboard_Util::B
 /* Queen                                               */
 /*******************************************************/
 
-Bitboard ChessEngine::MoveTables::GetQueenMoves(uint8_t index, Bitboard_Util::Bitboard occupancies){
+Bitboard ChessEngine::MoveTables::GetQueenMoves(uint8_t index, BitboardUtil::Bitboard occupancies){
     return GetBishopMoves(index, occupancies) || GetRookMoves(index, occupancies);
 }
 

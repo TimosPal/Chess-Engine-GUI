@@ -7,7 +7,7 @@
 #include "MoveGeneration/MoveTables.h"
 
 using namespace ChessEngine;
-using namespace ChessEngine::Bitboard_Util;
+using namespace ChessEngine::BitboardUtil;
 
 int main() {
     BoardState state = {};

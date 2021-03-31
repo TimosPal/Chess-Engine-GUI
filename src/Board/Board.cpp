@@ -1,6 +1,6 @@
 #include "Board.h"
 
-using namespace ChessEngine::Bitboard_Util;
+using namespace ChessEngine::BitboardUtil;
 
 ChessEngine::Board::Board(const BoardState& state) : state(state) {
     InitOccupancies(Color::White);
@@ -33,7 +33,7 @@ void ChessEngine::Board::Draw(){
 }
 
 void ChessEngine::Board::InitOccupancies(Color color){
-    Bitboard_Util::Bitboard temp = BITBOARD_EMPTY;
+    BitboardUtil::Bitboard temp = BITBOARD_EMPTY;
     for (int i = 0; i < 6; i++) {
         temp |= state.pieceBoards[color][i];
     }

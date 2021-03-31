@@ -51,9 +51,9 @@ static bool ParseFenPlacement(const std::string& placement, BoardState& state){
                 auto [type, color] = pieceInfo;
 
                 // Update appropriate bitboard with the piece position.
-                Bitboard_Util::Bitboard &currPieceBoard = state.pieceBoards[color][type];
-                uint8_t squareIndex = Bitboard_Util::GetSquareIndex(file, rank);
-                currPieceBoard |= Bitboard_Util::SetBit(currPieceBoard, squareIndex);
+                BitboardUtil::Bitboard &currPieceBoard = state.pieceBoards[color][type];
+                uint8_t squareIndex = BitboardUtil::GetSquareIndex(file, rank);
+                currPieceBoard |= BitboardUtil::SetBit(currPieceBoard, squareIndex);
             }
             file++;
 
@@ -160,8 +160,8 @@ static bool ParseEnPassant(const std::string& enPassantString, BoardState& state
         return false;
 
     auto [file, rank] = coords;
-    uint8_t squareIndex = Bitboard_Util::GetSquareIndex(file, rank);
-    state.enPassantBoard = Bitboard_Util::SetBit(BITBOARD_EMPTY, squareIndex);
+    uint8_t squareIndex = BitboardUtil::GetSquareIndex(file, rank);
+    state.enPassantBoard = BitboardUtil::SetBit(BITBOARD_EMPTY, squareIndex);
 
     return true;
 }
