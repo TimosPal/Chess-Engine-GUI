@@ -58,34 +58,34 @@ namespace ChessEngine::BitboardUtil {
     /*******************************************************/
 
     // File masks.
-    extern Bitboard fileA_Mask;
-    extern Bitboard fileB_Mask;
-    extern Bitboard fileG_Mask;
-    extern Bitboard fileH_Mask;
+    extern const Bitboard fileA_Mask;
+    extern const Bitboard fileB_Mask;
+    extern const Bitboard fileG_Mask;
+    extern const Bitboard fileH_Mask;
 
     // Not file masks.
-    extern Bitboard not_FileA_Mask;
-    extern Bitboard not_FileB_Mask;
-    extern Bitboard not_FileG_Mask;
-    extern Bitboard not_FileH_Mask;
+    extern const Bitboard not_FileA_Mask;
+    extern const Bitboard not_FileB_Mask;
+    extern const Bitboard not_FileG_Mask;
+    extern const Bitboard not_FileH_Mask;
 
-    extern Bitboard not_FileAB_Mask;
-    extern Bitboard not_FileGH_Mask;
+    extern const Bitboard not_FileAB_Mask;
+    extern const Bitboard not_FileGH_Mask;
 
     // Rank masks.
-    extern Bitboard r1_Mask;
-    extern Bitboard r2_Mask;
-    extern Bitboard r7_Mask;
-    extern Bitboard r8_Mask;
+    extern const Bitboard r1_Mask;
+    extern const Bitboard r2_Mask;
+    extern const Bitboard r7_Mask;
+    extern const Bitboard r8_Mask;
 
     // Used in castling.
-    extern Bitboard kingSideCastling_Mask;
-    extern Bitboard queenSideCastling_Mask;
+    extern const Bitboard kingSideCastling_Mask;
+    extern const Bitboard queenSideCastling_Mask;
 
     // Mixed boards , need to mask with appropriate color rank.
-    extern Bitboard kingsStartingPosBoard;
-    extern Bitboard kingsCastlePosBoard;
-    extern Bitboard queenCastlePosBoard;
+    extern const Bitboard kingsStartingPosBoard;
+    extern const Bitboard kingsCastlePosBoard;
+    extern const Bitboard queenCastlePosBoard;
 
 }
 
