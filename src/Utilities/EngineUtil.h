@@ -33,6 +33,9 @@ namespace ChessEngine {
 
     const char* PieceTypeToAscii(PieceType type, Color color);
 
+    /* InitEngine engine tables etc */
+    void InitEngine();
+
 }
 
 #endif

@@ -13,7 +13,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /*******************************************************/
 
     /* Generate a move table based on the given function for each board position. */
-    std::array<Bitboard, 64> InitMasksTable(Bitboard getMask(uint8_t, uint8_t)) {
+    std::array<Bitboard, 64> CreateMasksTable(Bitboard getMask(uint8_t, uint8_t)) {
         std::array<Bitboard, 64> mask = {};
 
         for (uint8_t rank = 0; rank < 8; rank++) {
@@ -64,7 +64,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /* Rook                                                */
     /*******************************************************/
 
-    Bitboard GetRookBlockerMask(uint8_t file, uint8_t rank){
+    Bitboard GetRookMask(uint8_t file, uint8_t rank){
         Bitboard mask = BITBOARD_EMPTY;
 
         mask |= GetDirectionalBlockerMask(file, rank, 0, 1);
@@ -91,7 +91,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /* Bishop                                              */
     /*******************************************************/
 
-    Bitboard GetBishopBlockerMask(uint8_t file, uint8_t rank){
+    Bitboard GetBishopMask(uint8_t file, uint8_t rank){
         Bitboard mask = BITBOARD_EMPTY;
 
         mask |= GetDirectionalBlockerMask(file, rank, 1, 1);
@@ -114,35 +114,62 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
         return mask;
     }
 
-    void InitMovesForSquare(std::array<Bitboard, permutations>& slidingMoves, uint8_t squareIndex, bool forBishop){
+    /* Initialize the move array for each square by calculating each occupancy
+     * permutation (key) and its corresponding attack (value) , creating an almost perfect hash */
+    void InitSlidingMoves(std::array<Bitboard, permutations>& slidingMoves, uint8_t squareIndex, bool forBishop){
         auto [file, rank] = GetCoordinates(squareIndex);
-        Bitboard blockerMask = forBishop ? GetBishopBlockerMask(file, rank) :
-                               GetRookBlockerMask(file, rank);
-        uint8_t bitCount = GetBitCount(blockerMask);
+
+        Bitboard blockerMask;
+        uint8_t bitCount;
+        if(forBishop){
+            bitCount = bishopMaskBitCounts[squareIndex];
+            blockerMask = bishopMasks[squareIndex];
+        }else{
+            bitCount = rookMaskBitCounts[squareIndex];
+            blockerMask = rookMasks[squareIndex];
+        }
 
         for (uint16_t permutationIndex = 0; permutationIndex < (1 << bitCount); permutationIndex++) {
             Bitboard occupanciesPermutation = GetPermutation(blockerMask, permutationIndex);
-            uint64_t index = forBishop ? BishopMagicHash(blockerMask, squareIndex, bitCount) :
-                             RookMagicHash(blockerMask, squareIndex, bitCount);
-            Bitboard attacks = GetBishopMoves(file, rank, occupanciesPermutation);
+
+            uint64_t index;
+            Bitboard attacks;
+            if(forBishop){
+                index = BishopMagicHash(blockerMask, squareIndex, bitCount);
+                attacks = GetBishopMoves(file, rank, occupanciesPermutation);
+            }else{
+                index = RookMagicHash(blockerMask, squareIndex, bitCount);
+                attacks = GetRookMoves(file, rank, occupanciesPermutation);
+            }
 
             slidingMoves[index] = attacks;
         }
     }
-
 
     /*******************************************************/
     /* Attack masks                                        */
     /*******************************************************/
 
     // Blocker masks , to be used in magic bitboards.
-    const std::array<Bitboard, 64> rookMasks = InitMasksTable(GetRookBlockerMask);
-    const std::array<Bitboard, 64> bishopMasks = InitMasksTable(GetBishopBlockerMask);
+    std::array<BitboardUtil::Bitboard, 64> rookMasks;
+    std::array<BitboardUtil::Bitboard, 64> bishopMasks;
 
-    // Used instead of GetBitCount in run time calculations.
-    const std::array<uint64_t , 64> rookMaskBitCounts =
-            InitMasksTable([](uint8_t file, uint8_t rank) { return (uint64_t)GetBitCount(rookMasks[GetSquareIndex(file, rank)]); } );
-    const std::array<uint64_t , 64> bishopMaskBitCounts =
-            InitMasksTable([](uint8_t file, uint8_t rank) { return (uint64_t)GetBitCount(bishopMasks[GetSquareIndex(file, rank)]); } );
+    std::array<uint64_t , 64> rookMaskBitCounts;
+    std::array<uint64_t , 64> bishopMaskBitCounts;
+
+    void InitBlockerMasks(){
+        rookMasks = CreateMasksTable(GetRookMask);
+        bishopMasks = CreateMasksTable(GetBishopMask);
+
+        auto rookBitCount = [](uint8_t file, uint8_t rank) {
+            return (uint64_t) BitboardUtil::GetBitCount(rookMasks[BitboardUtil::GetSquareIndex(file, rank)]);
+        };
+        auto bishopBitCount = [](uint8_t file, uint8_t rank) {
+            return (uint64_t) BitboardUtil::GetBitCount(bishopMasks[BitboardUtil::GetSquareIndex(file, rank)]);
+        };
+
+        rookMaskBitCounts = CreateMasksTable(rookBitCount);
+        bishopMaskBitCounts = CreateMasksTable(bishopBitCount);
+    }
 
 }

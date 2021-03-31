@@ -3,7 +3,7 @@
 #include "LeaperPieces.h"
 #include "SlidingPieces.h"
 
-namespace ChessEngine::MoveTables {
+namespace ChessEngine::MoveGeneration::MoveTables {
 
     // NOTE: performance isn't crucial for these functions
     // since they are run once when producing the tables.
@@ -17,7 +17,7 @@ namespace ChessEngine::MoveTables {
     /*******************************************************/
 
     /* Generate a move table based on the given function for each board position. */
-    static std::array<Bitboard, 64> InitLeaperMoves(Bitboard GetMoves(Bitboard)) {
+    static std::array<Bitboard, 64> CreateLeaperMoves(Bitboard GetMoves(Bitboard)) {
         std::array<Bitboard, 64> movesTable = {};
 
         for (uint8_t rank = 0; rank < 8; rank++) {
@@ -33,23 +33,34 @@ namespace ChessEngine::MoveTables {
     }
 
     /* Generate a single move table for rooks and bishops */
-    static std::array<Bitboard, permutations> InitSlidingMoves() {
-        std::array<Bitboard, permutations> slidingMoves = {};
+    static std::array<Bitboard, permutations> CreateSlidingMoves() {
+        std::array<Bitboard, permutations> moves = {};
 
         for (int rank = 0; rank < 8; rank++) {
             for (int file = 0; file < 8; file++) {
                 uint8_t squareIndex = GetSquareIndex(file, rank);
 
-                SlidingPieces::InitMovesForSquare(slidingMoves, squareIndex, true);
-                SlidingPieces::InitMovesForSquare(slidingMoves, squareIndex, false);
+                SlidingPieces::InitSlidingMoves(moves, squareIndex, true);
+                SlidingPieces::InitSlidingMoves(moves, squareIndex, false);
             }
         }
 
-        return slidingMoves;
+        return moves;
+    }
+
+    void InitAttacks(){
+        kingMoves = CreateLeaperMoves(LeaperPieces::GetKingMoves);
+        knightMoves = CreateLeaperMoves(LeaperPieces::GetKnightMoves);
+
+        auto whiteLeaper = [](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::White); };
+        auto blackLeaper = [](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::Black); };
+
+        pawnAttacks = {CreateLeaperMoves(whiteLeaper), CreateLeaperMoves(blackLeaper)};
+        slidingMoves = CreateSlidingMoves();
     }
 
     // Main sliding piece table , contains both rook and bishop attacks.
-    static std::array<Bitboard, permutations> slidingMoves = InitSlidingMoves();
+    std::array<Bitboard, permutations> slidingMoves;
 
     /*******************************************************/
     /* Rook                                                */
@@ -85,10 +96,8 @@ namespace ChessEngine::MoveTables {
     /*******************************************************/
 
     // [team color][square index].
-    // NOTE: lambdas are used since InitLeaperMoves expects no color argument. (Only pawns move differ based on color)
-    static std::array<std::array<Bitboard, 64>, 2> pawnAttacks =
-            {InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::White); }),
-             InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::Black); })};
+    // NOTE: lambdas are used since CreateLeaperMoves expects no color argument. (Only pawns move differ based on color)
+    std::array<std::array<Bitboard, 64>, 2> pawnAttacks;
 
     Bitboard GetPawnAttacks(Color color, uint8_t index) {
         return pawnAttacks[color][index];
@@ -99,7 +108,7 @@ namespace ChessEngine::MoveTables {
     /*******************************************************/
 
     // [square index] only. Black and white have the same attacks.
-    static std::array<Bitboard, 64> knightMoves = InitLeaperMoves(LeaperPieces::GetKnightMoves);
+    std::array<Bitboard, 64> knightMoves;
 
     Bitboard GetKnightMoves(uint8_t index) {
         return knightMoves[index];
@@ -110,7 +119,7 @@ namespace ChessEngine::MoveTables {
     /*******************************************************/
 
     // [square index] only. Black and white have the same attacks.
-    static std::array<Bitboard, 64> kingMoves = InitLeaperMoves(LeaperPieces::GetKingMoves);
+    std::array<Bitboard, 64> kingMoves;
 
     Bitboard GetKingMoves(uint8_t index) {
         return kingMoves[index];

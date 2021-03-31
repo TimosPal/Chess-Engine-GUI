@@ -9,6 +9,8 @@ using namespace ChessEngine;
 using namespace ChessEngine::BitboardUtil;
 
 int main() {
+    InitEngine(); // Should be called first.
+
     BoardState state = {};
     std::string fenPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     if(!ParseFenString(fenPosition, state)){
@@ -20,7 +22,7 @@ int main() {
     //board.Draw();
 
     Bitboard b = board.GetOccupancies()[2];
-    Bitboard a = MoveTables::GetBishopMoves(GetSquareIndex(File::E, Rank::R3) , b);
+    Bitboard a = MoveGeneration::MoveTables::GetBishopMoves(GetSquareIndex(File::E, Rank::R3) , b);
     DrawBitBoard(a);
     DrawBitBoard(b);
 
