@@ -13,12 +13,13 @@ namespace ChessEngine::MagicNumbers {
 
     constexpr uint64_t permutations = 88772;
 
-    struct
+    struct SquareInfo
     {
         uint64_t magicNumber;
         int mainTableOffset;
-    }
-            bishop_magics[64] =
+    };
+
+    constexpr SquareInfo bishopMagics[64] =
             {
                     { 0x007fbfbfbfbfbfffu,   5378 },
                     { 0x0000a060401007fcu,   4093 },
@@ -84,8 +85,9 @@ namespace ChessEngine::MagicNumbers {
                     { 0x0000000401002008u,  16588 },
                     { 0x0000004040404040u,   6905 },
                     { 0x007fff9fdf7ff813u,  16076 }
-            },
-            rook_magics[64] =
+            };
+
+    constexpr SquareInfo rookMagics[64] =
             {
                     { 0x00280077ffebfffeu,  26304 },
                     { 0x2004010201097fffu,  35520 },
@@ -154,12 +156,12 @@ namespace ChessEngine::MagicNumbers {
             };
 
     constexpr uint64_t BishopMagicHash(Bitboard_Util::Bitboard board, uint8_t squareIndex, uint8_t bitCount){
-        auto squareInfo = bishop_magics[squareIndex];
+        auto squareInfo = bishopMagics[squareIndex];
         return ((board * squareInfo.magicNumber) >> (64 - bitCount)) + squareInfo.mainTableOffset;
     }
 
     constexpr uint64_t RookMagicHash(Bitboard_Util::Bitboard board, uint8_t squareIndex, uint8_t bitCount){
-        auto squareInfo = rook_magics[squareIndex];
+        auto squareInfo = rookMagics[squareIndex];
         return ((board * squareInfo.magicNumber) >> (64 - bitCount)) + squareInfo.mainTableOffset;
     }
 

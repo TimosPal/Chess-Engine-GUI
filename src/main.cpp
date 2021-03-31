@@ -20,8 +20,10 @@ int main() {
     Board board(state);
     //board.Draw();
 
-    Bitboard a = MoveTables::GetQueenMoves(GetSquareIndex(File::E, Rank::R3) , board.GetOccupancies()[2]);
+    Bitboard b = board.GetOccupancies()[2];
+    Bitboard a = MoveTables::GetBishopMoves(GetSquareIndex(File::E, Rank::R3) , b);
     DrawBitBoard(a);
+    DrawBitBoard(b);
 
 
     return 0;

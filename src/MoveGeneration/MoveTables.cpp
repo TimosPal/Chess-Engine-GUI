@@ -31,7 +31,7 @@ static constexpr std::array<Bitboard, 64> InitLeaperMoves(Bitboard GetMoves(Bitb
 }
 
 /* Generate a single move table for rooks and bishops */
-constexpr std::array<Bitboard, permutations> InitSlidingMoves(){
+static constexpr std::array<Bitboard, permutations> InitSlidingMoves(){
     std::array<Bitboard, permutations> slidingMoves = {};
 
     for (int rank = 0; rank < 8; rank++) {
@@ -39,7 +39,7 @@ constexpr std::array<Bitboard, permutations> InitSlidingMoves(){
             uint8_t squareIndex = GetSquareIndex(file, rank);
 
             InitMovesForSquare(slidingMoves, squareIndex, true);
-            InitMovesForSquare(slidingMoves, squareIndex, false);
+            //InitMovesForSquare(slidingMoves, squareIndex, false);
         }
     }
 
@@ -47,7 +47,7 @@ constexpr std::array<Bitboard, permutations> InitSlidingMoves(){
 }
 
 // Main sliding piece table , contains both rook and bishop attacks.
-static std::array<Bitboard, permutations> slidingMoves = InitSlidingMoves();
+static constexpr std::array<Bitboard, permutations> slidingMoves = InitSlidingMoves();
 
 /*******************************************************/
 /* Rook                                                */
@@ -55,7 +55,8 @@ static std::array<Bitboard, permutations> slidingMoves = InitSlidingMoves();
 
 Bitboard ChessEngine::MoveTables::GetRookMoves(uint8_t index, Bitboard_Util::Bitboard occupancies){
     Bitboard blockerMask = rookMasks[index];
-    uint8_t bitCount = GetBitCount(blockerMask);
+    DrawBitBoard(blockerMask);
+    uint8_t bitCount = rookMaskBitCounts[index];
     return slidingMoves[RookMagicHash(occupancies, index, bitCount)];
 }
 
@@ -65,7 +66,7 @@ Bitboard ChessEngine::MoveTables::GetRookMoves(uint8_t index, Bitboard_Util::Bit
 
 Bitboard ChessEngine::MoveTables::GetBishopMoves(uint8_t index, Bitboard_Util::Bitboard occupancies){
     Bitboard blockerMask = bishopMasks[index];
-    uint8_t bitCount = GetBitCount(blockerMask);
+    uint8_t bitCount = bishopMaskBitCounts[index];
     return slidingMoves[BishopMagicHash(occupancies, index, bitCount)];
 }
 

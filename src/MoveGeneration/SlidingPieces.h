@@ -124,7 +124,7 @@ namespace ChessEngine::SlidingPieces {
                                            GetRookBlockerMask(file, rank);
         uint8_t bitCount = GetBitCount(blockerMask);
 
-        for (int permutationIndex = 0; permutationIndex < 1 << bitCount; permutationIndex++) {
+        for (uint16_t permutationIndex = 0; permutationIndex < (1 << bitCount); permutationIndex++) {
             Bitboard occupanciesPermutation = GetPermutation(blockerMask, permutationIndex);
             uint64_t index = forBishop ? BishopMagicHash(blockerMask, squareIndex, bitCount) :
                                          RookMagicHash(blockerMask, squareIndex, bitCount);
@@ -142,6 +142,12 @@ namespace ChessEngine::SlidingPieces {
     // Blocker masks , to be used in magic bitboards.
     constexpr std::array<Bitboard, 64> rookMasks = InitMasksTable(GetRookBlockerMask);
     constexpr std::array<Bitboard, 64> bishopMasks = InitMasksTable(GetBishopBlockerMask);
+
+    // Used instead of GetBitCount in run time calculations.
+    constexpr std::array<uint64_t , 64> rookMaskBitCounts =
+            InitMasksTable([](File file, Rank rank) { return (uint64_t)GetBitCount(rookMasks[GetSquareIndex(file, rank)]); } );
+    constexpr std::array<uint64_t , 64> bishopMaskBitCounts =
+            InitMasksTable([](File file, Rank rank) { return (uint64_t)GetBitCount(bishopMasks[GetSquareIndex(file, rank)]); } );
 
 }
 
