@@ -35,7 +35,7 @@ std::ostream& ChessEngine::MoveGeneration::operator<<(std::ostream& out, const M
         uint8_t flags = value;
         while(flags != 0) { // Print each flag based on the bits
             uint8_t lsbIndex = BitboardUtil::GetLSBIndex(flags);
-            MoveType tempFlag = (MoveType)BitboardUtil::SetBit(0, lsbIndex);
+            auto tempFlag = (MoveType)BitboardUtil::SetBit(0, lsbIndex);
 
             flags = BitboardUtil::PopBit(flags, lsbIndex);
             out << MoveTypeToString(tempFlag);

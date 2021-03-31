@@ -1,5 +1,5 @@
-#ifndef MAGICNUMBERS_H
-#define MAGICNUMBERS_H
+#ifndef MAGIC_NUMBERS_H
+#define MAGIC_NUMBERS_H
 
 #include "../Board/Bitboard.h"
 
@@ -9,7 +9,7 @@ namespace ChessEngine::MagicNumbers {
     // http://www.talkchess.com/forum3/viewtopic.php?p=727500#p727500
 
     // A compact merged lookup table is used for space efficiency.
-    // main array index = magic + offet.
+    // main array index = magic + offset.
 
     constexpr uint64_t permutations = 88772;
 

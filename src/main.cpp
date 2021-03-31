@@ -1,5 +1,4 @@
 #include <iostream>
-#include <unistd.h>
 
 #include "FenParser/FenParser.h"
 #include "Board/Board.h"

@@ -1,5 +1,5 @@
-#ifndef MOVETABLES_H
-#define MOVETABLES_H
+#ifndef MOVE_TABLES_H
+#define MOVE_TABLES_H
 
 #include "../Board/Bitboard.h"
 

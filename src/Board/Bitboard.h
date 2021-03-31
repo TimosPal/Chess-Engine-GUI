@@ -7,7 +7,6 @@
 #include "../Utilities/EngineUtil.h"
 
 #define BIT_MASK 0x1ULL
-
 #define BITBOARD_EMPTY 0x0ULL
 
 namespace ChessEngine::BitboardUtil {
@@ -62,7 +61,7 @@ namespace ChessEngine::BitboardUtil {
         return index64[(GetLSB(board) * debruijn64) >> 58];
     }
 
-    constexpr uint8_t GetSquareIndex(uint8_t file, uint8_t rank) {
+    constexpr uint8_t GetSquareIndex(int file, int rank) {
         return rank * 8 + file;
     }
 

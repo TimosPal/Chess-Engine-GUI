@@ -17,7 +17,7 @@ namespace ChessEngine::MoveGeneration::LeaperPieces {
 
     /* Generate the attack moves of pawns */
     Bitboard GetPawnAttacks(Bitboard board, Color color) {
-        Bitboard leftAttack = BITBOARD_EMPTY, rightAttack = BITBOARD_EMPTY;
+        Bitboard leftAttack, rightAttack;
         if (color == Color::White) {
             leftAttack = ShiftUpLeft(board) & not_FileH_Mask;
             rightAttack = ShiftUpRight(board) & not_FileA_Mask;
@@ -35,7 +35,7 @@ namespace ChessEngine::MoveGeneration::LeaperPieces {
 
     /* Generate the double push moves of pawns , check for occupancy only on the first move. */
     Bitboard GetDoublePawnPushes(Bitboard board, Bitboard occupancies, Color color) {
-        Bitboard pushes = BITBOARD_EMPTY;
+        Bitboard pushes;
         if (color == Color::White) {
             pushes = ShiftUp(board & r2_Mask) & ~occupancies;
             pushes = ShiftUp(pushes);

@@ -1,6 +1,5 @@
 #include "FenParser.h"
 
-#include <tuple>
 #include <sstream>
 
 using namespace ChessEngine;
@@ -45,7 +44,7 @@ static bool ParseFenPlacement(const std::string& placement, BoardState& state){
                 file += emptySquares - 1;
             }else {
                 // Get the piece info based on the fen token.
-                std::tuple<PieceType, Color> pieceInfo;
+                std::tuple<PieceType, Color> pieceInfo{};
                 if(!TokenToPiece(token, pieceInfo))
                     return false;
                 auto [type, color] = pieceInfo;
@@ -100,7 +99,7 @@ static bool ParseCastlingRights(const std::string& rightsString, BoardState& sta
     }
 
     for(char token : rightsString) {
-        std::tuple<PieceType, Color> pieceInfo;
+        std::tuple<PieceType, Color> pieceInfo{};
         if(!TokenToPiece(token, pieceInfo))
             return false;
         auto [type, color] = pieceInfo;
@@ -155,7 +154,7 @@ static bool ParseEnPassant(const std::string& enPassantString, BoardState& state
         return true;
     }
 
-    std::tuple<uint8_t, uint8_t> coords;
+    std::tuple<uint8_t, uint8_t> coords{};
     if(!StringToCoord(enPassantString, coords))
         return false;
 

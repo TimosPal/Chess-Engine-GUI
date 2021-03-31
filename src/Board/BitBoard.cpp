@@ -22,9 +22,9 @@ namespace ChessEngine::BitboardUtil {
         // permutations just flattened out.
 
         Bitboard permutation = BITBOARD_EMPTY;
-        int i = 0; // i points to the current i-th bit of the permutationIndex.
+        uint8_t i = 0; // i points to the current i-th bit of the permutationIndex.
         while (board != 0) {
-            int lsbIndex = GetLSBIndex(board);
+            uint8_t lsbIndex = GetLSBIndex(board);
 
             if (permutationIndex & SetBit(BITBOARD_EMPTY, i)) {
                 // project the i-th bit on the board.

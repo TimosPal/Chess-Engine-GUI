@@ -1,5 +1,5 @@
-#ifndef BOARDSTATE_H
-#define BOARDSTATE_H
+#ifndef BOARD_STATE_H
+#define BOARD_STATE_H
 
 #include "Bitboard.h"
 

@@ -1,5 +1,5 @@
-#ifndef FENPARSER_H
-#define FENPARSER_H
+#ifndef FEN_PARSER_H
+#define FEN_PARSER_H
 
 #include <string>
 

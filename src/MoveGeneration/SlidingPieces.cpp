@@ -30,7 +30,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     Bitboard GetDirectionalBlockerMask(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY){
         // Exclude outer edges.
         Bitboard mask = BITBOARD_EMPTY;
-        int x = file + dirX, y = rank + dirY;
+        uint8_t x = file + dirX, y = rank + dirY;
         while(x > 0 && x < 7 && y > 0 && y < 7) {
             mask |= SetBit(BITBOARD_EMPTY, GetSquareIndex(x, y));
             x += dirX;
@@ -44,7 +44,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     Bitboard GetDirectionalMoves(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY, Bitboard occupancies){
         // Include outer edges if not blocked till that point.
         Bitboard mask = BITBOARD_EMPTY;
-        int x = file + dirX, y = rank + dirY;
+        uint8_t x = file + dirX, y = rank + dirY;
         while(x >= 0 && x <= 7 && y >= 0 && y <= 7) {
             Bitboard currentBit = SetBit(BITBOARD_EMPTY, GetSquareIndex(x, y));
             mask |= currentBit;

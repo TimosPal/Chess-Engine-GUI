@@ -1,5 +1,5 @@
-#ifndef LEAPERPIECES_H
-#define LEAPERPIECES_H
+#ifndef LEAPER_PIECES_H
+#define LEAPER_PIECES_H
 
 #include "../Board/Bitboard.h"
 

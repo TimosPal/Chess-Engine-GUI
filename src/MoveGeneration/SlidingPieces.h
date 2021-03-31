@@ -1,5 +1,5 @@
-#ifndef SLIDINGPIECES_H
-#define SLIDINGPIECES_H
+#ifndef SLIDING_PIECES_H
+#define SLIDING_PIECES_H
 
 #include "../Board/Bitboard.h"
 #include "MagicNumbers.h"

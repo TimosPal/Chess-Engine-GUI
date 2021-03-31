@@ -59,7 +59,7 @@ namespace ChessEngine::MoveTables {
         Bitboard blockerMask = SlidingPieces::rookMasks[index];
         DrawBitBoard(blockerMask);
         uint8_t bitCount = SlidingPieces::rookMaskBitCounts[index];
-        return slidingMoves[RookMagicHash(occupancies, index, bitCount)];
+        return slidingMoves[RookMagicHash(occupancies & blockerMask, index, bitCount)];
     }
 
     /*******************************************************/
@@ -69,7 +69,7 @@ namespace ChessEngine::MoveTables {
     Bitboard GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
         Bitboard blockerMask = SlidingPieces::bishopMasks[index];
         uint8_t bitCount = SlidingPieces::bishopMaskBitCounts[index];
-        return slidingMoves[BishopMagicHash(occupancies, index, bitCount)];
+        return slidingMoves[BishopMagicHash(occupancies & blockerMask, index, bitCount)];
     }
 
     /*******************************************************/
@@ -77,7 +77,7 @@ namespace ChessEngine::MoveTables {
     /*******************************************************/
 
     Bitboard GetQueenMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
-        return GetBishopMoves(index, occupancies) || GetRookMoves(index, occupancies);
+        return GetBishopMoves(index, occupancies) | GetRookMoves(index, occupancies);
     }
 
     /*******************************************************/

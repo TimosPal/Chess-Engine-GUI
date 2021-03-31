@@ -1,5 +1,5 @@
-#ifndef MOVEGENERATION_H
-#define MOVEGENERATION_H
+#ifndef MOVE_GENERATION_H
+#define MOVE_GENERATION_H
 
 #include <cstdint>
 

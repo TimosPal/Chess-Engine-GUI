@@ -1,5 +1,5 @@
-#ifndef ENGINEUTIL_H
-#define ENGINEUTIL_H
+#ifndef ENGINE_UTIL_H
+#define ENGINE_UTIL_H
 
 #include <string>
 #include <tuple>
