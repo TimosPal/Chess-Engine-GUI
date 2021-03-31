@@ -24,7 +24,6 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /*******************************************************/
 
     BitboardUtil::Bitboard GetRookBlockerMask(uint8_t file, uint8_t rank);
-
     BitboardUtil::Bitboard GetRookMoves(uint8_t file, uint8_t rank, BitboardUtil::Bitboard occupancies);
 
     /*******************************************************/
@@ -32,7 +31,6 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /*******************************************************/
 
     BitboardUtil::Bitboard GetBishopBlockerMask(uint8_t file, uint8_t rank);
-
     BitboardUtil::Bitboard GetBishopMoves(uint8_t file, uint8_t rank, BitboardUtil::Bitboard occupancies);
 
     void InitMovesForSquare(std::array<BitboardUtil::Bitboard, MagicNumbers::permutations>& slidingMoves, uint8_t squareIndex, bool forBishop);

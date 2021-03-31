@@ -3,113 +3,118 @@
 #include "LeaperPieces.h"
 #include "SlidingPieces.h"
 
-using namespace ChessEngine;
-using namespace ChessEngine::BitboardUtil;
-using namespace ChessEngine::LeaperPieces;
-using namespace ChessEngine::SlidingPieces;
-using namespace ChessEngine::MoveTables;
-using namespace ChessEngine::MagicNumbers;
 
-/*******************************************************/
-/* General                                             */
-/*******************************************************/
+namespace ChessEngine::MoveTables {
 
-/* Generate a move table based on the given function for each board position. */
-static constexpr std::array<Bitboard, 64> InitLeaperMoves(Bitboard GetMoves(Bitboard)) {
-    std::array<Bitboard, 64> movesTable = {};
+    // NOTE: performance isn't crucial for these functions
+    // since they are run once when producing the tables.
 
-    for (uint8_t rank = 0; rank < 8; rank++) {
-        for (uint8_t file = 0; file < 8; file++) {
-            uint8_t squareIndex = GetSquareIndex(file, rank);
+    using namespace ChessEngine::BitboardUtil;
+    using namespace ChessEngine::MagicNumbers;
+    using namespace ChessEngine::MoveGeneration;
 
-            Bitboard board = SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
-            movesTable[squareIndex] = GetMoves(board);
+    /*******************************************************/
+    /* General                                             */
+    /*******************************************************/
+
+    /* Generate a move table based on the given function for each board position. */
+    static std::array<Bitboard, 64> InitLeaperMoves(Bitboard GetMoves(Bitboard)) {
+        std::array<Bitboard, 64> movesTable = {};
+
+        for (uint8_t rank = 0; rank < 8; rank++) {
+            for (uint8_t file = 0; file < 8; file++) {
+                uint8_t squareIndex = GetSquareIndex(file, rank);
+
+                Bitboard board = SetBit(BITBOARD_EMPTY, GetSquareIndex(file, rank));
+                movesTable[squareIndex] = GetMoves(board);
+            }
         }
+
+        return movesTable;
     }
 
-    return movesTable;
-}
+    /* Generate a single move table for rooks and bishops */
+    static std::array<Bitboard, permutations> InitSlidingMoves() {
+        std::array<Bitboard, permutations> slidingMoves = {};
 
-/* Generate a single move table for rooks and bishops */
-static constexpr std::array<Bitboard, permutations> InitSlidingMoves(){
-    std::array<Bitboard, permutations> slidingMoves = {};
+        for (int rank = 0; rank < 8; rank++) {
+            for (int file = 0; file < 8; file++) {
+                uint8_t squareIndex = GetSquareIndex(file, rank);
 
-    for (int rank = 0; rank < 8; rank++) {
-        for (int file = 0; file < 8; file++) {
-            uint8_t squareIndex = GetSquareIndex(file, rank);
-
-            InitMovesForSquare(slidingMoves, squareIndex, true);
-            //InitMovesForSquare(slidingMoves, squareIndex, false);
+                SlidingPieces::InitMovesForSquare(slidingMoves, squareIndex, true);
+                SlidingPieces::InitMovesForSquare(slidingMoves, squareIndex, false);
+            }
         }
+
+        return slidingMoves;
     }
 
-    return slidingMoves;
-}
+    // Main sliding piece table , contains both rook and bishop attacks.
+    static std::array<Bitboard, permutations> slidingMoves = InitSlidingMoves();
 
-// Main sliding piece table , contains both rook and bishop attacks.
-static constexpr std::array<Bitboard, permutations> slidingMoves = InitSlidingMoves();
+    /*******************************************************/
+    /* Rook                                                */
+    /*******************************************************/
 
-/*******************************************************/
-/* Rook                                                */
-/*******************************************************/
+    Bitboard ChessEngine::MoveTables::GetRookMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
+        Bitboard blockerMask = SlidingPieces::rookMasks[index];
+        DrawBitBoard(blockerMask);
+        uint8_t bitCount = SlidingPieces::rookMaskBitCounts[index];
+        return slidingMoves[RookMagicHash(occupancies, index, bitCount)];
+    }
 
-Bitboard ChessEngine::MoveTables::GetRookMoves(uint8_t index, BitboardUtil::Bitboard occupancies){
-    Bitboard blockerMask = rookMasks[index];
-    DrawBitBoard(blockerMask);
-    uint8_t bitCount = rookMaskBitCounts[index];
-    return slidingMoves[RookMagicHash(occupancies, index, bitCount)];
-}
+    /*******************************************************/
+    /* Bishop                                              */
+    /*******************************************************/
 
-/*******************************************************/
-/* Bishop                                              */
-/*******************************************************/
+    Bitboard ChessEngine::MoveTables::GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
+        Bitboard blockerMask = SlidingPieces::bishopMasks[index];
+        uint8_t bitCount = SlidingPieces::bishopMaskBitCounts[index];
+        return slidingMoves[BishopMagicHash(occupancies, index, bitCount)];
+    }
 
-Bitboard ChessEngine::MoveTables::GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies){
-    Bitboard blockerMask = bishopMasks[index];
-    uint8_t bitCount = bishopMaskBitCounts[index];
-    return slidingMoves[BishopMagicHash(occupancies, index, bitCount)];
-}
+    /*******************************************************/
+    /* Queen                                               */
+    /*******************************************************/
 
-/*******************************************************/
-/* Queen                                               */
-/*******************************************************/
+    Bitboard ChessEngine::MoveTables::GetQueenMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
+        return GetBishopMoves(index, occupancies) || GetRookMoves(index, occupancies);
+    }
 
-Bitboard ChessEngine::MoveTables::GetQueenMoves(uint8_t index, BitboardUtil::Bitboard occupancies){
-    return GetBishopMoves(index, occupancies) || GetRookMoves(index, occupancies);
-}
+    /*******************************************************/
+    /* Pawn                                                */
+    /*******************************************************/
 
-/*******************************************************/
-/* Pawn                                                */
-/*******************************************************/
+    // [team color][square index].
+    // NOTE: lambdas are used since InitLeaperMoves expects no color argument. (Only pawns move differ based on color)
+    static std::array<std::array<Bitboard, 64>, 2> pawnAttacks =
+            {InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::White); }),
+             InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::Black); })};
 
-// [team color][square index].
-// NOTE: lambdas are used since InitLeaperMoves expects no color argument. (Only pawns move differ based on color)
-static constexpr std::array<std::array<Bitboard, 64>, 2> pawnAttacks =
-        {InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::White); }),
-         InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::Black); })};
+    Bitboard ChessEngine::MoveTables::GetPawnAttacks(Color color, uint8_t index) {
+        return pawnAttacks[color][index];
+    }
 
-Bitboard ChessEngine::MoveTables::GetPawnAttacks(Color color, uint8_t index){
-    return pawnAttacks[color][index];
-}
+    /*******************************************************/
+    /* Knight                                              */
+    /*******************************************************/
 
-/*******************************************************/
-/* Knight                                              */
-/*******************************************************/
+    // [square index] only. Black and white have the same attacks.
+    static std::array<Bitboard, 64> knightMoves = InitLeaperMoves(LeaperPieces::GetKnightMoves);
 
-// [square index] only. Black and white have the same attacks.
-static constexpr std::array<Bitboard, 64> knightMoves = InitLeaperMoves(LeaperPieces::GetKnightMoves);
+    Bitboard ChessEngine::MoveTables::GetKnightMoves(uint8_t index) {
+        return knightMoves[index];
+    }
 
-Bitboard ChessEngine::MoveTables::GetKnightMoves(uint8_t index){
-    return knightMoves[index];
-}
+    /*******************************************************/
+    /* King                                                */
+    /*******************************************************/
 
-/*******************************************************/
-/* King                                                */
-/*******************************************************/
+    // [square index] only. Black and white have the same attacks.
+    static std::array<Bitboard, 64> kingMoves = InitLeaperMoves(LeaperPieces::GetKingMoves);
 
-// [square index] only. Black and white have the same attacks.
-static constexpr std::array<Bitboard, 64> kingMoves = InitLeaperMoves(LeaperPieces::GetKingMoves);
+    Bitboard ChessEngine::MoveTables::GetKingMoves(uint8_t index) {
+        return kingMoves[index];
+    }
 
-Bitboard ChessEngine::MoveTables::GetKingMoves(uint8_t index){
-    return kingMoves[index];
 }

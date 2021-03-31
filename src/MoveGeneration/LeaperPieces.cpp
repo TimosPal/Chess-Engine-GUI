@@ -2,6 +2,9 @@
 
 namespace ChessEngine::MoveGeneration::LeaperPieces {
 
+    // NOTE: performance isn't crucial for these functions
+    // since they are run once when producing the tables.
+
     using namespace ChessEngine::BitboardUtil;
 
     /*******************************************************/
