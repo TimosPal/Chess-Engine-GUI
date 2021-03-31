@@ -3,7 +3,6 @@
 #include "LeaperPieces.h"
 #include "SlidingPieces.h"
 
-
 namespace ChessEngine::MoveTables {
 
     // NOTE: performance isn't crucial for these functions
@@ -56,7 +55,7 @@ namespace ChessEngine::MoveTables {
     /* Rook                                                */
     /*******************************************************/
 
-    Bitboard ChessEngine::MoveTables::GetRookMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
+    Bitboard GetRookMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
         Bitboard blockerMask = SlidingPieces::rookMasks[index];
         DrawBitBoard(blockerMask);
         uint8_t bitCount = SlidingPieces::rookMaskBitCounts[index];
@@ -67,7 +66,7 @@ namespace ChessEngine::MoveTables {
     /* Bishop                                              */
     /*******************************************************/
 
-    Bitboard ChessEngine::MoveTables::GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
+    Bitboard GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
         Bitboard blockerMask = SlidingPieces::bishopMasks[index];
         uint8_t bitCount = SlidingPieces::bishopMaskBitCounts[index];
         return slidingMoves[BishopMagicHash(occupancies, index, bitCount)];
@@ -77,7 +76,7 @@ namespace ChessEngine::MoveTables {
     /* Queen                                               */
     /*******************************************************/
 
-    Bitboard ChessEngine::MoveTables::GetQueenMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
+    Bitboard GetQueenMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
         return GetBishopMoves(index, occupancies) || GetRookMoves(index, occupancies);
     }
 
@@ -91,7 +90,7 @@ namespace ChessEngine::MoveTables {
             {InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::White); }),
              InitLeaperMoves([](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::Black); })};
 
-    Bitboard ChessEngine::MoveTables::GetPawnAttacks(Color color, uint8_t index) {
+    Bitboard GetPawnAttacks(Color color, uint8_t index) {
         return pawnAttacks[color][index];
     }
 
@@ -102,7 +101,7 @@ namespace ChessEngine::MoveTables {
     // [square index] only. Black and white have the same attacks.
     static std::array<Bitboard, 64> knightMoves = InitLeaperMoves(LeaperPieces::GetKnightMoves);
 
-    Bitboard ChessEngine::MoveTables::GetKnightMoves(uint8_t index) {
+    Bitboard GetKnightMoves(uint8_t index) {
         return knightMoves[index];
     }
 
@@ -113,7 +112,7 @@ namespace ChessEngine::MoveTables {
     // [square index] only. Black and white have the same attacks.
     static std::array<Bitboard, 64> kingMoves = InitLeaperMoves(LeaperPieces::GetKingMoves);
 
-    Bitboard ChessEngine::MoveTables::GetKingMoves(uint8_t index) {
+    Bitboard GetKingMoves(uint8_t index) {
         return kingMoves[index];
     }
 

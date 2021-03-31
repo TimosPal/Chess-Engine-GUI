@@ -141,8 +141,8 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
 
     // Used instead of GetBitCount in run time calculations.
     const std::array<uint64_t , 64> rookMaskBitCounts =
-            InitMasksTable([](File file, Rank rank) { return (uint64_t)GetBitCount(rookMasks[GetSquareIndex(file, rank)]); } );
+            InitMasksTable([](uint8_t file, uint8_t rank) { return (uint64_t)GetBitCount(rookMasks[GetSquareIndex(file, rank)]); } );
     const std::array<uint64_t , 64> bishopMaskBitCounts =
-            InitMasksTable([](File file, Rank rank) { return (uint64_t)GetBitCount(bishopMasks[GetSquareIndex(file, rank)]); } );
+            InitMasksTable([](uint8_t file, uint8_t rank) { return (uint64_t)GetBitCount(bishopMasks[GetSquareIndex(file, rank)]); } );
 
 }
