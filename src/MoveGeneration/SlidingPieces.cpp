@@ -19,7 +19,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
         for (uint8_t rank = 0; rank < 8; rank++) {
             for (uint8_t file = 0; file < 8; file++) {
                 uint8_t squareIndex = GetSquareIndex(file, rank);
-                mask[squareIndex] = getMask((File)file, (Rank)rank);
+                mask[squareIndex] = getMask(file, rank);
             }
         }
 

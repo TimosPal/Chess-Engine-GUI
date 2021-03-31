@@ -17,17 +17,58 @@ namespace ChessEngine::BitboardUtil {
     using Bitboard = uint64_t;
 
     /*******************************************************/
-    /* Basic functions                                     */
+    /* Basic constexpr functions                           */
     /*******************************************************/
 
-    Bitboard GetBit(Bitboard board, uint8_t index);
-    Bitboard SetBit(Bitboard board, uint8_t index);
-    Bitboard PopBit(Bitboard board, uint8_t index);
-    Bitboard GetLSB(Bitboard board);
+    constexpr Bitboard GetBit(Bitboard board, uint8_t index) {
+        return board & (BIT_MASK << index);
+    }
 
-    uint8_t GetBitCount(Bitboard board);
-    uint8_t GetLSBIndex(Bitboard board);
-    uint8_t GetSquareIndex(uint8_t file, uint8_t rank);
+    constexpr Bitboard SetBit(Bitboard board, uint8_t index) {
+        return board | (BIT_MASK << index);
+    }
+
+    constexpr Bitboard PopBit(Bitboard board, uint8_t index) {
+        return board ^ GetBit(board, index);
+    }
+
+    constexpr Bitboard GetLSB(Bitboard board) {
+        return board & -board;
+    }
+
+    constexpr uint8_t GetBitCount(Bitboard board) {
+        uint8_t count = 0;
+        while (board) {
+            count++;
+            board &= board - 1;
+        }
+        return count;
+    }
+
+    constexpr uint8_t GetLSBIndex(Bitboard board) { // NOTE: maybe use built_in_ffs (?)
+        /* De Bruijn bitscan algorithm */
+        const uint64_t debruijn64 = 0x03f79d71b4cb0a89;
+        const uint8_t index64[64] = {
+                0, 1, 48, 2, 57, 49, 28, 3,
+                61, 58, 50, 42, 38, 29, 17, 4,
+                62, 55, 59, 36, 53, 51, 43, 22,
+                45, 39, 33, 30, 24, 18, 12, 5,
+                63, 47, 56, 27, 60, 41, 37, 16,
+                54, 35, 52, 21, 44, 32, 23, 11,
+                46, 26, 40, 15, 34, 20, 31, 10,
+                25, 14, 19, 9, 13, 8, 7, 6
+        };
+
+        return index64[(GetLSB(board) * debruijn64) >> 58];
+    }
+
+    constexpr uint8_t GetSquareIndex(uint8_t file, uint8_t rank) {
+        return rank * 8 + file;
+    }
+
+    /*******************************************************/
+    /* General                                             */
+    /*******************************************************/
 
     /* Returns file , rank in a tuple based opn the given square index */
     std::tuple<uint8_t, uint8_t> GetCoordinates(uint8_t squareIndex);
@@ -57,35 +98,58 @@ namespace ChessEngine::BitboardUtil {
     /* Basic masks                                         */
     /*******************************************************/
 
+    /* 'From' should be smaller than 'to' */
+    constexpr Bitboard GetCastlingMask(uint8_t from, uint8_t to) {
+        Bitboard temp = BITBOARD_EMPTY;
+
+        while (from <= to) {
+            temp = SetBit(temp, GetSquareIndex(from, Rank::R1));
+            temp = SetBit(temp, GetSquareIndex(from, Rank::R8));
+
+            from++;
+        }
+
+        return temp;
+    }
+
     // File masks.
-    extern const Bitboard fileA_Mask;
-    extern const Bitboard fileB_Mask;
-    extern const Bitboard fileG_Mask;
-    extern const Bitboard fileH_Mask;
+    constexpr Bitboard fileA_Mask = 0x0101010101010101ULL;
+    constexpr Bitboard fileB_Mask = fileA_Mask << 1;
+    constexpr Bitboard fileG_Mask = fileA_Mask << 6;
+    constexpr Bitboard fileH_Mask = fileA_Mask << 7;
 
     // Not file masks.
-    extern const Bitboard not_FileA_Mask;
-    extern const Bitboard not_FileB_Mask;
-    extern const Bitboard not_FileG_Mask;
-    extern const Bitboard not_FileH_Mask;
+    constexpr Bitboard not_FileA_Mask = ~fileA_Mask;
+    constexpr Bitboard not_FileB_Mask = ~fileB_Mask;
+    constexpr Bitboard not_FileG_Mask = ~fileG_Mask;
+    constexpr Bitboard not_FileH_Mask = ~fileH_Mask;
 
-    extern const Bitboard not_FileAB_Mask;
-    extern const Bitboard not_FileGH_Mask;
+    constexpr Bitboard not_FileAB_Mask = ~(fileA_Mask | fileB_Mask);
+    constexpr Bitboard not_FileGH_Mask = ~(fileH_Mask | fileG_Mask);
 
     // Rank masks.
-    extern const Bitboard r1_Mask;
-    extern const Bitboard r2_Mask;
-    extern const Bitboard r7_Mask;
-    extern const Bitboard r8_Mask;
+    constexpr Bitboard r1_Mask = 0xff;
+    constexpr Bitboard r2_Mask = r1_Mask << (8 * 1);
+    constexpr Bitboard r7_Mask = r1_Mask << (8 * 6);
+    constexpr Bitboard r8_Mask = r1_Mask << (8 * 7);
 
     // Used in castling.
-    extern const Bitboard kingSideCastling_Mask;
-    extern const Bitboard queenSideCastling_Mask;
+    constexpr Bitboard kingSideCastling_Mask = GetCastlingMask(File::F, File::G);
+    constexpr Bitboard queenSideCastling_Mask = GetCastlingMask(File::B, File::D);
 
     // Mixed boards , need to mask with appropriate color rank.
-    extern const Bitboard kingsStartingPosBoard;
-    extern const Bitboard kingsCastlePosBoard;
-    extern const Bitboard queenCastlePosBoard;
+    constexpr Bitboard kingsStartingPosBoard =
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::E, Rank::R1)) |
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::E, Rank::R8));
+
+    constexpr Bitboard kingsCastlePosBoard =
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::G, Rank::R1)) |
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::G, Rank::R8));
+
+    constexpr Bitboard queenCastlePosBoard =
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::C, Rank::R1)) |
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::C, Rank::R8));
+
 
 }
 

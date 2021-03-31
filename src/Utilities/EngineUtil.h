@@ -27,7 +27,7 @@ namespace ChessEngine {
     std::string FileToString(File file);
     std::string RankToString(Rank rank);
 
-    bool StringToCoord(const std::string& str, std::tuple<File, Rank>& coords);
+    bool StringToCoord(const std::string& str, std::tuple<uint8_t , uint8_t >& coords);
 
     Color InvertColor(Color color);
 

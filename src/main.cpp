@@ -25,6 +25,5 @@ int main() {
     DrawBitBoard(a);
     DrawBitBoard(b);
 
-
     return 0;
 }

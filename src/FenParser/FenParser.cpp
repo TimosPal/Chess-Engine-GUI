@@ -155,7 +155,7 @@ static bool ParseEnPassant(const std::string& enPassantString, BoardState& state
         return true;
     }
 
-    std::tuple<File, Rank> coords;
+    std::tuple<uint8_t, uint8_t> coords;
     if(!StringToCoord(enPassantString, coords))
         return false;
 

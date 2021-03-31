@@ -15,7 +15,7 @@ std::string ChessEngine::RankToString(Rank rank){
 
 Color ChessEngine::InvertColor(Color color) { return (Color)((color + 1) % 2); }
 
-bool ChessEngine::StringToCoord(const std::string& str, std::tuple<File, Rank>& coords){
+bool ChessEngine::StringToCoord(const std::string& str, std::tuple<uint8_t , uint8_t >& coords){
     if(str.length() != 2)
         return false;
 
@@ -29,7 +29,7 @@ bool ChessEngine::StringToCoord(const std::string& str, std::tuple<File, Rank>& 
         return false;
 
     // Safe cast to Enums.
-    coords = {(File)fileTemp, (Rank)rankTemp};
+    coords = {fileTemp, rankTemp};
 
     return true;
 }
