@@ -77,7 +77,7 @@ namespace ChessEngine {
 
     void InitEngine() {
         MoveGeneration::SlidingPieces::InitBlockerMasks();
-        MoveGeneration::MoveTables::InitAttacks();
+        MoveGeneration::MoveTables::InitTables();
     }
 
 }

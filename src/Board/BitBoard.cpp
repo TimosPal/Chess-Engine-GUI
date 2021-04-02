@@ -51,7 +51,6 @@ namespace ChessEngine::BitboardUtil {
         std::cout << std::endl;
     }
 
-
     /*******************************************************/
     /* Directional shifting                                */
     /*******************************************************/

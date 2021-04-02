@@ -41,26 +41,25 @@ namespace ChessEngine::MoveGeneration::MoveTables {
                 uint8_t squareIndex = GetSquareIndex(file, rank);
 
                 SlidingPieces::InitSlidingMoves(moves, squareIndex, true);
-                SlidingPieces::InitSlidingMoves(moves, squareIndex, false);
+                //SlidingPieces::InitSlidingMoves(moves, squareIndex, false);
             }
         }
 
         return moves;
     }
 
-    void InitAttacks(){
-        kingMoves = CreateLeaperMoves(LeaperPieces::GetKingMoves);
-        knightMoves = CreateLeaperMoves(LeaperPieces::GetKnightMoves);
-
+    void InitTables(){
         auto whiteLeaper = [](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::White); };
         auto blackLeaper = [](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::Black); };
 
         pawnAttacks = {CreateLeaperMoves(whiteLeaper), CreateLeaperMoves(blackLeaper)};
+        kingMoves = CreateLeaperMoves(LeaperPieces::GetKingMoves);
+        knightMoves = CreateLeaperMoves(LeaperPieces::GetKnightMoves);
         slidingMoves = CreateSlidingMoves();
     }
 
     // Main sliding piece table , contains both rook and bishop attacks.
-    std::array<Bitboard, permutations> slidingMoves;
+    std::array<Bitboard, permutations> slidingMoves{};
 
     /*******************************************************/
     /* Rook                                                */
@@ -70,7 +69,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
         Bitboard blockerMask = SlidingPieces::rookMasks[index];
         DrawBitBoard(blockerMask);
         uint8_t bitCount = SlidingPieces::rookMaskBitCounts[index];
-        return slidingMoves[RookMagicHash(occupancies & blockerMask, index, bitCount)];
+        return slidingMoves[RookMagicHash(blockerMask & ~occupancies, index, bitCount)];
     }
 
     /*******************************************************/
@@ -80,7 +79,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
     Bitboard GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
         Bitboard blockerMask = SlidingPieces::bishopMasks[index];
         uint8_t bitCount = SlidingPieces::bishopMaskBitCounts[index];
-        return slidingMoves[BishopMagicHash(occupancies & blockerMask, index, bitCount)];
+        return slidingMoves[BishopMagicHash(blockerMask & ~occupancies, index, bitCount)];
     }
 
     /*******************************************************/
@@ -97,7 +96,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
 
     // [team color][square index].
     // NOTE: lambdas are used since CreateLeaperMoves expects no color argument. (Only pawns move differ based on color)
-    std::array<std::array<Bitboard, 64>, 2> pawnAttacks;
+    std::array<std::array<Bitboard, 64>, 2> pawnAttacks{};
 
     Bitboard GetPawnAttacks(Color color, uint8_t index) {
         return pawnAttacks[color][index];
@@ -108,7 +107,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
     /*******************************************************/
 
     // [square index] only. Black and white have the same attacks.
-    std::array<Bitboard, 64> knightMoves;
+    std::array<Bitboard, 64> knightMoves{};
 
     Bitboard GetKnightMoves(uint8_t index) {
         return knightMoves[index];
@@ -119,7 +118,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
     /*******************************************************/
 
     // [square index] only. Black and white have the same attacks.
-    std::array<Bitboard, 64> kingMoves;
+    std::array<Bitboard, 64> kingMoves{};
 
     Bitboard GetKingMoves(uint8_t index) {
         return kingMoves[index];

@@ -128,7 +128,7 @@ static bool ParseCastlingRights(const std::string& rightsString, BoardState& sta
 static bool ParseMoveCounter(const std::string& counterString, BoardState& state, bool forHalf){
     // create an input stream with your string.
     // NOTE: number concat with another string still passes!
-    int counter;
+    int counter = -1;
     std::istringstream iss (counterString);
     iss >> counter;
     if (iss.fail()) {

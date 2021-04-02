@@ -1,3 +1,5 @@
+#include <cassert>
+#include <iostream>
 #include "SlidingPieces.h"
 
 namespace ChessEngine::MoveGeneration::SlidingPieces {
@@ -129,19 +131,30 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
             blockerMask = rookMasks[squareIndex];
         }
 
+        std::cout << "Bitcount : " << (int)bitCount << std::endl;
+        BitboardUtil::DrawBitBoard(blockerMask);
+
         for (uint16_t permutationIndex = 0; permutationIndex < (1 << bitCount); permutationIndex++) {
             Bitboard occupanciesPermutation = GetPermutation(blockerMask, permutationIndex);
+
+            std::cout << "Perm index : " << permutationIndex << std::endl;
+            BitboardUtil::DrawBitBoard(blockerMask);
 
             uint64_t index;
             Bitboard attacks;
             if(forBishop){
-                index = BishopMagicHash(blockerMask, squareIndex, bitCount);
+                index = BishopMagicHash(occupanciesPermutation, squareIndex, bitCount);
                 attacks = GetBishopMoves(file, rank, occupanciesPermutation);
             }else{
-                index = RookMagicHash(blockerMask, squareIndex, bitCount);
+                index = RookMagicHash(occupanciesPermutation, squareIndex, bitCount);
                 attacks = GetRookMoves(file, rank, occupanciesPermutation);
             }
 
+            std::cout << "Attack of : " << permutationIndex << std::endl;
+            BitboardUtil::DrawBitBoard(attacks);
+
+            // If this fails then index was not unique.
+            assert(slidingMoves[index] == 0 || slidingMoves[index] == attacks);
             slidingMoves[index] = attacks;
         }
     }
@@ -151,11 +164,11 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /*******************************************************/
 
     // Blocker masks , to be used in magic bitboards.
-    std::array<BitboardUtil::Bitboard, 64> rookMasks;
-    std::array<BitboardUtil::Bitboard, 64> bishopMasks;
+    std::array<BitboardUtil::Bitboard, 64> rookMasks{};
+    std::array<BitboardUtil::Bitboard, 64> bishopMasks{};
 
-    std::array<uint64_t , 64> rookMaskBitCounts;
-    std::array<uint64_t , 64> bishopMaskBitCounts;
+    std::array<uint64_t , 64> rookMaskBitCounts{};
+    std::array<uint64_t , 64> bishopMaskBitCounts{};
 
     void InitBlockerMasks(){
         rookMasks = CreateMasksTable(GetRookMask);

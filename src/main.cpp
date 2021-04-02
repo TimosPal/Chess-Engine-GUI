@@ -4,6 +4,7 @@
 #include "Board/Board.h"
 #include "MoveGeneration/MoveGeneration.h"
 #include "MoveGeneration/MoveTables.h"
+#include "MoveGeneration/SlidingPieces.h"
 
 using namespace ChessEngine;
 using namespace ChessEngine::BitboardUtil;
@@ -21,10 +22,9 @@ int main() {
     Board board(state);
     //board.Draw();
 
-    Bitboard b = board.GetOccupancies()[2];
-    Bitboard a = MoveGeneration::MoveTables::GetBishopMoves(GetSquareIndex(File::E, Rank::R3) , b);
+    Bitboard b = board.GetOccupancies()[2]; // TODO: rook 4 corners.
+    Bitboard a = MoveGeneration::MoveTables::GetBishopMoves(GetSquareIndex(File::E, Rank::R3) , 0);
     DrawBitBoard(a);
-    DrawBitBoard(b);
 
     return 0;
 }
