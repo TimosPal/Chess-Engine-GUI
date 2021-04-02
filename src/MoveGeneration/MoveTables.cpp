@@ -41,7 +41,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
                 uint8_t squareIndex = GetSquareIndex(file, rank);
 
                 SlidingPieces::InitSlidingMoves(moves, squareIndex, true);
-                //SlidingPieces::InitSlidingMoves(moves, squareIndex, false);
+                SlidingPieces::InitSlidingMoves(moves, squareIndex, false);
             }
         }
 
@@ -67,9 +67,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
 
     Bitboard GetRookMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
         Bitboard blockerMask = SlidingPieces::rookMasks[index];
-        DrawBitBoard(blockerMask);
-        uint8_t bitCount = SlidingPieces::rookMaskBitCounts[index];
-        return slidingMoves[RookMagicHash(blockerMask & ~occupancies, index, bitCount)];
+        return slidingMoves[RookMagicHash(blockerMask & occupancies, index)];
     }
 
     /*******************************************************/
@@ -78,8 +76,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
 
     Bitboard GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies) {
         Bitboard blockerMask = SlidingPieces::bishopMasks[index];
-        uint8_t bitCount = SlidingPieces::bishopMaskBitCounts[index];
-        return slidingMoves[BishopMagicHash(blockerMask & ~occupancies, index, bitCount)];
+        return slidingMoves[BishopMagicHash(blockerMask & occupancies, index)];
     }
 
     /*******************************************************/

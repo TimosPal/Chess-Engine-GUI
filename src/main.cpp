@@ -13,18 +13,15 @@ int main() {
     InitEngine(); // Should be called first.
 
     BoardState state = {};
-    std::string fenPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    std::string fenPosition = "8/8/2p5/3B4/8/1p6/6p1/8 w - - 0 1";
     if(!ParseFenString(fenPosition, state)){
         std::cout << "Incorrect fen string" << std::endl;
         return -1;
     }
 
     Board board(state);
-    //board.Draw();
+    board.Draw();
 
-    Bitboard b = board.GetOccupancies()[2]; // TODO: rook 4 corners.
-    Bitboard a = MoveGeneration::MoveTables::GetBishopMoves(GetSquareIndex(File::E, Rank::R3) , 0);
-    DrawBitBoard(a);
 
     return 0;
 }

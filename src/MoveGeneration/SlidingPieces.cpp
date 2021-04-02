@@ -29,11 +29,16 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     }
 
     /* Generate a mask based on an initial position and direction */
-    Bitboard GetDirectionalBlockerMask(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY){
+    Bitboard GetDirectionalBlockerMask(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY, bool checkX, bool checkY){
         // Exclude outer edges.
         Bitboard mask = BITBOARD_EMPTY;
         uint8_t x = file + dirX, y = rank + dirY;
-        while(x > 0 && x < 7 && y > 0 && y < 7) {
+        while(true) {
+            if(checkX && (x <= 0 || x >= 7))
+                break;
+            if(checkY && (y <= 0 || y >= 7))
+                break;
+
             mask |= SetBit(BITBOARD_EMPTY, GetSquareIndex(x, y));
             x += dirX;
             y += dirY;
@@ -69,10 +74,10 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     Bitboard GetRookMask(uint8_t file, uint8_t rank){
         Bitboard mask = BITBOARD_EMPTY;
 
-        mask |= GetDirectionalBlockerMask(file, rank, 0, 1);
-        mask |= GetDirectionalBlockerMask(file, rank, 0, -1);
-        mask |= GetDirectionalBlockerMask(file, rank, 1, 0);
-        mask |= GetDirectionalBlockerMask(file, rank, -1, 0);
+        mask |= GetDirectionalBlockerMask(file, rank, 0, 1, false, true);
+        mask |= GetDirectionalBlockerMask(file, rank, 0, -1, false, true);
+        mask |= GetDirectionalBlockerMask(file, rank, 1, 0, true, false);
+        mask |= GetDirectionalBlockerMask(file, rank, -1, 0, true, false);
 
         return mask;
     }
@@ -96,10 +101,10 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     Bitboard GetBishopMask(uint8_t file, uint8_t rank){
         Bitboard mask = BITBOARD_EMPTY;
 
-        mask |= GetDirectionalBlockerMask(file, rank, 1, 1);
-        mask |= GetDirectionalBlockerMask(file, rank, 1, -1);
-        mask |= GetDirectionalBlockerMask(file, rank, -1, 1);
-        mask |= GetDirectionalBlockerMask(file, rank, -1, -1);
+        mask |= GetDirectionalBlockerMask(file, rank, 1, 1, true, true);
+        mask |= GetDirectionalBlockerMask(file, rank, 1, -1, true, true);
+        mask |= GetDirectionalBlockerMask(file, rank, -1, 1, true, true);
+        mask |= GetDirectionalBlockerMask(file, rank, -1, -1, true, true);
 
         return mask;
     }
@@ -121,37 +126,21 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     void InitSlidingMoves(std::array<Bitboard, permutations>& slidingMoves, uint8_t squareIndex, bool forBishop){
         auto [file, rank] = GetCoordinates(squareIndex);
 
-        Bitboard blockerMask;
-        uint8_t bitCount;
-        if(forBishop){
-            bitCount = bishopMaskBitCounts[squareIndex];
-            blockerMask = bishopMasks[squareIndex];
-        }else{
-            bitCount = rookMaskBitCounts[squareIndex];
-            blockerMask = rookMasks[squareIndex];
-        }
-
-        std::cout << "Bitcount : " << (int)bitCount << std::endl;
-        BitboardUtil::DrawBitBoard(blockerMask);
+        Bitboard blockerMask = forBishop ? bishopMasks[squareIndex] : rookMasks[squareIndex];
+        uint8_t bitCount = GetBitCount(blockerMask);
 
         for (uint16_t permutationIndex = 0; permutationIndex < (1 << bitCount); permutationIndex++) {
             Bitboard occupanciesPermutation = GetPermutation(blockerMask, permutationIndex);
 
-            std::cout << "Perm index : " << permutationIndex << std::endl;
-            BitboardUtil::DrawBitBoard(blockerMask);
-
             uint64_t index;
             Bitboard attacks;
             if(forBishop){
-                index = BishopMagicHash(occupanciesPermutation, squareIndex, bitCount);
+                index = BishopMagicHash(occupanciesPermutation, squareIndex);
                 attacks = GetBishopMoves(file, rank, occupanciesPermutation);
             }else{
-                index = RookMagicHash(occupanciesPermutation, squareIndex, bitCount);
+                index = RookMagicHash(occupanciesPermutation, squareIndex);
                 attacks = GetRookMoves(file, rank, occupanciesPermutation);
             }
-
-            std::cout << "Attack of : " << permutationIndex << std::endl;
-            BitboardUtil::DrawBitBoard(attacks);
 
             // If this fails then index was not unique.
             assert(slidingMoves[index] == 0 || slidingMoves[index] == attacks);
@@ -167,22 +156,9 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     std::array<BitboardUtil::Bitboard, 64> rookMasks{};
     std::array<BitboardUtil::Bitboard, 64> bishopMasks{};
 
-    std::array<uint64_t , 64> rookMaskBitCounts{};
-    std::array<uint64_t , 64> bishopMaskBitCounts{};
-
     void InitBlockerMasks(){
         rookMasks = CreateMasksTable(GetRookMask);
         bishopMasks = CreateMasksTable(GetBishopMask);
-
-        auto rookBitCount = [](uint8_t file, uint8_t rank) {
-            return (uint64_t) BitboardUtil::GetBitCount(rookMasks[BitboardUtil::GetSquareIndex(file, rank)]);
-        };
-        auto bishopBitCount = [](uint8_t file, uint8_t rank) {
-            return (uint64_t) BitboardUtil::GetBitCount(bishopMasks[BitboardUtil::GetSquareIndex(file, rank)]);
-        };
-
-        rookMaskBitCounts = CreateMasksTable(rookBitCount);
-        bishopMaskBitCounts = CreateMasksTable(bishopBitCount);
     }
 
 }

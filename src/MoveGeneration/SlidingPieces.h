@@ -16,7 +16,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     std::array<BitboardUtil::Bitboard, 64> CreateMasksTable(BitboardUtil::Bitboard getMask(uint8_t, uint8_t));
 
     /* Generate a mask based on an initial position and direction */
-    BitboardUtil::Bitboard GetDirectionalBlockerMask(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY);
+    BitboardUtil::Bitboard GetDirectionalBlockerMask(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY, bool checkX, bool checkY);
 
     /* Generate an attack mask based on an initial position , direction and occupancies */
     BitboardUtil::Bitboard GetDirectionalMoves(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY, BitboardUtil::Bitboard occupancies);
@@ -45,11 +45,6 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     // Blocker masks , to be used in magic bitboards.
     extern std::array<BitboardUtil::Bitboard, 64> rookMasks;
     extern std::array<BitboardUtil::Bitboard, 64> bishopMasks;
-
-    // Used instead of GetBitCount in run time calculations.
-    extern std::array<uint64_t , 64> rookMaskBitCounts;
-    extern std::array<uint64_t , 64> bishopMaskBitCounts;
-
 
 }
 
