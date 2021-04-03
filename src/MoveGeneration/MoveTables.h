@@ -8,7 +8,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
 
     // Access precalculated moves from compile time initialized arrays.
 
-    void InitTables(); // Need to call at startup.
+    void InitMoveTables(); // Need to call at startup.
 
     BitboardUtil::Bitboard GetPawnAttacks(Color color, uint8_t index);
     BitboardUtil::Bitboard GetKnightMoves(uint8_t index);

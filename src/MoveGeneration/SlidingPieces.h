@@ -13,7 +13,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     void InitBlockerMasks();
 
     /* Generate a move table based on the given function for each board position. */
-    std::array<BitboardUtil::Bitboard, 64> CreateMasksTable(BitboardUtil::Bitboard getMask(uint8_t, uint8_t));
+    std::array<BitboardUtil::Bitboard, 64> CreateBlockerMasksTable(BitboardUtil::Bitboard getMask(uint8_t, uint8_t));
 
     /* Generate a mask based on an initial position and direction */
     BitboardUtil::Bitboard GetDirectionalBlockerMask(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY, bool checkX, bool checkY);
@@ -26,14 +26,14 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /* Rook                                                */
     /*******************************************************/
 
-    BitboardUtil::Bitboard GetRookMask(uint8_t file, uint8_t rank);
+    BitboardUtil::Bitboard GetRookBlockerMask(uint8_t file, uint8_t rank);
     BitboardUtil::Bitboard GetRookMoves(uint8_t file, uint8_t rank, BitboardUtil::Bitboard occupancies);
 
     /*******************************************************/
     /* Bishop                                              */
     /*******************************************************/
 
-    BitboardUtil::Bitboard GetBishopMask(uint8_t file, uint8_t rank);
+    BitboardUtil::Bitboard GetBishopBlockerMask(uint8_t file, uint8_t rank);
     BitboardUtil::Bitboard GetBishopMoves(uint8_t file, uint8_t rank, BitboardUtil::Bitboard occupancies);
 
     void InitSlidingMoves(std::array<BitboardUtil::Bitboard, MagicNumbers::permutations>& slidingMoves, uint8_t squareIndex, bool forBishop);

@@ -3,8 +3,6 @@
 #include "FenParser/FenParser.h"
 #include "Board/Board.h"
 #include "MoveGeneration/MoveGeneration.h"
-#include "MoveGeneration/MoveTables.h"
-#include "MoveGeneration/SlidingPieces.h"
 
 using namespace ChessEngine;
 using namespace ChessEngine::BitboardUtil;
@@ -21,6 +19,8 @@ int main() {
 
     Board board(state);
     board.Draw();
+
+    ChessEngine::MoveGeneration::GetPseudoMoves(board.GetState(), White, board.GetOccupancies());
 
 
     return 0;

@@ -48,7 +48,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
         return moves;
     }
 
-    void InitTables(){
+    void InitMoveTables(){
         auto whiteLeaper = [](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::White); };
         auto blackLeaper = [](auto board) { return LeaperPieces::GetPawnAttacks(board, Color::Black); };
 

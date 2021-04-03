@@ -208,22 +208,51 @@ namespace ChessEngine::MoveGeneration {
         }
     }
 
+    void GetPseudoSlidingPieceMoves(const BoardState &state, Color color, const Bitboard *occupancies, PieceType type) {
+        Color enemyColor = InvertColor(color);
+        Bitboard enemyOccupancies = occupancies[enemyColor];
+        Bitboard globalOccupancies = occupancies[Color::Both];
+
+        Bitboard slidingPieceBoard = state.pieceBoards[color][type];
+
+        Bitboard (*getMoves)(uint8_t, Bitboard);
+        switch (type) { // Find proper function for piece type.
+            case PieceType::Queen: getMoves = MoveTables::GetQueenMoves; break;
+            case PieceType::Rook: getMoves = MoveTables::GetRookMoves; break;
+            case PieceType::Bishop: getMoves = MoveTables::GetBishopMoves; break;
+            default: assert(false); // Invalid
+        }
+
+        while (slidingPieceBoard != 0) {
+            uint8_t fromSquareIndex = GetLSBIndex(slidingPieceBoard);
+
+            Bitboard moves = getMoves(fromSquareIndex, globalOccupancies);
+
+            // Quiet moves
+            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet);
+
+            // Captures
+            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture);
+
+            slidingPieceBoard = PopBit(slidingPieceBoard, fromSquareIndex);
+        }
+    }
+
     void GetPseudoMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
         // Pawns.
         GetPseudoPawnMoves(state, color, occupancies);
-
         // King.
         GetPseudoKingMoves(state, color, occupancies);
-
         // Knight
         GetPseudoKnightMoves(state, color, occupancies);
-
         // Castling.
         GetPseudoCastlingMoves(state, color, occupancies);
-
-        // Queen / rook / bishop.
-        // TODO:
-
+        // Queen
+        GetPseudoSlidingPieceMoves(state, color, occupancies, PieceType::Rook);
+        // Bishop
+        GetPseudoSlidingPieceMoves(state, color, occupancies, PieceType::Bishop);
+        // Queen.
+        GetPseudoSlidingPieceMoves(state, color, occupancies, PieceType::Queen);
     }
 
 }

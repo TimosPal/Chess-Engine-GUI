@@ -15,7 +15,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /*******************************************************/
 
     /* Generate a move table based on the given function for each board position. */
-    std::array<Bitboard, 64> CreateMasksTable(Bitboard getMask(uint8_t, uint8_t)) {
+    std::array<Bitboard, 64> CreateBlockerMasksTable(Bitboard getMask(uint8_t, uint8_t)) {
         std::array<Bitboard, 64> mask = {};
 
         for (uint8_t rank = 0; rank < 8; rank++) {
@@ -71,7 +71,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /* Rook                                                */
     /*******************************************************/
 
-    Bitboard GetRookMask(uint8_t file, uint8_t rank){
+    Bitboard GetRookBlockerMask(uint8_t file, uint8_t rank){
         Bitboard mask = BITBOARD_EMPTY;
 
         mask |= GetDirectionalBlockerMask(file, rank, 0, 1, false, true);
@@ -98,7 +98,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /* Bishop                                              */
     /*******************************************************/
 
-    Bitboard GetBishopMask(uint8_t file, uint8_t rank){
+    Bitboard GetBishopBlockerMask(uint8_t file, uint8_t rank){
         Bitboard mask = BITBOARD_EMPTY;
 
         mask |= GetDirectionalBlockerMask(file, rank, 1, 1, true, true);
@@ -157,8 +157,8 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     std::array<BitboardUtil::Bitboard, 64> bishopMasks{};
 
     void InitBlockerMasks(){
-        rookMasks = CreateMasksTable(GetRookMask);
-        bishopMasks = CreateMasksTable(GetBishopMask);
+        rookMasks = CreateBlockerMasksTable(GetRookBlockerMask);
+        bishopMasks = CreateBlockerMasksTable(GetBishopBlockerMask);
     }
 
 }

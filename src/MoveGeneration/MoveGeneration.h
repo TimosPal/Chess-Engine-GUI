@@ -29,6 +29,7 @@ namespace ChessEngine::MoveGeneration {
     void GetPseudoKingMoves(const BoardState& state, Color color, const BitboardUtil::Bitboard* occupancies);
     void GetPseudoCastlingMoves(const BoardState& state, Color color, const BitboardUtil::Bitboard* occupancies);
     void GetPseudoKnightMoves(const BoardState& state, Color color, const BitboardUtil::Bitboard* occupancies);
+    void GetPseudoSlidingPieceMoves(const BoardState &state, Color color, const BitboardUtil::Bitboard *occupancies, PieceType type);
 
     bool IsOfMoveType(MoveType flags, MoveType type);
     std::string MoveTypeToString(MoveType type); /* Should contain a single flag */
