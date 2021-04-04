@@ -129,6 +129,8 @@ namespace ChessEngine::BitboardUtil {
     // Rank masks.
     constexpr Bitboard r1_Mask = 0xff;
     constexpr Bitboard r2_Mask = r1_Mask << (8 * 1);
+    constexpr Bitboard r3_Mask = r1_Mask << (8 * 2);
+    constexpr Bitboard r6_Mask = r1_Mask << (8 * 5);
     constexpr Bitboard r7_Mask = r1_Mask << (8 * 6);
     constexpr Bitboard r8_Mask = r1_Mask << (8 * 7);
 

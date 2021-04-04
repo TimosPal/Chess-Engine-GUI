@@ -65,21 +65,34 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             Bitboard attacks = MoveTables::GetPawnAttacks(color, fromSquareIndex);
             auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, attackMoveFlags);
 
-            // En passant
-            // NOTE: slightly waste full to check for every pawn (Only 2 needed) TODO: FIX.
-            if (state.enPassantBoard != BITBOARD_EMPTY) {
-                // Previous move enabled en passant.
+            pawnsBoard = PopBit(pawnsBoard, fromSquareIndex);
+        }
+    }
 
-                // NOTE: it is possible to en passant your own piece only if
-                // something is wrong with the turns!
-                assert(!(attacks & state.enPassantBoard & r2_Mask && color == Color::White) ||
-                       !(attacks & state.enPassantBoard & r7_Mask && color == Color::Black));
+    void GetEnPassantMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+        Color enemyColor = InvertColor(color);
+
+        uint8_t enPassantIndex = GetLSBIndex(state.enPassantBoard);
+        if (state.enPassantBoard != BITBOARD_EMPTY) {
+            Color enPassantColor = state.enPassantBoard & r3_Mask ? Color::White : Color::Black;
+
+            // Enemy prev turn must have caused en passant!
+            assert(enemyColor == enPassantColor);
+
+            // Only possible attackers are the en passant's 2 corners , as if it were an attacking pawn.
+            Bitboard enPassantPieces = MoveTables::GetPawnAttacks(enPassantColor, state.enPassantBoard);
+            enPassantPieces &= color; // color != enPassantColor : keep only attackers.
+            while(enPassantPieces != 0){ // Max 2 loops.
+                uint8_t fromSquareIndex = GetLSBIndex(enPassantPieces);
 
                 auto enPassantMoveFlags = (MoveType) (MoveType::Capture | MoveType::EnPassant);
-                auto m3 = ExtractMoves(attacks & state.enPassantBoard, fromSquareIndex, enPassantMoveFlags);
-            }
+                Move move = {.fromSquareIndex = fromSquareIndex,
+                             .toSquareIndex = enPassantIndex,
+                             .flags = enPassantMoveFlags};
+                std::cout << move << std::endl;
 
-            pawnsBoard = PopBit(pawnsBoard, fromSquareIndex);
+                enPassantPieces = PopBit(enPassantPieces, fromSquareIndex);
+            }
         }
     }
 
@@ -181,16 +194,18 @@ namespace ChessEngine::MoveGeneration::Pseudo {
 
     void GetAllMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
         // Pawns.
-        GetPawnMoves(state, color, occupancies); // TODO:
+        GetPawnMoves(state, color, occupancies);
         // King.
         GetKingMoves(state, color, occupancies);
-        // Knight
+        // Knight.
         GetKnightMoves(state, color, occupancies);
         // Castling.
         GetCastlingMoves(state, color, occupancies);
-        // Queen
+        // En passant.
+        GetEnPassantMoves(state, color, occupancies);
+        // Queen.
         GetSlidingMoves(state, color, occupancies, PieceType::Rook);
-        // Bishop
+        // Bishop.
         GetSlidingMoves(state, color, occupancies, PieceType::Bishop);
         // Queen.
         GetSlidingMoves(state, color, occupancies, PieceType::Queen);
