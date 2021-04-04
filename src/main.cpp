@@ -11,7 +11,7 @@ int main() {
     InitEngine(); // Should be called first.
 
     BoardState state = {};
-    std::string fenPosition = "8/8/2p5/N7/4B3/1p6/8/8 w - - 0 1";
+    std::string fenPosition = "8/8/8/3PpP2/8/8/8/8 w - e6 1 1";
     if(!ParseFenString(fenPosition, state)){
         std::cout << "Incorrect fen string" << std::endl;
         return -1;

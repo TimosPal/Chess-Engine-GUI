@@ -80,8 +80,8 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             assert(enemyColor == enPassantColor);
 
             // Only possible attackers are the en passant's 2 corners , as if it were an attacking pawn.
-            Bitboard enPassantPieces = MoveTables::GetPawnAttacks(enPassantColor, state.enPassantBoard);
-            enPassantPieces &= color; // color != enPassantColor : keep only attackers.
+            Bitboard enPassantPieces = MoveTables::GetPawnAttacks(enPassantColor, enPassantIndex);
+            enPassantPieces &= occupancies[color]; // color != enPassantColor : keep only attackers.
             while(enPassantPieces != 0){ // Max 2 loops.
                 uint8_t fromSquareIndex = GetLSBIndex(enPassantPieces);
 
