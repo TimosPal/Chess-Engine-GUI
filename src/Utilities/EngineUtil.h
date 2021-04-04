@@ -21,17 +21,15 @@ namespace ChessEngine {
     };
 
     enum PieceType{
-        Pawn, Rook, Bishop, Knight, King, Queen
+        Pawn, Rook, Bishop, Knight, King, Queen, None
     };
 
     std::string FileToString(File file);
     std::string RankToString(Rank rank);
+    std::string PieceTypeToString(PieceType type, Color color);
 
     bool StringToCoord(const std::string& str, std::tuple<uint8_t , uint8_t >& coords);
-
     Color InvertColor(Color color);
-
-    const char* PieceTypeToAscii(PieceType type, Color color);
 
     /* InitEngine engine tables etc */
     void InitEngine();

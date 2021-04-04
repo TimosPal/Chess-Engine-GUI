@@ -37,7 +37,7 @@ namespace ChessEngine {
         return true;
     }
 
-    const char *PieceTypeToAscii(PieceType type, Color color) {
+    std::string PieceTypeToString(PieceType type, Color color) {
         if (color == Color::White) {
             switch (type) {
                 case PieceType::Pawn:

@@ -17,7 +17,7 @@ void ChessEngine::Board::Draw(){
                 Color color = (i < 6) ? Color::White : Color::Black;
                 auto type = (PieceType)(i % 6);
                 if(GetBit(state.pieceBoards[color][type], GetSquareIndex(file, rank))){
-                    std::cout << " " << PieceTypeToAscii(type, color) << " ";
+                    std::cout << " " << PieceTypeToString(type, color) << " ";
                     found = true;
                     break;
                 }

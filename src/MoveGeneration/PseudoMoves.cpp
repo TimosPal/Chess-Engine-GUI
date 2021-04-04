@@ -1,4 +1,4 @@
-#include "MoveGeneration.h"
+#include "PseudoMoves.h"
 
 #include <list>
 #include <iostream>
@@ -6,70 +6,11 @@
 
 #include "MoveTables.h"
 #include "LeaperPieces.h"
+#include "Move.h"
 
-namespace ChessEngine::MoveGeneration {
+namespace ChessEngine::MoveGeneration::Pseudo {
 
     using namespace ChessEngine::BitboardUtil;
-
-    bool IsOfMoveType(MoveType flags, MoveType type) {
-        return flags & type;
-    }
-
-    std::string MoveTypeToString(MoveType type) {
-        switch (type) {
-            case MoveType::None:
-                return "None";
-            case MoveType::Quiet:
-                return "Quiet";
-            case MoveType::Capture:
-                return "Capture";
-            case MoveType::Promotion:
-                return "Promotion";
-            case MoveType::EnPassant:
-                return "EnPassant";
-            case MoveType::KingSideCastling:
-                return "KingSideCastling";
-            case MoveType::QueenSideCastling:
-                return "QueenSideCastling";
-            default:
-                return "Error";
-        }
-    }
-
-    std::ostream &operator<<(std::ostream &out, const MoveType value) {
-        if (value == MoveType::None) {
-            out << "None";
-        } else {
-            uint8_t flags = value;
-            while (flags != 0) { // Print each flag based on the bits
-                uint8_t lsbIndex = GetLSBIndex(flags);
-                auto tempFlag = (MoveType) SetBit(0, lsbIndex);
-
-                flags = PopBit(flags, lsbIndex);
-                out << MoveTypeToString(tempFlag);
-                if (flags != 0) // Dont print final space.
-                    out << " ";
-            }
-        }
-
-        return out;
-    }
-
-    std::ostream &operator<<(std::ostream &out, Move value) {
-        auto[xf, yf] = GetCoordinates(value.fromSquareIndex);
-        auto[xt, yt] = GetCoordinates(value.toSquareIndex);
-
-        out << value.flags
-            << " ["
-            << FileToString((File) xf)
-            << RankToString((Rank) yf)
-            << "]->["
-            << FileToString((File) xt)
-            << RankToString((Rank) yt)
-            << "]";
-
-        return out;
-    }
 
     static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, MoveType flags) {
         std::list<Move> moveList;
@@ -92,7 +33,7 @@ namespace ChessEngine::MoveGeneration {
         return moveList;
     }
 
-    void GetPseudoPawnMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetPawnMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = occupancies[enemyColor];
         Bitboard globalOccupancies = occupancies[Color::Both];
@@ -125,7 +66,7 @@ namespace ChessEngine::MoveGeneration {
             auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, attackMoveFlags);
 
             // En passant
-            // NOTE: slightly waste full to check for every pawn (Only 2 needed)
+            // NOTE: slightly waste full to check for every pawn (Only 2 needed) TODO: FIX.
             if (state.enPassantBoard != BITBOARD_EMPTY) {
                 // Previous move enabled en passant.
 
@@ -142,7 +83,7 @@ namespace ChessEngine::MoveGeneration {
         }
     }
 
-    void GetPseudoCastlingMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetCastlingMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
         // Check whether or not there are pieces between the king and the rook.
         Bitboard globalOccupancies = occupancies[Color::Both];
         Bitboard colorMask = (color == Color::White) ? r1_Mask : r8_Mask;
@@ -167,7 +108,7 @@ namespace ChessEngine::MoveGeneration {
         }
     }
 
-    void GetPseudoKnightMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetKnightMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = occupancies[enemyColor];
         Bitboard globalOccupancies = occupancies[Color::Both];
@@ -189,7 +130,7 @@ namespace ChessEngine::MoveGeneration {
         }
     }
 
-    void GetPseudoKingMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetKingMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = occupancies[enemyColor];
         Bitboard globalOccupancies = occupancies[Color::Both];
@@ -208,7 +149,7 @@ namespace ChessEngine::MoveGeneration {
         }
     }
 
-    void GetPseudoSlidingPieceMoves(const BoardState &state, Color color, const Bitboard *occupancies, PieceType type) {
+    void GetSlidingMoves(const BoardState &state, Color color, const Bitboard *occupancies, PieceType type) {
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = occupancies[enemyColor];
         Bitboard globalOccupancies = occupancies[Color::Both];
@@ -238,21 +179,21 @@ namespace ChessEngine::MoveGeneration {
         }
     }
 
-    void GetPseudoMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetAllMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
         // Pawns.
-        GetPseudoPawnMoves(state, color, occupancies);
+        GetPawnMoves(state, color, occupancies); // TODO:
         // King.
-        GetPseudoKingMoves(state, color, occupancies);
+        GetKingMoves(state, color, occupancies);
         // Knight
-        GetPseudoKnightMoves(state, color, occupancies);
+        GetKnightMoves(state, color, occupancies);
         // Castling.
-        GetPseudoCastlingMoves(state, color, occupancies);
+        GetCastlingMoves(state, color, occupancies);
         // Queen
-        GetPseudoSlidingPieceMoves(state, color, occupancies, PieceType::Rook);
+        GetSlidingMoves(state, color, occupancies, PieceType::Rook);
         // Bishop
-        GetPseudoSlidingPieceMoves(state, color, occupancies, PieceType::Bishop);
+        GetSlidingMoves(state, color, occupancies, PieceType::Bishop);
         // Queen.
-        GetPseudoSlidingPieceMoves(state, color, occupancies, PieceType::Queen);
+        GetSlidingMoves(state, color, occupancies, PieceType::Queen);
     }
 
 }
