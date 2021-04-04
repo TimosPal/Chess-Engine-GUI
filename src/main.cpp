@@ -20,7 +20,7 @@ int main() {
     Board board(state);
     board.Draw();
 
-    ChessEngine::MoveGeneration::Pseudo::GetAllMoves(board.GetState(), White, board.GetOccupancies());
+    MoveGeneration::Pseudo::GetAllMoves(board.GetState(), White, board.GetOccupancies());
 
 
     return 0;
