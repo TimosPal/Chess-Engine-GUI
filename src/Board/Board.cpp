@@ -11,22 +11,8 @@ ChessEngine::Board::Board(const BoardState& state) : state(state) {
 void ChessEngine::Board::Draw(){
     for (int rank = 7; rank >= 0; rank--) {
         for (int file = 0; file < 8; file++) {
-            // Iterate bitboards.
-            bool found = false;
-            for (int i = 0; i < 12; i++) {
-                Color color = (i < 6) ? Color::White : Color::Black;
-                auto type = (PieceType)(i % 6);
-                if(GetBit(state.pieceBoards[color][type], GetSquareIndex(file, rank))){
-                    std::cout << " " << PieceTypeToString(type, color) << " ";
-                    found = true;
-                    break;
-                }
-            }
-
-            // If we found nothing
-            if(!found){
-                std::cout << " - ";
-            }
+            auto [type, color] = state.GetPosType(GetSquareIndex(file, rank));
+            std::cout << " " << PieceTypeToString(type, color) << " ";
         }
         std::cout << std::endl;
     }

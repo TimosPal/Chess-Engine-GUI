@@ -1,6 +1,7 @@
 #include "Move.h"
 
 #include <iostream>
+#include <cassert>
 
 #include "../Board/Bitboard.h"
 
@@ -29,7 +30,7 @@ namespace ChessEngine::MoveGeneration {
             case MoveType::QueenSideCastling:
                 return "QueenSideCastling";
             default:
-                return "Error";
+                assert(false);
         }
     }
 

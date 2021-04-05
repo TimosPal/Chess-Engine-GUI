@@ -27,6 +27,20 @@ namespace ChessEngine{
         // Is EMPTY when there is no en passant available
         BitboardUtil::Bitboard enPassantBoard = BITBOARD_EMPTY;
 
+        std::tuple<PieceType, Color> GetPosType(uint8_t index){
+            for (uint8_t i = 0; i < 12; i++) {
+                uint8_t pieceIndex = i % 6;
+                Color color = i < 6 ? Color::White : Color::Black;
+
+                BitboardUtil::Bitboard currBoard = pieceBoards[color][pieceIndex];
+                if(BitboardUtil::GetBit(currBoard, index)){
+                    return {(PieceType)pieceIndex, color};
+                }
+            }
+
+            return {PieceType::None, Color::Both};
+        }
+
     };
 
 }

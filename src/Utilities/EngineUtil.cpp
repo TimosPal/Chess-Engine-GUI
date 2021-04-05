@@ -52,8 +52,10 @@ namespace ChessEngine {
                     return "Q";
                 case PieceType::Bishop:
                     return "B";
-                default:
+                case PieceType::None:
                     return "-";
+                default:
+                    assert(false);
             }
         } else {
             switch (type) {
@@ -69,8 +71,10 @@ namespace ChessEngine {
                     return "q";
                 case PieceType::Bishop:
                     return "b";
-                default:
+                case PieceType::None:
                     return "-";
+                default:
+                    assert(false);
             }
         }
     }
