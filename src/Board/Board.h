@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "BoardState.h"
+#include "BoardUtilities.h"
 
 #include <iostream>
 
@@ -20,20 +21,14 @@ namespace ChessEngine {
         }
 
         BitboardUtil::Bitboard* GetOccupancies(){ //NOTE: For testing only.
-            return occupancies;
+            return utilities.occupancies;
         }
 
     private:
 
-        BoardState state{};
+        BoardState state;
+        BoardUtilities utilities;
 
-        // Occupancy bitboards for both colors.
-        BitboardUtil::Bitboard occupancies[3]{};
-
-        /* Initialize the 2 occupancy bitboards
-         * NOTE:Should be called only once at the start.
-         * Further updates should be done based on the executed move. */
-        void InitOccupancies(Color color);
     };
 
 }

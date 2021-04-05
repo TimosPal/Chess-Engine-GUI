@@ -33,10 +33,10 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    void GetPawnMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetPawnMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
         Color enemyColor = InvertColor(color);
-        Bitboard enemyOccupancies = occupancies[enemyColor];
-        Bitboard globalOccupancies = occupancies[Color::Both];
+        Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
+        Bitboard globalOccupancies = utilities.occupancies[Color::Both];
 
         // Pawns.
         Bitboard pawnsBoard = state.pieceBoards[color][PieceType::Pawn];
@@ -69,7 +69,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         }
     }
 
-    void GetEnPassantMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetEnPassantMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
         Color enemyColor = InvertColor(color);
 
         uint8_t enPassantIndex = GetLSBIndex(state.enPassantBoard);
@@ -96,9 +96,9 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         }
     }
 
-    void GetCastlingMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetCastlingMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
         // Check whether or not there are pieces between the king and the rook.
-        Bitboard globalOccupancies = occupancies[Color::Both];
+        Bitboard globalOccupancies = utilities.occupancies[Color::Both];
         Bitboard colorMask = (color == Color::White) ? r1_Mask : r8_Mask;
 
         if (state.kingSideCastling[color]) {
@@ -121,10 +121,10 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         }
     }
 
-    void GetKnightMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetKnightMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
         Color enemyColor = InvertColor(color);
-        Bitboard enemyOccupancies = occupancies[enemyColor];
-        Bitboard globalOccupancies = occupancies[Color::Both];
+        Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
+        Bitboard globalOccupancies = utilities.occupancies[Color::Both];
 
         // Pawns.
         Bitboard knightsBoard = state.pieceBoards[color][PieceType::Knight];
@@ -143,10 +143,10 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         }
     }
 
-    void GetKingMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetKingMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
         Color enemyColor = InvertColor(color);
-        Bitboard enemyOccupancies = occupancies[enemyColor];
-        Bitboard globalOccupancies = occupancies[Color::Both];
+        Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
+        Bitboard globalOccupancies = utilities.occupancies[Color::Both];
 
         Bitboard kingBoard = state.pieceBoards[color][PieceType::King];
 
@@ -162,10 +162,10 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         }
     }
 
-    void GetSlidingMoves(const BoardState &state, Color color, const Bitboard *occupancies, PieceType type) {
+    void GetSlidingMoves(const BoardState &state, Color color, PieceType type, const BoardUtilities& utilities) {
         Color enemyColor = InvertColor(color);
-        Bitboard enemyOccupancies = occupancies[enemyColor];
-        Bitboard globalOccupancies = occupancies[Color::Both];
+        Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
+        Bitboard globalOccupancies = utilities.occupancies[Color::Both];
 
         Bitboard slidingPieceBoard = state.pieceBoards[color][type];
 
@@ -192,23 +192,23 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         }
     }
 
-    void GetAllMoves(const BoardState &state, Color color, const Bitboard *occupancies) {
+    void GetAllMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
         // Pawns.
-        GetPawnMoves(state, color, occupancies);
+        GetPawnMoves(state, color, utilities);
         // King.
-        GetKingMoves(state, color, occupancies);
+        GetKingMoves(state, color, utilities);
         // Knight.
-        GetKnightMoves(state, color, occupancies);
+        GetKnightMoves(state, color, utilities);
         // Castling.
-        GetCastlingMoves(state, color, occupancies);
+        GetCastlingMoves(state, color, utilities);
         // En passant.
-        GetEnPassantMoves(state, color, occupancies);
+        GetEnPassantMoves(state, color, utilities);
         // Queen.
-        GetSlidingMoves(state, color, occupancies, PieceType::Rook);
+        GetSlidingMoves(state, color, PieceType::Rook, utilities);
         // Bishop.
-        GetSlidingMoves(state, color, occupancies, PieceType::Bishop);
+        GetSlidingMoves(state, color, PieceType::Bishop, utilities);
         // Queen.
-        GetSlidingMoves(state, color, occupancies, PieceType::Queen);
+        GetSlidingMoves(state, color, PieceType::Queen, utilities);
     }
 
 }
