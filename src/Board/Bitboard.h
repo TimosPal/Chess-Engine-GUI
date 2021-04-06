@@ -65,6 +65,10 @@ namespace ChessEngine::BitboardUtil {
         return rank * 8 + file;
     }
 
+    constexpr Bitboard SwapBit(Bitboard board, uint8_t from, uint8_t to){ // TODO: faster approach?
+        return SetBit(PopBit(board, from), to);
+    }
+
     /*******************************************************/
     /* General                                             */
     /*******************************************************/
