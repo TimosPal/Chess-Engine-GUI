@@ -7,8 +7,9 @@ ChessEngine::Board::Board(const BoardState& state) : state(state) , utilities(st
 void ChessEngine::Board::Draw(){
     for (int rank = 7; rank >= 0; rank--) {
         for (int file = 0; file < 8; file++) {
-            auto [type, color] = utilities.squaresOccupants[rank][file];
-            std::cout << " " << PieceTypeToString(type, color) << " ";
+            uint8_t index = GetSquareIndex(file, rank);
+            auto [type, color] = utilities.squaresOccupants[index];
+            std::cout << " " << PieceTypeToChar(type, color) << " ";
         }
         std::cout << std::endl;
     }

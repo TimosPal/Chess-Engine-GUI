@@ -20,7 +20,7 @@ int main() {
     Board board(state);
     board.Draw();
 
-    //MoveGeneration::Pseudo::GetAllMoves(board.GetState(), White, board.GetOccupancies());
+    MoveGeneration::Pseudo::GetAllMoves(board.GetState(), White, board.GetUtilities());
 
 
     return 0;

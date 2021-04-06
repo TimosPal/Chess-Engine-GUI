@@ -8,7 +8,7 @@ namespace ChessEngine {
     struct BoardUtilities {
         // Occupancy bitboards for both colors.
         BitboardUtil::Bitboard occupancies[3]{};
-        std::tuple<PieceType, Color> squaresOccupants[8][8];
+        std::tuple<PieceType, Color> squaresOccupants[64];
 
         explicit BoardUtilities(const BoardState& state);
 

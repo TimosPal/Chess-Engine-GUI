@@ -12,16 +12,23 @@ namespace ChessEngine::MoveGeneration::Pseudo {
 
     using namespace ChessEngine::BitboardUtil;
 
-    static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, MoveType flags) {
+    static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, MoveType flags, const BoardUtilities& utilities) {
         std::list<Move> moveList;
 
         // iterate over the bitboard , for each isolated bit find the corresponding moves.
         while (moves != 0) {
             uint8_t toSquareIndex = GetLSBIndex(moves);
 
-            Move move = {.fromSquareIndex = fromSquareIndex,
+            auto [selfType, selfColor] = utilities.squaresOccupants[fromSquareIndex];
+            auto [enemyType, enemyColor] = utilities.squaresOccupants[toSquareIndex];
+
+            Move move = {
+                    .fromSquareIndex = fromSquareIndex,
                     .toSquareIndex = toSquareIndex,
-                    .flags = flags};
+                    .flags = flags,
+                    .selfType = selfType,
+                    .enemyType = enemyType,
+            };
 
             moveList.emplace_back(move);
 
@@ -58,12 +65,12 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             Bitboard pushes = LeaperPieces::GetPawnPushes(tempPieceBoard, color);
             pushes |= LeaperPieces::GetDoublePawnPushes(tempPieceBoard, globalOccupancies, color);
 
-            auto m1 = ExtractMoves(pushes & ~globalOccupancies, fromSquareIndex, quietMoveFlags);
+            auto m1 = ExtractMoves(pushes & ~globalOccupancies, fromSquareIndex, quietMoveFlags, utilities);
 
             // Captures
             auto attackMoveFlags = (MoveType) (MoveType::Capture | promotionFlag);
             Bitboard attacks = MoveTables::GetPawnAttacks(color, fromSquareIndex);
-            auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, attackMoveFlags);
+            auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, attackMoveFlags, utilities);
 
             pawnsBoard = PopBit(pawnsBoard, fromSquareIndex);
         }
@@ -134,10 +141,10 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             Bitboard moves = MoveTables::GetKnightMoves(fromSquareIndex);
 
             // Quiet moves
-            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet);
+            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet, utilities);
 
             // Captures
-            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture);
+            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture, utilities);
 
             knightsBoard = PopBit(knightsBoard, fromSquareIndex);
         }
@@ -155,10 +162,10 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             Bitboard moves = MoveTables::GetKingMoves(fromSquareIndex);
 
             // Quiet moves
-            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet);
+            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet, utilities);
 
             // Captures
-            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture);
+            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture, utilities);
         }
     }
 
@@ -183,10 +190,10 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             Bitboard moves = getMoves(fromSquareIndex, globalOccupancies);
 
             // Quiet moves
-            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet);
+            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet, utilities);
 
             // Captures
-            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture);
+            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture, utilities);
 
             slidingPieceBoard = PopBit(slidingPieceBoard, fromSquareIndex);
         }

@@ -11,7 +11,8 @@ namespace ChessEngine {
 
         for (int rank = 7; rank >= 0; rank--) {
             for (int file = 0; file < 8; file++) {
-                squaresOccupants[rank][file] = state.GetPosType(GetSquareIndex(file, rank));
+                uint8_t index = GetSquareIndex(file, rank);
+                squaresOccupants[index] = state.GetPosType(index);
             }
         }
     }

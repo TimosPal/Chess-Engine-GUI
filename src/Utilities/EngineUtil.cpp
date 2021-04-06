@@ -37,46 +37,50 @@ namespace ChessEngine {
         return true;
     }
 
-    std::string PieceTypeToString(PieceType type, Color color) {
+    char PieceTypeToChar(PieceType type, Color color) {
         if (color == Color::White) {
             switch (type) {
                 case PieceType::Pawn:
-                    return "P";
+                    return 'P';
                 case PieceType::Rook:
-                    return "R";
+                    return 'R';
                 case PieceType::Knight:
-                    return "N";
+                    return 'N';
                 case PieceType::King:
-                    return "K";
+                    return 'K';
                 case PieceType::Queen:
-                    return "Q";
+                    return 'Q';
                 case PieceType::Bishop:
-                    return "B";
+                    return 'B';
                 case PieceType::None:
-                    return "-";
+                    return '-';
                 default:
                     assert(false);
             }
         } else {
             switch (type) {
                 case PieceType::Pawn:
-                    return "p";
+                    return 'p';
                 case PieceType::Rook:
-                    return "r";
+                    return 'r';
                 case PieceType::Knight:
-                    return "n";
+                    return 'n';
                 case PieceType::King:
-                    return "k";
+                    return 'k';
                 case PieceType::Queen:
-                    return "q";
+                    return 'q';
                 case PieceType::Bishop:
-                    return "b";
+                    return 'b';
                 case PieceType::None:
-                    return "-";
+                    return '-';
                 default:
                     assert(false);
             }
         }
+    }
+
+    char PieceTypeToChar(PieceType type) {
+        return PieceTypeToChar(type, Color::Black); // if we want lowercase chars , and dont care about color.
     }
 
     void InitEngine() {

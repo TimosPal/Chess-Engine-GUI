@@ -16,12 +16,12 @@ namespace ChessEngine {
 
         void Draw();
 
-        BoardState GetState(){ //NOTE: For testing only.
+        BoardState& GetState(){ //NOTE: For testing only.
             return state;
         }
 
-        BitboardUtil::Bitboard* GetOccupancies(){ //NOTE: For testing only.
-            return utilities.occupancies;
+        BoardUtilities& GetUtilities(){ //NOTE: For testing only.
+            return utilities;
         }
 
     private:

@@ -57,14 +57,22 @@ namespace ChessEngine::MoveGeneration {
         auto[xf, yf] = GetCoordinates(value.fromSquareIndex);
         auto[xt, yt] = GetCoordinates(value.toSquareIndex);
 
+        // Empty string if None.
+        std::string enemyTypeStr;
+        if(value.enemyType != PieceType::None){
+            enemyTypeStr = PieceTypeToChar(value.enemyType);
+        }
+
         out << value.flags
-            << " ["
+            << " [ "
+            << PieceTypeToChar(value.selfType)
             << FileToString((File) xf)
             << RankToString((Rank) yf)
-            << "]->["
+            << " -> "
+            << enemyTypeStr
             << FileToString((File) xt)
             << RankToString((Rank) yt)
-            << "]";
+            << " ]";
 
         return out;
     }

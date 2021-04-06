@@ -20,9 +20,11 @@ namespace ChessEngine::MoveGeneration {
     struct Move {
         uint8_t fromSquareIndex;
         uint8_t toSquareIndex;
+
         MoveType flags;
-        PieceType self; //TODO
-        PieceType enemy; //TODO
+
+        PieceType selfType;
+        PieceType enemyType;
     };
 
     bool IsOfMoveType(MoveType flags, MoveType type);

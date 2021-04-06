@@ -90,7 +90,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
         mask |= GetDirectionalMoves(file, rank, 1, 0, occupancies);
         mask |= GetDirectionalMoves(file, rank, -1, 0, occupancies);
 
-        // Exclude self.
+        // Exclude selfType.
         return mask;
     }
 
@@ -117,7 +117,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
         mask |= GetDirectionalMoves(file, rank, -1, 1, occupancies);
         mask |= GetDirectionalMoves(file, rank, -1, -1, occupancies);
 
-        // Exclude self.
+        // Exclude selfType.
         return mask;
     }
 
