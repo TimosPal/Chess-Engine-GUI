@@ -1,12 +1,10 @@
 #include "PseudoMoves.h"
 
-#include <list>
 #include <iostream>
 #include <cassert>
 
 #include "MoveTables.h"
 #include "LeaperPieces.h"
-#include "Move.h"
 
 namespace ChessEngine::MoveGeneration::Pseudo {
 
@@ -32,15 +30,14 @@ namespace ChessEngine::MoveGeneration::Pseudo {
 
             moveList.emplace_back(move);
 
-            std::cout << move << std::endl;
-
             moves = PopBit(moves, toSquareIndex);
         }
 
         return moveList;
     }
 
-    void GetPawnMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetPawnMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+        std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
         Bitboard globalOccupancies = utilities.occupancies[Color::Both];
@@ -65,18 +62,23 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             Bitboard pushes = LeaperPieces::GetPawnPushes(tempPieceBoard, color);
             pushes |= LeaperPieces::GetDoublePawnPushes(tempPieceBoard, globalOccupancies, color);
 
-            auto m1 = ExtractMoves(pushes & ~globalOccupancies, fromSquareIndex, quietMoveFlags, utilities);
+            auto quietMoves = ExtractMoves(pushes & ~globalOccupancies, fromSquareIndex, quietMoveFlags, utilities);
+            moveList.splice(moveList.end(), quietMoves);
 
             // Captures
             auto attackMoveFlags = (MoveType) (MoveType::Capture | promotionFlag);
             Bitboard attacks = MoveTables::GetPawnAttacks(color, fromSquareIndex);
-            auto m2 = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, attackMoveFlags, utilities);
+            auto captures = ExtractMoves(attacks & enemyOccupancies, fromSquareIndex, attackMoveFlags, utilities);
+            moveList.splice(moveList.end(), captures);
 
             pawnsBoard = PopBit(pawnsBoard, fromSquareIndex);
         }
+
+        return moveList;
     }
 
-    void GetEnPassantMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetEnPassantMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+        std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
 
         uint8_t enPassantIndex = GetLSBIndex(state.enPassantBoard);
@@ -96,14 +98,18 @@ namespace ChessEngine::MoveGeneration::Pseudo {
                 Move move = {.fromSquareIndex = fromSquareIndex,
                              .toSquareIndex = enPassantIndex,
                              .flags = enPassantMoveFlags};
-                std::cout << move << std::endl;
+
+                moveList.push_back(move);
 
                 enPassantPieces = PopBit(enPassantPieces, fromSquareIndex);
             }
         }
+
+        return moveList;
     }
 
-    void GetCastlingMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetCastlingMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+        std::list<Move> moveList;
         // Check whether or not there are pieces between the king and the rook.
         Bitboard globalOccupancies = utilities.occupancies[Color::Both];
         Bitboard colorMask = (color == Color::White) ? r1_Mask : r8_Mask;
@@ -114,7 +120,8 @@ namespace ChessEngine::MoveGeneration::Pseudo {
                 Move move = {.fromSquareIndex = GetLSBIndex(kingsStartingPosBoard & colorMask),
                         .toSquareIndex = GetLSBIndex(kingsCastlePosBoard & colorMask),
                         .flags = MoveType::KingSideCastling};
-                std::cout << move << std::endl;
+
+                moveList.push_back(move);
             }
         }
         if (state.queenSideCastling[color]) {
@@ -123,12 +130,16 @@ namespace ChessEngine::MoveGeneration::Pseudo {
                 Move move = {.fromSquareIndex = GetLSBIndex(kingsStartingPosBoard & colorMask),
                         .toSquareIndex = GetLSBIndex(queenCastlePosBoard & colorMask),
                         .flags = MoveType::QueenSideCastling};
-                std::cout << move << std::endl;
+
+                moveList.push_back(move);
             }
         }
+
+        return moveList;
     }
 
-    void GetKnightMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetKnightMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+        std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
         Bitboard globalOccupancies = utilities.occupancies[Color::Both];
@@ -141,16 +152,22 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             Bitboard moves = MoveTables::GetKnightMoves(fromSquareIndex);
 
             // Quiet moves
-            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet, utilities);
+            auto quietMoves = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet, utilities);
+            moveList.splice(moveList.end(), quietMoves);
 
             // Captures
-            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture, utilities);
+            auto captures = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture, utilities);
+            moveList.splice(moveList.end(), captures);
+
 
             knightsBoard = PopBit(knightsBoard, fromSquareIndex);
         }
+
+        return moveList;
     }
 
-    void GetKingMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetKingMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+        std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
         Bitboard globalOccupancies = utilities.occupancies[Color::Both];
@@ -162,14 +179,20 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             Bitboard moves = MoveTables::GetKingMoves(fromSquareIndex);
 
             // Quiet moves
-            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet, utilities);
+            auto quietMoves = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet, utilities);
+            moveList.splice(moveList.end(), quietMoves);
 
             // Captures
-            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture, utilities);
+            auto captures = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture, utilities);
+            moveList.splice(moveList.end(), captures);
+
         }
+
+        return moveList;
     }
 
-    void GetSlidingMoves(const BoardState &state, Color color, PieceType type, const BoardUtilities& utilities) {
+    std::list<Move> GetSlidingMoves(const BoardState &state, Color color, PieceType type, const BoardUtilities& utilities) {
+        std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
         Bitboard globalOccupancies = utilities.occupancies[Color::Both];
@@ -190,32 +213,48 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             Bitboard moves = getMoves(fromSquareIndex, globalOccupancies);
 
             // Quiet moves
-            auto m1 = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet, utilities);
+            auto quietMoves = ExtractMoves(moves & ~globalOccupancies, fromSquareIndex, MoveType::Quiet, utilities);
+            moveList.splice(moveList.end(), quietMoves);
 
             // Captures
-            auto m2 = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture, utilities);
+            auto captures = ExtractMoves(moves & enemyOccupancies, fromSquareIndex, MoveType::Capture, utilities);
+            moveList.splice(moveList.end(), captures);
 
             slidingPieceBoard = PopBit(slidingPieceBoard, fromSquareIndex);
         }
+
+        return moveList;
     }
 
-    void GetAllMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetAllMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+        std::list<Move> moveList;
+
         // Pawns.
-        GetPawnMoves(state, color, utilities);
+        auto pawnMoves = GetPawnMoves(state, color, utilities);
+        moveList.splice(moveList.end(), pawnMoves);
         // King.
-        GetKingMoves(state, color, utilities);
+        auto kingMoves = GetKingMoves(state, color, utilities);
+        moveList.splice(moveList.end(), kingMoves);
         // Knight.
-        GetKnightMoves(state, color, utilities);
+        auto knightMoves = GetKnightMoves(state, color, utilities);
+        moveList.splice(moveList.end(), knightMoves);
         // Castling.
-        GetCastlingMoves(state, color, utilities);
+        auto castlingMoves = GetCastlingMoves(state, color, utilities);
+        moveList.splice(moveList.end(), castlingMoves);
         // En passant.
-        GetEnPassantMoves(state, color, utilities);
-        // Queen.
-        GetSlidingMoves(state, color, PieceType::Rook, utilities);
+        auto enPassantMoves = GetEnPassantMoves(state, color, utilities);
+        moveList.splice(moveList.end(), enPassantMoves);
+        // rook.
+        auto rookMoves = GetSlidingMoves(state, color, PieceType::Rook, utilities);
+        moveList.splice(moveList.end(), rookMoves);
         // Bishop.
-        GetSlidingMoves(state, color, PieceType::Bishop, utilities);
+        auto bishopMoves = GetSlidingMoves(state, color, PieceType::Bishop, utilities);
+        moveList.splice(moveList.end(), bishopMoves);
         // Queen.
-        GetSlidingMoves(state, color, PieceType::Queen, utilities);
+        auto queenMoves = GetSlidingMoves(state, color, PieceType::Queen, utilities);
+        moveList.splice(moveList.end(), queenMoves);
+
+        return moveList;
     }
 
 }

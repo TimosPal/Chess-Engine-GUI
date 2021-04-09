@@ -1,8 +1,11 @@
 #include <iostream>
 
 #include "FenParser/FenParser.h"
+
 #include "Board/Board.h"
+
 #include "MoveGeneration/PseudoMoves.h"
+#include "MoveGeneration/MoveGeneration.h"
 
 using namespace ChessEngine;
 using namespace ChessEngine::BitboardUtil;
@@ -20,7 +23,8 @@ int main() {
     Board board(state);
     board.Draw();
 
-    MoveGeneration::Pseudo::GetAllMoves(board.GetState(), White, board.GetUtilities());
+    auto moves = MoveGeneration::Pseudo::GetAllMoves(board.GetState(), White, board.GetUtilities());
+    MoveGeneration::PrintMoves(moves);
 
 
     return 0;
