@@ -9,7 +9,7 @@ namespace ChessEngine::MoveGeneration {
 
     using namespace ChessEngine::BitboardUtil;
 
-    bool IsOfMoveType(MoveType flags, MoveType type) {
+    bool IsMoveType(MoveType flags, MoveType type) {
         return flags & type;
     }
 

@@ -27,7 +27,7 @@ namespace ChessEngine::MoveGeneration {
         PieceType enemyType;
     };
 
-    bool IsOfMoveType(MoveType flags, MoveType type);
+    bool IsMoveType(MoveType flags, MoveType type);
     std::string MoveTypeToString(MoveType type); /* Should contain a single flag */
 
     std::ostream& operator<<(std::ostream& out, MoveType value);

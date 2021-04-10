@@ -1,0 +1,29 @@
+add_library(
+        Engine STATIC
+        src/Board/Board.cpp
+        src/Board/Board.h
+        src/Board/Bitboard.h
+        src/Utilities/EngineUtil.h
+        src/MoveGeneration/LeaperPieces.h
+        src/MoveGeneration/PseudoMoves.h
+        src/FenParser/FenParser.h
+        src/FenParser/FenParser.cpp
+        src/Board/BoardState.h
+        src/Board/Bitboard.cpp
+        src/MoveGeneration/PseudoMoves.cpp
+        src/Utilities/EngineUtil.cpp
+        src/MoveGeneration/SlidingPieces.h
+        src/MoveGeneration/MoveTables.h
+        src/MoveGeneration/MagicNumbers.h
+        src/MoveGeneration/MoveTables.cpp
+        src/MoveGeneration/LeaperPieces.cpp
+        src/MoveGeneration/SlidingPieces.cpp
+        src/MoveGeneration/Move.h
+        src/MoveGeneration/Move.cpp
+        src/Board/BoardUtilities.h
+        src/Board/BoardUtilities.cpp
+        src/MoveGeneration/MoveGeneration.h
+        src/MoveGeneration/MoveGeneration.cpp
+)
+
+target_include_directories(Engine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
