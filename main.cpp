@@ -1,4 +1,5 @@
 #include <iostream>
+#include <SFML/Window.hpp>
 
 #include <FenParser/FenParser.h>
 
@@ -25,6 +26,8 @@ int main() {
 
     auto moves = MoveGeneration::Pseudo::GetAllMoves(board.GetState(), White, board.GetUtilities());
     MoveGeneration::PrintMoves(moves);
+
+    sf::Window window(sf::VideoMode(800, 600), "My window");
 
     return 0;
 }

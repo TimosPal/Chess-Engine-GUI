@@ -3,7 +3,15 @@ project(Chess)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(SFML_INCLUDE_DIR "C:\\SFML-2.5.1/include")
+set(SFML_LIBRARY_DIR "C:\\SFML-2.5.1/lib")
+set(SFML_DIR "C:\\SFML-2.5.1/lib/cmake/SFML")
+
+link_directories(SFML_LIBRARY_DIR)
+include_directories(SFML_INCLUDE_DIR)
+find_package(SFML 2.5.1 COMPONENTS system window audio graphics)
+
 add_subdirectory(Engine)
 
 add_executable(Chess main.cpp)
-target_link_libraries(Chess Engine)
+target_link_libraries(Chess Engine sfml-graphics sfml-audio sfml-window sfml-system)

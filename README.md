@@ -27,3 +27,7 @@ pseudo moves for a given position without needing to calculate them on the fly.
 
 Exception : pawn pushes are calculated on the spot due to their simplicity and strong correlation
 to the occupancy bitboards when calculating double pushes on the 2nd or 7th ranks.
+
+## Dependencies
+SFML , neither the package or the dlls are included in this repo.
+Used : sfml-graphics sfml-audio sfml-window sfml-system
