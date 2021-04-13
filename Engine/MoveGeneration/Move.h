@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "../Utilities/EngineUtil.h"
+#include "../Utilities/Utilities.h"
 
 namespace ChessEngine::MoveGeneration {
 

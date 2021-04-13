@@ -21,7 +21,7 @@ namespace ChessEngine {
     };
 
     enum PieceType{
-        Pawn, Rook, Bishop, Knight, King, Queen, None
+        King, Queen, Bishop, Knight, Rook, Pawn, None
     };
 
     std::string FileToString(File file);
@@ -32,8 +32,8 @@ namespace ChessEngine {
     bool StringToCoord(const std::string& str, std::tuple<uint8_t , uint8_t >& coords);
     Color InvertColor(Color color);
 
-    /* InitEngine engine tables etc */
-    void InitEngine();
+    /* Init engine tables etc */
+    void Init();
 
 }
 

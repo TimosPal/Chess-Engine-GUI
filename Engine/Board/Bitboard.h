@@ -4,7 +4,7 @@
 #include <array>
 #include <tuple>
 
-#include "../Utilities/EngineUtil.h"
+#include "../Utilities/Utilities.h"
 
 #define BIT_MASK 0x1ULL
 #define BITBOARD_EMPTY 0x0ULL

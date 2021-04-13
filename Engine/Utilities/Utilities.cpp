@@ -1,5 +1,5 @@
 #include <cassert>
-#include "EngineUtil.h"
+#include "Utilities.h"
 
 #include "../MoveGeneration/SlidingPieces.h"
 #include "../MoveGeneration/MoveTables.h"
@@ -83,7 +83,7 @@ namespace ChessEngine {
         return PieceTypeToChar(type, Color::Black); // if we want lowercase chars , and dont care about color.
     }
 
-    void InitEngine() {
+    void Init() {
         MoveGeneration::SlidingPieces::InitBlockerMasks();
         MoveGeneration::MoveTables::InitMoveTables();
     }
