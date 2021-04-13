@@ -15,5 +15,5 @@ find_package(SFML 2.5.1 COMPONENTS system window audio graphics)
 
 add_subdirectory(Engine)
 
-add_executable(Chess main.cpp Frontend/src/TextureManager.h Frontend/src/TextureManager.cpp)
+add_executable(Chess main.cpp Frontend/src/TextureManager.h Frontend/src/TextureManager.cpp Frontend/src/Game.h Frontend/src/Game.cpp Frontend/src/RenderingUtil.h Frontend/src/RenderingUtil.cpp)
 target_link_libraries(Chess Engine sfml-graphics sfml-audio sfml-window sfml-system)

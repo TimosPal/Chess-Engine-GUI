@@ -20,6 +20,11 @@ namespace ChessFrontend {
             return pieceSprites[color][type];
         }
 
+        /* Get a scaling factor to convert "from" to "to". */
+        static constexpr float GetScalingFactor(float from, float to){
+            return  from / to;
+        }
+
     private:
         // TODO: maybe make more generic if more sprites are needed.
         static sf::Texture piecesSpriteSheet;

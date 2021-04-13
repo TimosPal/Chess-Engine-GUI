@@ -21,7 +21,7 @@ namespace ChessFrontend {
             // the order of the sprites is the same as the order of the PieceType and Color enums.
             // So the indexing can be done with [Color][PieceType].
 
-            int pieceSpriteSize = piecesSpriteSheet.getSize().x / 6;
+            int pieceSpriteSize = (int)piecesSpriteSheet.getSize().x / 6;
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 6; j++) {
                     sf::Sprite currPieceSprite;
