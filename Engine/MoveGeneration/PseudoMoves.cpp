@@ -240,10 +240,10 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         moveList.splice(moveList.end(), knightMoves);
         // Castling.
         auto castlingMoves = GetCastlingMoves(state, color, utilities);
-        moveList.splice(moveList.end(), castlingMoves);
+        //moveList.splice(moveList.end(), castlingMoves);
         // En passant.
         auto enPassantMoves = GetEnPassantMoves(state, color, utilities);
-        moveList.splice(moveList.end(), enPassantMoves);
+        //moveList.splice(moveList.end(), enPassantMoves);
         // rook.
         auto rookMoves = GetSlidingMoves(state, color, PieceType::Rook, utilities);
         moveList.splice(moveList.end(), rookMoves);

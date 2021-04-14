@@ -43,6 +43,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /*******************************************************/
 
     // Blocker masks , to be used in magic bitboards.
+    // TODO: change globals to static
     extern std::array<BitboardUtil::Bitboard, 64> rookMasks;
     extern std::array<BitboardUtil::Bitboard, 64> bishopMasks;
 

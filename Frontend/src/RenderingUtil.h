@@ -1,5 +1,5 @@
-#ifndef RENDERINGUTIL_H
-#define RENDERINGUTIL_H
+#ifndef RENDERING_UTIL_H
+#define RENDERING_UTIL_H
 
 
 #include <SFML/Graphics/RectangleShape.hpp>

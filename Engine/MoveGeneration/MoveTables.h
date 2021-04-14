@@ -18,6 +18,7 @@ namespace ChessEngine::MoveGeneration::MoveTables {
     BitboardUtil::Bitboard GetBishopMoves(uint8_t index, BitboardUtil::Bitboard occupancies);
     BitboardUtil::Bitboard GetQueenMoves(uint8_t index, BitboardUtil::Bitboard occupancies);
 
+    // TODO: change globals to static
     extern std::array<BitboardUtil::Bitboard, 64> kingMoves;
     extern std::array<BitboardUtil::Bitboard, 64> knightMoves;
     extern std::array<std::array<BitboardUtil::Bitboard, 64>, 2> pawnAttacks;

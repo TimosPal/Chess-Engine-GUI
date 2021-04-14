@@ -16,11 +16,11 @@ namespace ChessEngine {
 
         void Draw();
 
-        BoardState& GetState(){ //NOTE: For testing only.
+        BoardState& GetState(){
             return state;
         }
 
-        BoardUtilities& GetUtilities(){ //NOTE: For testing only.
+        BoardUtilities& GetUtilities(){
             return utilities;
         }
 

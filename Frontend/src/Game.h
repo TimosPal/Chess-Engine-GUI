@@ -8,16 +8,22 @@ namespace ChessFrontend {
 
     class Game{
     public:
-        Game(ChessEngine::BoardState state, int width, int height, std::string title);
+        Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, int width, int height, const std::string& title);
 
         void HandleEvents();
+        void PlayMove();
         void Render();
 
-        bool IsRunning() { return window.isOpen();}
+        bool IsRunning() { return window.isOpen(); }
 
     private:
         sf::RenderWindow window;
         ChessEngine::Board board;
+
+        bool boardHasChanged; // Since last frame.
+
+        bool whiteAI;
+        bool blackAI;
     };
 
 }
