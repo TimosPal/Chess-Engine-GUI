@@ -20,6 +20,12 @@ namespace ChessFrontend::RenderingUtil {
         }
     }
 
+    void ScalePieceSprite(sf::Sprite& sprite, sf::Vector2i targetScale){
+        int spritePixelSize = sprite.getTexture()->getSize().x / 6;
+        float scalingFactor = ChessFrontend::TextureManager::GetScalingFactor(targetScale.x, spritePixelSize);
+        sprite.setScale(scalingFactor, scalingFactor);
+    }
+
     void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardState state) {
         int width = window.getSize().x;
         int height = window.getSize().y;
@@ -32,10 +38,7 @@ namespace ChessFrontend::RenderingUtil {
                     continue;
 
                 auto currSprite = ChessFrontend::TextureManager::GetPieceSprite(color, type);
-                int spritePixelSize = currSprite.getTexture()->getSize().x / 6;
-                float scalingFactor = ChessFrontend::TextureManager::GetScalingFactor(tileSize.x, spritePixelSize);
-
-                currSprite.setScale(scalingFactor, scalingFactor);
+                ScalePieceSprite(currSprite, tileSize);
                 currSprite.setPosition(i * tileSize.x, (8 - j - 1) * tileSize.y);
 
                 window.draw(currSprite);

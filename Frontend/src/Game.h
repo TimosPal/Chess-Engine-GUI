@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <Engine/Board/Board.h>
+#include <SFML/Graphics/Sprite.hpp>
 
 namespace ChessFrontend {
 
@@ -24,6 +25,12 @@ namespace ChessFrontend {
 
         bool whiteAI;
         bool blackAI;
+
+        bool isHolding;
+        sf::Sprite holdingSprite;
+
+        void RealPlayerTurn();
+
     };
 
 }

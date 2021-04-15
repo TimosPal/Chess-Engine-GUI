@@ -6,6 +6,7 @@
 #include <Engine/MoveGeneration/MoveGeneration.h>
 
 #include "./RenderingUtil.h"
+#include "TextureManager.h"
 
 namespace ChessFrontend {
 
@@ -13,7 +14,7 @@ namespace ChessFrontend {
                 : window(sf::VideoMode(width, height), title) ,
                 board(state) , boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI)
         {
-            window.setFramerateLimit(60);
+            window.setFramerateLimit(120);
         }
 
         void Game::HandleEvents(){
@@ -39,6 +40,15 @@ namespace ChessFrontend {
             RenderingUtil::DrawCheckerBoard(window);
             RenderingUtil::DrawPieces(window, board.GetState());
 
+            if(isHolding) {
+                sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                RenderingUtil::ScalePieceSprite(holdingSprite, tileSize);
+                holdingSprite.setPosition(mousePos.x - tileSize.x / 2, mousePos.y - tileSize.y / 2);
+                window.draw(holdingSprite);
+            }
+
             window.display();
         }
 
@@ -50,11 +60,31 @@ namespace ChessFrontend {
             if(isAI){
                 auto moves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
                 MakeMove(moves.front(), board.GetState().turnOf, board.GetState(), board.GetUtilities());
+                boardHasChanged = true;
             }else{
-                // Player code.
+                RealPlayerTurn();
+            }
+        }
+
+        void Game::RealPlayerTurn(){
+            using namespace ChessEngine::BitboardUtil;
+
+            sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            sf::Vector2i tilePos(mousePos.x / tileSize.x, 8 - 1 - mousePos.y / tileSize.y);
+
+            auto[type, color] = board.GetState().GetPosType(GetSquareIndex(tilePos.x, tilePos.y));
+
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                // Is same color , not empty square and isn't already holding a sprite.
+                if (type != ChessEngine::PieceType::None && color == board.GetState().turnOf  && !isHolding) {
+                    isHolding = true;
+                    holdingSprite = TextureManager::GetPieceSprite(color, type);
+                }
+            }else{
+                isHolding = false;
             }
 
-            boardHasChanged = true;
         }
 
 }

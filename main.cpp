@@ -20,12 +20,11 @@ int main() {
         return -1;
     }
 
-    ChessFrontend::Game game(state,true, false, width, height, "Chess");
+    ChessFrontend::Game game(state,false, true, width, height, "Chess");
     while (game.IsRunning()) {
         game.HandleEvents();
-        game.Render();
         game.PlayMove();
-        usleep(70000);
+        game.Render();
     }
 
     return 0;

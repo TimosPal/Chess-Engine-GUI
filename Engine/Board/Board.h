@@ -28,7 +28,6 @@ namespace ChessEngine {
 
         BoardState state;
         BoardUtilities utilities;
-
     };
 
 }
