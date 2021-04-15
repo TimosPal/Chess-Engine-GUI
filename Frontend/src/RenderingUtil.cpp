@@ -26,7 +26,7 @@ namespace ChessFrontend::RenderingUtil {
         sprite.setScale(scalingFactor, scalingFactor);
     }
 
-    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardState state) {
+    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardState state, bool isHolding, sf::Vector2i fromPos) {
         int width = window.getSize().x;
         int height = window.getSize().y;
         auto tileSize = sf::Vector2(width / 8, height / 8);
@@ -35,6 +35,8 @@ namespace ChessFrontend::RenderingUtil {
             for (int j = 0; j < 8; j++) {
                 auto[type, color] = state.GetPosType(ChessEngine::BitboardUtil::GetSquareIndex(i, j));
                 if (type == ChessEngine::PieceType::None) // Empty tile.
+                    continue;
+                if (isHolding && fromPos.x == i && fromPos.y == j) // holding piece
                     continue;
 
                 auto currSprite = ChessFrontend::TextureManager::GetPieceSprite(color, type);

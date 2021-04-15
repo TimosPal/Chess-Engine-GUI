@@ -38,7 +38,7 @@ namespace ChessFrontend {
             window.clear();
 
             RenderingUtil::DrawCheckerBoard(window);
-            RenderingUtil::DrawPieces(window, board.GetState());
+            RenderingUtil::DrawPieces(window, board.GetState(), isHolding, fromPos);
 
             if(isHolding) {
                 sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
@@ -68,6 +68,7 @@ namespace ChessFrontend {
 
         void Game::RealPlayerTurn(){
             using namespace ChessEngine::BitboardUtil;
+            using namespace ChessEngine::MoveGeneration;
 
             sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
@@ -78,11 +79,33 @@ namespace ChessFrontend {
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                 // Is same color , not empty square and isn't already holding a sprite.
                 if (type != ChessEngine::PieceType::None && color == board.GetState().turnOf  && !isHolding) {
-                    isHolding = true;
+                    isHolding = true; // Pickup.
                     holdingSprite = TextureManager::GetPieceSprite(color, type);
+                    fromPos = tilePos;
                 }
             }else{
-                isHolding = false;
+                if(isHolding) {
+                    uint8_t fromIndex = GetSquareIndex(fromPos.x, fromPos.y);
+                    uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
+                    auto moves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+
+                    Move move{};
+                    bool validMove = false;
+                    for (auto currMove : moves) {
+                        if (currMove.fromSquareIndex == fromIndex && currMove.toSquareIndex == toIndex) {
+                            move = currMove;
+                            validMove = true;
+                            break;
+                        }
+                    }
+
+                    if (validMove) {
+                        MakeMove(move, board.GetState().turnOf, board.GetState(), board.GetUtilities());
+                        boardHasChanged = true;
+                    }
+
+                    isHolding = false; // Drop off.
+                }
             }
 
         }

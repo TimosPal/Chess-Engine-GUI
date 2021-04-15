@@ -28,6 +28,7 @@ namespace ChessFrontend {
 
         bool isHolding;
         sf::Sprite holdingSprite;
+        sf::Vector2i fromPos;
 
         void RealPlayerTurn();
 
