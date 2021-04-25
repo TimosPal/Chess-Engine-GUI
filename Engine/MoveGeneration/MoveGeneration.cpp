@@ -78,4 +78,16 @@ namespace ChessEngine::MoveGeneration {
         return false;
     }
 
+    std::list<Move> FromIndexMoves(uint8_t from, const std::list<Move>& moves){
+        std::list<Move> fromMoves;
+
+        for (auto currMove : moves) {
+            if (currMove.fromSquareIndex == from) {
+                fromMoves.push_back(currMove);
+            }
+        }
+
+        return fromMoves;
+    }
+
 }

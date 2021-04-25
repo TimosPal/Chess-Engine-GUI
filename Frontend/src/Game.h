@@ -5,6 +5,8 @@
 #include <Engine/Board/Board.h>
 #include <SFML/Graphics/Sprite.hpp>
 
+#include <Engine/MoveGeneration/Move.h>
+
 #include <list>
 
 namespace ChessFrontend {
@@ -29,9 +31,11 @@ namespace ChessFrontend {
         bool boardHasChanged; // Since last frame.
 
         // Information about the current human player.
+        // Used for graphics.
         bool isHolding;
         sf::Sprite holdingSprite;
         sf::Vector2i fromPos;
+        std::list<ChessEngine::MoveGeneration::Move> activePieceMoves;
 
         // Returns true if player made a move
         bool HumanTurn();

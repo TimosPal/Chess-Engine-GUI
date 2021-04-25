@@ -1,12 +1,14 @@
 #ifndef RENDERING_UTIL_H
 #define RENDERING_UTIL_H
 
+#include <list>
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
 #include <Engine/Board/BoardState.h>
+#include <Engine/MoveGeneration/Move.h>
 
 namespace ChessFrontend::RenderingUtil {
 
@@ -16,7 +18,9 @@ namespace ChessFrontend::RenderingUtil {
 
     void ScalePieceSprite(sf::Sprite &sprite, sf::Vector2i targetScale);
 
-    void DrawHoldingPiece(sf::RenderWindow& window, sf::Sprite& holdingSprite);
+    void DrawHoldingPiece(sf::RenderWindow &window, sf::Sprite &holdingSprite);
+
+    void DrawActivePieceMoves(sf::RenderWindow &window, std::list<ChessEngine::MoveGeneration::Move> activePieceMoves);
 
 }
 

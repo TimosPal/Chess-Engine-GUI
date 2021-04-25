@@ -1,8 +1,17 @@
 #include "RenderingUtil.h"
 
 #include <SFML/Window/Mouse.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
 
 #include "./TextureManager.h"
+
+#define BLACK_TILE_COLOR 238, 238, 210
+#define WHITE_TILE_COLOR 118, 150, 86
+
+#define CIRCLE_COLOR 0, 0, 0, 50
+#define CIRCLE_QUIET_PERCENTAGE 0.20
+#define CIRCLE_ATTACK_PERCENTAGE 1.0
+#define CIRCLE_OUTLINE_PERCENTAGE 0.07
 
 namespace ChessFrontend::RenderingUtil {
 
@@ -16,7 +25,7 @@ namespace ChessFrontend::RenderingUtil {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 rectangle.setPosition(tileSize.x * i, tileSize.y * j);
-                rectangle.setFillColor((i % 2 == j % 2) ? sf::Color(238, 238, 210) : sf::Color(118, 150, 86));
+                rectangle.setFillColor((i % 2 == j % 2) ? sf::Color(BLACK_TILE_COLOR) : sf::Color(WHITE_TILE_COLOR));
                 window.draw(rectangle);
             }
         }
@@ -57,6 +66,47 @@ namespace ChessFrontend::RenderingUtil {
         RenderingUtil::ScalePieceSprite(holdingSprite, tileSize);
         holdingSprite.setPosition(mousePos.x - tileSize.x / 2, mousePos.y - tileSize.y / 2);
         window.draw(holdingSprite);
+    }
+
+    void DrawActivePieceMoves(sf::RenderWindow &window, std::list<ChessEngine::MoveGeneration::Move> activePieceMoves){
+        using namespace ChessEngine::MoveGeneration;
+        using namespace ChessEngine::BitboardUtil;
+
+        sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
+        float circleRadius = tileSize.x / 2;
+        float quietRadius = CIRCLE_QUIET_PERCENTAGE * circleRadius;
+        float captureRadius = CIRCLE_ATTACK_PERCENTAGE * circleRadius;
+
+        sf::CircleShape shape(circleRadius);
+        shape.setOutlineThickness(- tileSize.x * CIRCLE_OUTLINE_PERCENTAGE);
+
+        for(auto move : activePieceMoves) {
+            auto [posX , posY] = GetCoordinates(move.toSquareIndex);
+
+            // Captures have a ring circle.
+            float currentRadius;
+            if(IsMoveType(move.flags, MoveType::Capture)){
+                currentRadius = circleRadius;
+                shape.setFillColor(sf::Color::Transparent);
+                shape.setOutlineColor(sf::Color(CIRCLE_COLOR));
+            }else{
+                currentRadius = quietRadius;
+                shape.setFillColor(sf::Color(CIRCLE_COLOR));
+                shape.setOutlineColor(sf::Color::Transparent);
+            }
+
+            // Tile positions.
+            float newPosX = tileSize.x * posX;
+            float newPosY = tileSize.y * (8 - posY - 1);
+
+            // Center circle.
+            newPosX = newPosX + tileSize.x / 2 - currentRadius;
+            newPosY = newPosY + tileSize.y / 2 - currentRadius;
+
+            shape.setPosition(newPosX, newPosY);
+            shape.setRadius(currentRadius);
+            window.draw(shape);
+        }
     }
 
 }

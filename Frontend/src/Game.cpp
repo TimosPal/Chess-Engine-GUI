@@ -5,8 +5,6 @@
 #include <Engine/MoveGeneration/PseudoMoves.h>
 #include <Engine/MoveGeneration/MoveGeneration.h>
 
-#include <Engine/MoveGeneration/MoveGeneration.h>
-
 #include "./RenderingUtil.h"
 #include "TextureManager.h"
 
@@ -14,7 +12,7 @@ namespace ChessFrontend {
 
         Game::Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, int width, int height, const std::string& title)
                 : window(sf::VideoMode(width, height), title) ,
-                board(state) , boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI)
+                board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI), isHolding(false)
         {
             window.setFramerateLimit(120);
         }
@@ -42,6 +40,7 @@ namespace ChessFrontend {
             RenderingUtil::DrawCheckerBoard(window);
             RenderingUtil::DrawPieces(window, board.GetState(), isHolding, fromPos);
 
+            RenderingUtil::DrawActivePieceMoves(window, activePieceMoves);
             if(isHolding) {
                 RenderingUtil::DrawHoldingPiece(window, holdingSprite);
             }
@@ -71,6 +70,8 @@ namespace ChessFrontend {
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
+            bool madeMove = false;
+
             sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
             sf::Vector2i tilePos(mousePos.x / tileSize.x, 8 - 1 - mousePos.y / tileSize.y);
@@ -83,6 +84,9 @@ namespace ChessFrontend {
                     isHolding = true; // Pickup.
                     holdingSprite = TextureManager::GetPieceSprite(color, type);
                     fromPos = tilePos;
+
+                    auto pseudoMoves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+                    activePieceMoves = FromIndexMoves(GetSquareIndex(fromPos.x, fromPos.y), pseudoMoves);
                 }
             }else{
                 if(isHolding) {
@@ -92,17 +96,19 @@ namespace ChessFrontend {
                     uint8_t fromIndex = GetSquareIndex(fromPos.x, fromPos.y);
                     uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
 
-                    auto pseudoMoves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+                    //auto pseudoMoves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
 
                     Move move{};
-                    if(IndecesToMove(fromIndex, toIndex, pseudoMoves, move)) {
+                    if(IndecesToMove(fromIndex, toIndex, activePieceMoves, move)) {
                         MakeMove(move, board.GetState().turnOf, board.GetState(), board.GetUtilities());
-                        return true;
+
+                        activePieceMoves = std::list<Move>();
+                        madeMove = true;
                     }
                 }
             }
 
-            return false;
+            return madeMove;
         }
 
 }
