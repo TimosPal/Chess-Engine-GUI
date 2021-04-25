@@ -67,4 +67,15 @@ namespace ChessEngine::MoveGeneration {
         }
     }
 
+    bool IndecesToMove(uint8_t from, uint8_t to, const std::list<Move>& allMoves, Move& move){
+        for (auto currMove : allMoves) {
+            if (currMove.fromSquareIndex == from && currMove.toSquareIndex == to) {
+                move = currMove;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

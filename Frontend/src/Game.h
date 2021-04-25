@@ -5,6 +5,8 @@
 #include <Engine/Board/Board.h>
 #include <SFML/Graphics/Sprite.hpp>
 
+#include <list>
+
 namespace ChessFrontend {
 
     class Game{
@@ -21,16 +23,19 @@ namespace ChessFrontend {
         sf::RenderWindow window;
         ChessEngine::Board board;
 
-        bool boardHasChanged; // Since last frame.
-
         bool whiteAI;
         bool blackAI;
 
+        bool boardHasChanged; // Since last frame.
+
+        // Information about the current human player.
         bool isHolding;
         sf::Sprite holdingSprite;
         sf::Vector2i fromPos;
 
-        void RealPlayerTurn();
+        // Returns true if player made a move
+        bool HumanTurn();
+        bool AiTurn();
 
     };
 

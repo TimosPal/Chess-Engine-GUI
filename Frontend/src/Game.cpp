@@ -5,6 +5,8 @@
 #include <Engine/MoveGeneration/PseudoMoves.h>
 #include <Engine/MoveGeneration/MoveGeneration.h>
 
+#include <Engine/MoveGeneration/MoveGeneration.h>
+
 #include "./RenderingUtil.h"
 #include "TextureManager.h"
 
@@ -31,7 +33,7 @@ namespace ChessFrontend {
             // Print only once per change.
             if(boardHasChanged) {
                 board.Draw();
-                boardHasChanged = false;
+                std::cout << std::endl;
             }
 
             // SFML rendering.
@@ -41,12 +43,7 @@ namespace ChessFrontend {
             RenderingUtil::DrawPieces(window, board.GetState(), isHolding, fromPos);
 
             if(isHolding) {
-                sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
-                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-
-                RenderingUtil::ScalePieceSprite(holdingSprite, tileSize);
-                holdingSprite.setPosition(mousePos.x - tileSize.x / 2, mousePos.y - tileSize.y / 2);
-                window.draw(holdingSprite);
+                RenderingUtil::DrawHoldingPiece(window, holdingSprite);
             }
 
             window.display();
@@ -55,18 +52,22 @@ namespace ChessFrontend {
         void Game::PlayMove(){
             using namespace ChessEngine::MoveGeneration;
 
-            bool isAI = (board.GetState().turnOf == ChessEngine::Color::White) ? whiteAI : blackAI;
+            boardHasChanged = false; // Reset in every loop. Becomes true for one loop every move.
 
-            if(isAI){
-                auto moves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
-                MakeMove(moves.front(), board.GetState().turnOf, board.GetState(), board.GetUtilities());
-                boardHasChanged = true;
-            }else{
-                RealPlayerTurn();
-            }
+            bool isAI = (board.GetState().turnOf == ChessEngine::Color::White) ? whiteAI : blackAI;
+            boardHasChanged = (isAI) ? AiTurn() : HumanTurn();
         }
 
-        void Game::RealPlayerTurn(){
+        bool Game::AiTurn(){
+            using namespace ChessEngine::MoveGeneration;
+
+            auto moves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+            MakeMove(moves.front(), board.GetState().turnOf, board.GetState(), board.GetUtilities());
+
+            return true; // Plays move instantly.
+        }
+
+        bool Game::HumanTurn(){
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
@@ -85,29 +86,23 @@ namespace ChessFrontend {
                 }
             }else{
                 if(isHolding) {
+                    // Stop holding the piece , even if the move is invalid.
+                    isHolding = false;
+
                     uint8_t fromIndex = GetSquareIndex(fromPos.x, fromPos.y);
                     uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
-                    auto moves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+
+                    auto pseudoMoves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
 
                     Move move{};
-                    bool validMove = false;
-                    for (auto currMove : moves) {
-                        if (currMove.fromSquareIndex == fromIndex && currMove.toSquareIndex == toIndex) {
-                            move = currMove;
-                            validMove = true;
-                            break;
-                        }
-                    }
-
-                    if (validMove) {
+                    if(IndecesToMove(fromIndex, toIndex, pseudoMoves, move)) {
                         MakeMove(move, board.GetState().turnOf, board.GetState(), board.GetUtilities());
-                        boardHasChanged = true;
+                        return true;
                     }
-
-                    isHolding = false; // Drop off.
                 }
             }
 
+            return false;
         }
 
 }

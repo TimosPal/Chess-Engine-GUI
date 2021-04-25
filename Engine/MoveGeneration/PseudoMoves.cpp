@@ -232,24 +232,31 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         // Pawns.
         auto pawnMoves = GetPawnMoves(state, color, utilities);
         moveList.splice(moveList.end(), pawnMoves);
+
         // King.
         auto kingMoves = GetKingMoves(state, color, utilities);
         moveList.splice(moveList.end(), kingMoves);
+
         // Knight.
         auto knightMoves = GetKnightMoves(state, color, utilities);
         moveList.splice(moveList.end(), knightMoves);
+
         // Castling.
         auto castlingMoves = GetCastlingMoves(state, color, utilities);
         //moveList.splice(moveList.end(), castlingMoves);
+
         // En passant.
         auto enPassantMoves = GetEnPassantMoves(state, color, utilities);
         //moveList.splice(moveList.end(), enPassantMoves);
+
         // rook.
         auto rookMoves = GetSlidingMoves(state, color, PieceType::Rook, utilities);
         moveList.splice(moveList.end(), rookMoves);
+
         // Bishop.
         auto bishopMoves = GetSlidingMoves(state, color, PieceType::Bishop, utilities);
         moveList.splice(moveList.end(), bishopMoves);
+
         // Queen.
         auto queenMoves = GetSlidingMoves(state, color, PieceType::Queen, utilities);
         moveList.splice(moveList.end(), queenMoves);

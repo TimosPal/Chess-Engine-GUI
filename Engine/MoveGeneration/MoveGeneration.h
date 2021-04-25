@@ -13,6 +13,9 @@ namespace ChessEngine::MoveGeneration {
 
     void PrintMoves(const std::list<Move>& moveList);
 
+    // Find the move with the specific from and to indices.
+    bool IndecesToMove(uint8_t from, uint8_t to, const std::list<Move>& allMoves, Move& move);
+
 }
 
 #endif

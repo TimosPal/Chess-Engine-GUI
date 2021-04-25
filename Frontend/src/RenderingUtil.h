@@ -16,6 +16,8 @@ namespace ChessFrontend::RenderingUtil {
 
     void ScalePieceSprite(sf::Sprite &sprite, sf::Vector2i targetScale);
 
+    void DrawHoldingPiece(sf::RenderWindow& window, sf::Sprite& holdingSprite);
+
 }
 
 #endif

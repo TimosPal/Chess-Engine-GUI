@@ -1,5 +1,7 @@
 #include "RenderingUtil.h"
 
+#include <SFML/Window/Mouse.hpp>
+
 #include "./TextureManager.h"
 
 namespace ChessFrontend::RenderingUtil {
@@ -46,6 +48,15 @@ namespace ChessFrontend::RenderingUtil {
                 window.draw(currSprite);
             }
         }
+    }
+
+    void DrawHoldingPiece(sf::RenderWindow& window, sf::Sprite& holdingSprite){
+        sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+        RenderingUtil::ScalePieceSprite(holdingSprite, tileSize);
+        holdingSprite.setPosition(mousePos.x - tileSize.x / 2, mousePos.y - tileSize.y / 2);
+        window.draw(holdingSprite);
     }
 
 }
