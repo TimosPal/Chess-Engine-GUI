@@ -20,10 +20,15 @@ int main() {
     }
 
     ChessFrontend::Game game(state,false, true, width, height, "Chess");
+
+    sf::Clock deltaClock;
+    sf::Time dt{};
     while (game.IsRunning()) {
         game.HandleEvents();
         game.Render();
         game.PlayMove();
+
+        dt = deltaClock.restart();
     }
 
     return 0;

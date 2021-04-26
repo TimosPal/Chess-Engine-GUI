@@ -68,7 +68,7 @@ namespace ChessFrontend::RenderingUtil {
         window.draw(holdingSprite);
     }
 
-    void DrawActivePieceMoves(sf::RenderWindow &window, std::list<ChessEngine::MoveGeneration::Move> activePieceMoves){
+    void DrawActivePieceMoves(sf::RenderWindow &window, const std::list<ChessEngine::MoveGeneration::Move>& activePieceMoves){
         using namespace ChessEngine::MoveGeneration;
         using namespace ChessEngine::BitboardUtil;
 
@@ -86,7 +86,7 @@ namespace ChessFrontend::RenderingUtil {
             // Captures have a ring circle.
             float currentRadius;
             if(IsMoveType(move.flags, MoveType::Capture)){
-                currentRadius = circleRadius;
+                currentRadius = captureRadius;
                 shape.setFillColor(sf::Color::Transparent);
                 shape.setOutlineColor(sf::Color(CIRCLE_COLOR));
             }else{

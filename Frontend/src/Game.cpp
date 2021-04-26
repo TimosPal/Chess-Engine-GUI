@@ -4,6 +4,7 @@
 
 #include <Engine/MoveGeneration/PseudoMoves.h>
 #include <Engine/MoveGeneration/MoveGeneration.h>
+#include <unistd.h>
 
 #include "./RenderingUtil.h"
 #include "TextureManager.h"
@@ -84,19 +85,23 @@ namespace ChessFrontend {
             auto[type, color] = board.GetState().GetPosType(GetSquareIndex(tilePos.x, tilePos.y));
 
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                // If already holding , dont do anything.
                 if(!isHolding){
                     Move move{};
                     bool validMove = activePiece && IndecesToMove(fromIndex, toIndex, activePieceMoves, move);
                     if (validMove) {
+                        // Clicked a move when a piece was already active and it's also valid
                         MakeMove(move, board.GetState().turnOf, board.GetState(), board.GetUtilities());
 
                         activePiece = false;
                         isHolding = false;
                         madeMove = true;
-                    } else if (type == ChessEngine::PieceType::None) {
+                    } else if (type == ChessEngine::PieceType::None || color != board.GetState().turnOf) {
+                        // Clicked an invalid move , empty tile.
                         activePiece = false;
                         isHolding = false;
                     } else if (color == board.GetState().turnOf) {
+                        // Clicked another owned piece.
                         holdingSprite = TextureManager::GetPieceSprite(color, type);
                         fromPos = tilePos;
 
