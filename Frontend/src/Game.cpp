@@ -12,7 +12,8 @@ namespace ChessFrontend {
 
         Game::Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, int width, int height, const std::string& title)
                 : window(sf::VideoMode(width, height), title) ,
-                board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI), isHolding(false)
+                board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI),
+                isHolding(false), activePiece(false)
         {
             window.setFramerateLimit(120);
         }
@@ -40,9 +41,10 @@ namespace ChessFrontend {
             RenderingUtil::DrawCheckerBoard(window);
             RenderingUtil::DrawPieces(window, board.GetState(), isHolding, fromPos);
 
-            RenderingUtil::DrawActivePieceMoves(window, activePieceMoves);
-            if(isHolding) {
-                RenderingUtil::DrawHoldingPiece(window, holdingSprite);
+            if(activePiece) {
+                RenderingUtil::DrawActivePieceMoves(window, activePieceMoves);
+                if (isHolding)
+                    RenderingUtil::DrawHoldingPiece(window, holdingSprite);
             }
 
             window.display();
@@ -76,33 +78,45 @@ namespace ChessFrontend {
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
             sf::Vector2i tilePos(mousePos.x / tileSize.x, 8 - 1 - mousePos.y / tileSize.y);
 
+            uint8_t fromIndex = GetSquareIndex(fromPos.x, fromPos.y);
+            uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
+
             auto[type, color] = board.GetState().GetPosType(GetSquareIndex(tilePos.x, tilePos.y));
 
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                // Is same color , not empty square and isn't already holding a sprite.
-                if (type != ChessEngine::PieceType::None && color == board.GetState().turnOf  && !isHolding) {
-                    isHolding = true; // Pickup.
-                    holdingSprite = TextureManager::GetPieceSprite(color, type);
-                    fromPos = tilePos;
+                if(!isHolding){
+                    Move move{};
+                    bool validMove = activePiece && IndecesToMove(fromIndex, toIndex, activePieceMoves, move);
+                    if (validMove) {
+                        MakeMove(move, board.GetState().turnOf, board.GetState(), board.GetUtilities());
 
-                    auto pseudoMoves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
-                    activePieceMoves = FromIndexMoves(GetSquareIndex(fromPos.x, fromPos.y), pseudoMoves);
+                        activePiece = false;
+                        isHolding = false;
+                        madeMove = true;
+                    } else if (type == ChessEngine::PieceType::None) {
+                        activePiece = false;
+                        isHolding = false;
+                    } else if (color == board.GetState().turnOf) {
+                        holdingSprite = TextureManager::GetPieceSprite(color, type);
+                        fromPos = tilePos;
+
+                        auto pseudoMoves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf,
+                                                               board.GetUtilities());
+                        activePieceMoves = FromIndexMoves(GetSquareIndex(fromPos.x, fromPos.y), pseudoMoves);
+
+                        activePiece = true;
+                        isHolding = true;
+                    }
                 }
             }else{
                 if(isHolding) {
                     // Stop holding the piece , even if the move is invalid.
                     isHolding = false;
 
-                    uint8_t fromIndex = GetSquareIndex(fromPos.x, fromPos.y);
-                    uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
-
-                    //auto pseudoMoves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
-
                     Move move{};
                     if(IndecesToMove(fromIndex, toIndex, activePieceMoves, move)) {
                         MakeMove(move, board.GetState().turnOf, board.GetState(), board.GetUtilities());
-
-                        activePieceMoves = std::list<Move>();
+                        activePiece = false;
                         madeMove = true;
                     }
                 }

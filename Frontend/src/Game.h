@@ -32,6 +32,7 @@ namespace ChessFrontend {
 
         // Information about the current human player.
         // Used for graphics.
+        bool activePiece;
         bool isHolding;
         sf::Sprite holdingSprite;
         sf::Vector2i fromPos;
