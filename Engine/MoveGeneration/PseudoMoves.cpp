@@ -97,7 +97,9 @@ namespace ChessEngine::MoveGeneration::Pseudo {
                 auto enPassantMoveFlags = (MoveType) (MoveType::Capture | MoveType::EnPassant);
                 Move move = {.fromSquareIndex = fromSquareIndex,
                              .toSquareIndex = enPassantIndex,
-                             .flags = enPassantMoveFlags};
+                             .flags = enPassantMoveFlags,
+                             .selfType = PieceType::Pawn,
+                             .enemyType = PieceType::Pawn};
 
                 moveList.push_back(move);
 

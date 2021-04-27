@@ -85,7 +85,7 @@ namespace ChessFrontend::RenderingUtil {
 
             // Captures have a ring circle.
             float currentRadius;
-            if(IsMoveType(move.flags, MoveType::Capture)){
+            if(IsMoveType(move.flags, MoveType::Capture) && !IsMoveType(move.flags, MoveType::EnPassant)){
                 currentRadius = captureRadius;
                 shape.setFillColor(sf::Color::Transparent);
                 shape.setOutlineColor(sf::Color(CIRCLE_COLOR));
