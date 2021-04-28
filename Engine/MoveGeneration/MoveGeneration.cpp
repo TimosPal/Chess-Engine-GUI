@@ -93,16 +93,20 @@ namespace ChessEngine::MoveGeneration {
 
     static void DisableCastlingRights(const Move& move, Color color, Color opponentColor, BoardState& state){
         // Does nothing if nothing relevant to the castling rights happened.
-        if(move.selfType == PieceType::King){
-            state.kingSideCastling[color] = false;
-            state.queenSideCastling[color] = false;
-        }else if(move.selfType == PieceType::Rook){
-            // Check if own rooks moved.
-            DisableCastling_OneSide(move.fromSquareIndex, color, state);
+        if(state.kingSideCastling[color] || state.queenSideCastling[color]) {
+            if (move.selfType == PieceType::King) {
+                state.kingSideCastling[color] = false;
+                state.queenSideCastling[color] = false;
+            } else if (move.selfType == PieceType::Rook) {
+                // Check if own rooks moved.
+                DisableCastling_OneSide(move.fromSquareIndex, color, state);
+            }
         }
 
-        // Check if enemy rooks are captured.
-        DisableCastling_OneSide(move.toSquareIndex, opponentColor, state);
+        if(state.kingSideCastling[opponentColor] || state.queenSideCastling[opponentColor]) {
+            // Check if enemy rooks are captured.
+            DisableCastling_OneSide(move.toSquareIndex, opponentColor, state);
+        }
     }
 
     void MakeMove(const Move& move, Color color, BoardState& state, BoardUtilities& utilities){
