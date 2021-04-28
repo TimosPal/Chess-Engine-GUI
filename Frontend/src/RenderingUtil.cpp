@@ -16,8 +16,8 @@
 namespace ChessFrontend::RenderingUtil {
 
     void DrawCheckerBoard(sf::RenderWindow &window) {
-        int width = window.getSize().x;
-        int height = window.getSize().y;
+        int width = window.getView().getSize().x;
+        int height = window.getView().getSize().y;
 
         auto tileSize = sf::Vector2f(width / 8, height / 8);
         sf::RectangleShape rectangle(tileSize);
@@ -38,8 +38,8 @@ namespace ChessFrontend::RenderingUtil {
     }
 
     void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardState state, bool isHolding, sf::Vector2i fromPos) {
-        int width = window.getSize().x;
-        int height = window.getSize().y;
+        int width = window.getView().getSize().x;
+        int height = window.getView().getSize().y;
         auto tileSize = sf::Vector2(width / 8, height / 8);
 
         for (int i = 0; i < 8; i++) {
@@ -60,11 +60,12 @@ namespace ChessFrontend::RenderingUtil {
     }
 
     void DrawHoldingPiece(sf::RenderWindow& window, sf::Sprite& holdingSprite){
-        sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
+        sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+        sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
 
         RenderingUtil::ScalePieceSprite(holdingSprite, tileSize);
-        holdingSprite.setPosition(mousePos.x - tileSize.x / 2, mousePos.y - tileSize.y / 2);
+        holdingSprite.setPosition(worldPos.x - tileSize.x / 2, worldPos.y - tileSize.y / 2);
         window.draw(holdingSprite);
     }
 
@@ -72,7 +73,7 @@ namespace ChessFrontend::RenderingUtil {
         using namespace ChessEngine::MoveGeneration;
         using namespace ChessEngine::BitboardUtil;
 
-        sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
+        sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
         float circleRadius = tileSize.x / 2;
         float quietRadius = CIRCLE_QUIET_PERCENTAGE * circleRadius;
         float captureRadius = CIRCLE_ATTACK_PERCENTAGE * circleRadius;
