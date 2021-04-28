@@ -34,12 +34,75 @@ namespace ChessEngine::MoveGeneration {
             // Update square occupancies for said pawn
             utilities.squaresOccupants[pawnIndex] = {PieceType::None, Color::Both};
 
+            // Update occupancies board.
             Bitboard& enemyOccupancies = utilities.occupancies[opponentColor];
             enemyOccupancies = PopBit(enemyOccupancies, pawnIndex);
 
             // Reset en passant.
             state.enPassantBoard = BITBOARD_EMPTY;
         }
+    }
+
+    static void MakeMove_Castling(const Move &move,Color color, BoardState &state, BoardUtilities &utilities){
+        // The king has already moved , we need to handle the rook.
+
+        // We know the rook has to go right of the king when castling queen side
+        // and left of the king when castling king side.
+
+        uint8_t rookOldIndex;
+        uint8_t rookNewIndex;
+        Bitboard kingRankMask = (color == Color::White) ? r1_Mask : r8_Mask;
+        if(IsMoveType(move.flags, MoveType::QueenSideCastling)){
+            rookOldIndex = GetLSBIndex(BitboardUtil::queenRooksBoard & kingRankMask);
+            uint8_t rightOfKing = move.toSquareIndex + 1;
+            rookNewIndex = rightOfKing;
+        }else{
+            assert(IsMoveType(move.flags, MoveType::KingSideCastling));
+            rookOldIndex = GetLSBIndex(BitboardUtil::kingRooksBoard & kingRankMask);
+            uint8_t leftOfKing = move.toSquareIndex - 1;
+            rookNewIndex = leftOfKing;
+        }
+
+        // Update rook piece board.
+        Bitboard& rookBoard = state.pieceBoards[color][PieceType::Rook];
+        rookBoard = PopBit(rookBoard, rookOldIndex);
+        rookBoard = SetBit(rookBoard, rookNewIndex);
+
+        // Update square occupancies
+        utilities.squaresOccupants[rookOldIndex] = {PieceType::None, Color::Both};
+        utilities.squaresOccupants[rookNewIndex] = {PieceType::Rook, color};
+
+        // Update occupancies board.
+        Bitboard& selfOccupancies = utilities.occupancies[color];
+        selfOccupancies = PopBit(selfOccupancies, rookOldIndex);
+        selfOccupancies = SetBit(selfOccupancies, rookNewIndex);
+    }
+
+    static void DisableCastling_OneSide(uint8_t posIndex, Color color, BoardState& state){
+        // This is a helper function for DisableCastlingRights.
+        // for checking if a rook was moved or captured.
+        // (Based on the color and posIndex)
+        Bitboard colorRankMask = (color == Color::White) ? r1_Mask : r8_Mask;
+        auto posBoard = SetBit(BITBOARD_EMPTY, posIndex);
+        if(posBoard & kingRooksBoard & colorRankMask){
+            state.kingSideCastling[color] = false;
+        }else if(posBoard & queenRooksBoard & colorRankMask){
+            state.queenSideCastling[color] = false;
+        }
+    }
+
+    static void DisableCastlingRights(const Move& move, Color color, Color opponentColor, BoardState& state){
+        // Does nothing if nothing relevant to the castling rights happened.
+        if(move.selfType == PieceType::King){
+            state.kingSideCastling[color] = false;
+            state.queenSideCastling[color] = false;
+        }else if(move.selfType == PieceType::Rook){
+            // Check if own rooks moved.
+            DisableCastling_OneSide(move.fromSquareIndex, color, state);
+        }
+
+        // Check if enemy rooks are captured.
+        DisableCastling_OneSide(move.toSquareIndex, opponentColor, state);
     }
 
     void MakeMove(const Move& move, Color color, BoardState& state, BoardUtilities& utilities){
@@ -66,6 +129,16 @@ namespace ChessEngine::MoveGeneration {
             // Reset en passant.
             state.enPassantBoard = BITBOARD_EMPTY;
         }
+
+        // Castling.
+        auto castlingFlags = (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling);
+        if (IsMoveType(move.flags, castlingFlags)) {
+            MakeMove_Castling(move, color, state, utilities);
+        }
+
+        // Check if any moves disabled any castling rights.
+        // Castling is a king move so this is also caught here.
+        DisableCastlingRights(move, color, opponentColor, state);
 
         // Update squaresOccupants.
         // Doesn't catch rook on castling / promotions.

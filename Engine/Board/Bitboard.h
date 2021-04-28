@@ -155,6 +155,14 @@ namespace ChessEngine::BitboardUtil {
             SetBit(BITBOARD_EMPTY, GetSquareIndex(File::C, Rank::R1)) |
             SetBit(BITBOARD_EMPTY, GetSquareIndex(File::C, Rank::R8));
 
+    constexpr Bitboard queenRooksBoard =
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::A, Rank::R1)) |
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::A, Rank::R8));
+
+    constexpr Bitboard kingRooksBoard =
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::H, Rank::R1)) |
+            SetBit(BITBOARD_EMPTY, GetSquareIndex(File::H, Rank::R8));
+
 
 }
 

@@ -251,7 +251,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
 
         // Castling.
         auto castlingMoves = GetCastlingMoves(state, color, utilities);
-        //moveList.splice(moveList.end(), castlingMoves);
+        moveList.splice(moveList.end(), castlingMoves);
 
         // En passant.
         auto enPassantMoves = GetEnPassantMoves(state, color, utilities);
