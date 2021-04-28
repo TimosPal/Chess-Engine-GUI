@@ -20,7 +20,7 @@ namespace ChessFrontend::RenderingUtil {
 
     void DrawHoldingPiece(sf::RenderWindow &window, sf::Sprite &holdingSprite);
 
-    void DrawActivePieceMoves(sf::RenderWindow &window, const std::list<ChessEngine::MoveGeneration::Move>& activePieceMoves);
+    void DrawActivePieceMoves(sf::RenderWindow &window, std::list<ChessEngine::MoveGeneration::Move> activePieceMoves);
 
 }
 

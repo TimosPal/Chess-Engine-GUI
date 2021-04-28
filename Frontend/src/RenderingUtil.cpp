@@ -68,7 +68,7 @@ namespace ChessFrontend::RenderingUtil {
         window.draw(holdingSprite);
     }
 
-    void DrawActivePieceMoves(sf::RenderWindow &window, const std::list<ChessEngine::MoveGeneration::Move>& activePieceMoves){
+    void DrawActivePieceMoves(sf::RenderWindow &window, std::list<ChessEngine::MoveGeneration::Move> activePieceMoves){
         using namespace ChessEngine::MoveGeneration;
         using namespace ChessEngine::BitboardUtil;
 
@@ -79,6 +79,10 @@ namespace ChessFrontend::RenderingUtil {
 
         sf::CircleShape shape(circleRadius);
         shape.setOutlineThickness(- tileSize.x * CIRCLE_OUTLINE_PERCENTAGE);
+
+        // Remove move entries with same destination (Should be promotion moves) , so we get no overlapping circles.
+        auto binaryPredicate = [] (Move m1, Move m2) { return m1.toSquareIndex == m2.toSquareIndex; };
+        activePieceMoves.unique(binaryPredicate);
 
         for(auto move : activePieceMoves) {
             auto [posX , posY] = GetCoordinates(move.toSquareIndex);

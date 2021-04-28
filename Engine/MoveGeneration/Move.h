@@ -25,6 +25,8 @@ namespace ChessEngine::MoveGeneration {
 
         PieceType selfType;
         PieceType enemyType;
+
+        PieceType promotionType;
     };
 
     bool IsMoveType(MoveType flags, MoveType type);

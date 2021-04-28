@@ -115,8 +115,8 @@ namespace ChessEngine::MoveGeneration {
         // Update self piece bitboard.
         Bitboard& selfTypeBoard = state.pieceBoards[color][move.selfType];
         selfTypeBoard = PopBit(selfTypeBoard, move.fromSquareIndex);
-        // Promotion if available , otherwise just move.
-        PieceType promotionType = (IsMoveType(move.flags, MoveType::Promotion)) ? PieceType::Queen : move.selfType;
+        // Promotion if available , otherwise just move the same piece.
+        PieceType promotionType = (IsMoveType(move.flags, MoveType::Promotion)) ? move.promotionType : move.selfType;
         Bitboard& selfTypePromotionBoard = state.pieceBoards[color][promotionType];
         selfTypePromotionBoard = SetBit(selfTypePromotionBoard, move.toSquareIndex);
 

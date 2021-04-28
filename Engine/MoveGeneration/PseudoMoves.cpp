@@ -10,6 +10,32 @@ namespace ChessEngine::MoveGeneration::Pseudo {
 
     using namespace ChessEngine::BitboardUtil;
 
+    static std::list<Move> GetPromotions(Move move){
+        std::list<Move> moveList;
+
+        // We get the initial move but change the promotion type
+        // This isn't done in a for loop to avoid a connection between the
+        // enum declaration order.
+
+        Move queenPromo = move;
+        queenPromo.promotionType = PieceType::Queen;
+        moveList.push_back(queenPromo);
+
+        Move knightPromo = move;
+        knightPromo.promotionType = PieceType::Knight;
+        moveList.push_back(knightPromo);
+
+        Move rookPromo = move;
+        rookPromo.promotionType = PieceType::Rook;
+        moveList.push_back(rookPromo);
+
+        Move bishopPromo = move;
+        bishopPromo.promotionType = PieceType::Bishop;
+        moveList.push_back(bishopPromo);
+
+        return moveList;
+    }
+
     static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, MoveType flags, const BoardUtilities& utilities) {
         std::list<Move> moveList;
 
@@ -26,9 +52,15 @@ namespace ChessEngine::MoveGeneration::Pseudo {
                     .flags = flags,
                     .selfType = selfType,
                     .enemyType = enemyType,
+                    .promotionType = PieceType::None
             };
 
-            moveList.emplace_back(move);
+            if(IsMoveType(flags, MoveType::Promotion)) { // TODO: maybe not put this here?
+                auto promotions = GetPromotions(move);
+                moveList.splice(moveList.end(), promotions);
+            }else{
+                moveList.emplace_back(move);
+            }
 
             moves = PopBit(moves, toSquareIndex);
         }
