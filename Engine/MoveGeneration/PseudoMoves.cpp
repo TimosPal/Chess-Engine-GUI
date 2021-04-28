@@ -249,7 +249,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
 
         // En passant.
         auto enPassantMoves = GetEnPassantMoves(state, color, utilities);
-        //moveList.splice(moveList.end(), enPassantMoves);
+        moveList.splice(moveList.end(), enPassantMoves);
 
         // rook.
         auto rookMoves = GetSlidingMoves(state, color, PieceType::Rook, utilities);
