@@ -58,12 +58,18 @@ namespace ChessEngine::MoveGeneration::Pseudo {
             }
 
             // Quiet moves
-            auto quietMoveFlags = (MoveType) (MoveType::Quiet | promotionFlag);
-            Bitboard pushes = LeaperPieces::GetPawnPushes(tempPieceBoard, color);
-            pushes |= LeaperPieces::GetDoublePawnPushes(tempPieceBoard, globalOccupancies, color);
 
-            auto quietMoves = ExtractMoves(pushes & ~globalOccupancies, fromSquareIndex, quietMoveFlags, utilities);
-            moveList.splice(moveList.end(), quietMoves);
+            // Single pushes
+            auto singlePushFlags = (MoveType) (MoveType::Quiet | promotionFlag);
+            Bitboard singlePushes = LeaperPieces::GetPawnPushes(tempPieceBoard, color);
+            auto singlePushMoves = ExtractMoves(singlePushes & ~globalOccupancies, fromSquareIndex, singlePushFlags, utilities);
+            moveList.splice(moveList.end(), singlePushMoves);
+
+            // Double pushes
+            auto doublePushFlags = (MoveType) (MoveType::Quiet | MoveType::EnPassant);
+            Bitboard doublePushes = LeaperPieces::GetDoublePawnPushes(tempPieceBoard, globalOccupancies, color);
+            auto doublePushMoves = ExtractMoves(doublePushes & ~globalOccupancies, fromSquareIndex, doublePushFlags, utilities);
+            moveList.splice(moveList.end(), doublePushMoves);
 
             // Captures
             auto attackMoveFlags = (MoveType) (MoveType::Capture | promotionFlag);

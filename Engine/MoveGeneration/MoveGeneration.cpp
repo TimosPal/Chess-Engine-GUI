@@ -7,7 +7,7 @@ namespace ChessEngine::MoveGeneration {
 
     using namespace BitboardUtil;
 
-    static void MakeMove_EnPassant(const Move &move, Color opponentColor, BoardState &state, BoardUtilities &utilities) {
+    static void MakeMove_EnPassant(const Move &move,Color color, Color opponentColor, BoardState &state, BoardUtilities &utilities) {
         // The en passant square is behind the pawn so we need to go
         // up or down 1 tile to find the appropriate position.
         // For this to work we assume the turn orders are correct.
@@ -15,7 +15,7 @@ namespace ChessEngine::MoveGeneration {
         if (IsMoveType(move.flags, MoveType::Quiet)){
             // The move is already made , we just need to update the en passant state.
             Bitboard enPassantBoard = SetBit(BITBOARD_EMPTY, move.toSquareIndex);
-            state.enPassantBoard = (opponentColor == Color::White) ?
+            state.enPassantBoard = (color == Color::White) ?
                                       ShiftDown(enPassantBoard) :
                                       ShiftUp(enPassantBoard);
         }else{
@@ -61,7 +61,7 @@ namespace ChessEngine::MoveGeneration {
 
         // EnPassant can mean either a capture or a double pawn move.
         if (IsMoveType(move.flags, MoveType::EnPassant)) {
-            MakeMove_EnPassant(move, opponentColor, state, utilities);
+            MakeMove_EnPassant(move,color , opponentColor, state, utilities);
         }else {
             // Reset en passant.
             state.enPassantBoard = BITBOARD_EMPTY;
