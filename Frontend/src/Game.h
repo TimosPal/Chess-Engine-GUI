@@ -17,7 +17,7 @@ namespace ChessFrontend {
 
         void HandleEvents();
         void PlayMove();
-        void Render();
+        void Render(sf::Time dt);
 
         bool IsRunning() { return window.isOpen(); }
 
@@ -34,8 +34,13 @@ namespace ChessFrontend {
         // Used for graphics.
         bool activePiece;
         bool isHolding;
+        bool playMoveAnimation;
+
         sf::Sprite holdingSprite;
         sf::Vector2i fromPos;
+        float elapsedAnimTime;
+
+        ChessEngine::MoveGeneration::Move lastPlayedMove;
         std::list<ChessEngine::MoveGeneration::Move> activePieceMoves;
 
         // Returns true if player made a move

@@ -14,7 +14,7 @@ namespace ChessFrontend {
         Game::Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, int width, int height, const std::string& title)
                 : window(sf::VideoMode(width, height), title) ,
                 board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI),
-                isHolding(false), activePiece(false)
+                isHolding(false), activePiece(false), playMoveAnimation(false), elapsedAnimTime(0.0f)
         {
             window.setFramerateLimit(120);
         }
@@ -28,7 +28,7 @@ namespace ChessFrontend {
             }
         }
 
-        void Game::Render(){
+        void Game::Render(sf::Time dt){
             // Console rendering.
             // Print only once per change.
             if(boardHasChanged) {
@@ -39,13 +39,31 @@ namespace ChessFrontend {
             // SFML rendering.
             window.clear();
 
+            // A list with ignored positions when drawing pieces.
+            std::vector<sf::Vector2i> ignoreList = {};
+            if(isHolding)
+                ignoreList.push_back(fromPos);
+            if(playMoveAnimation) {
+                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(lastPlayedMove.toSquareIndex);
+                ignoreList.emplace_back(toX, toY);
+            }
+
             RenderingUtil::DrawCheckerBoard(window);
-            RenderingUtil::DrawPieces(window, board.GetState(), isHolding, fromPos);
+            RenderingUtil::DrawPieces(window, board.GetUtilities(), ignoreList);
 
             if(activePiece) {
                 RenderingUtil::DrawActivePieceMoves(window, activePieceMoves);
                 if (isHolding)
                     RenderingUtil::DrawHoldingPiece(window, holdingSprite);
+            }
+
+            if(playMoveAnimation) {
+                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, lastPlayedMove, board.GetState().turnOf, elapsedAnimTime / 0.3f);
+
+                if(playMoveAnimation)
+                    elapsedAnimTime += dt.asSeconds();
+                else
+                    elapsedAnimTime = 0;
             }
 
             window.display();
@@ -56,6 +74,9 @@ namespace ChessFrontend {
 
             boardHasChanged = false; // Reset in every loop. Becomes true for one loop every move.
 
+            if(playMoveAnimation)
+                return;
+
             bool isAI = (board.GetState().turnOf == ChessEngine::Color::White) ? whiteAI : blackAI;
             boardHasChanged = (isAI) ? AiTurn() : HumanTurn();
         }
@@ -64,7 +85,23 @@ namespace ChessFrontend {
             using namespace ChessEngine::MoveGeneration;
 
             auto moves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
-            MakeMove(moves.front(), board.GetState().turnOf, board.GetState(), board.GetUtilities());
+
+            Move mv;
+            int rng = rand() % moves.size();
+            int i = 0;
+            for(auto m : moves){
+                if(i == rng){
+                    mv = m;
+                    break;
+                }
+
+                i++;
+            }
+
+            MakeMove(mv, board.GetState().turnOf, board.GetState(), board.GetUtilities());
+
+            lastPlayedMove = mv;
+            playMoveAnimation = true;
 
             return true; // Plays move instantly.
         }
@@ -92,6 +129,9 @@ namespace ChessFrontend {
                     if (validMove) {
                         // Clicked a move when a piece was already active and it's also valid
                         MakeMove(move, board.GetState().turnOf, board.GetState(), board.GetUtilities());
+
+                        lastPlayedMove = move;
+                        playMoveAnimation = true;
 
                         activePiece = false;
                         isHolding = false;
@@ -121,6 +161,10 @@ namespace ChessFrontend {
                     Move move{};
                     if(IndecesToMove(fromIndex, toIndex, activePieceMoves, move)) {
                         MakeMove(move, board.GetState().turnOf, board.GetState(), board.GetUtilities());
+
+                        lastPlayedMove = move;
+                        playMoveAnimation = false; // Disable animations for drag n drop.
+
                         activePiece = false;
                         madeMove = true;
                     }

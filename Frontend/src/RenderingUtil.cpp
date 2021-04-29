@@ -1,5 +1,7 @@
 #include "RenderingUtil.h"
 
+#include <vector>
+
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 
@@ -37,18 +39,21 @@ namespace ChessFrontend::RenderingUtil {
         sprite.setScale(scalingFactor, scalingFactor);
     }
 
-    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardState state, bool isHolding, sf::Vector2i fromPos) {
+    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardUtilities& utilities, std::vector<sf::Vector2i> ignorePos) {
         int width = window.getView().getSize().x;
         int height = window.getView().getSize().y;
         auto tileSize = sf::Vector2(width / 8, height / 8);
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                auto[type, color] = state.GetPosType(ChessEngine::BitboardUtil::GetSquareIndex(i, j));
+                auto[type, color] = utilities.squaresOccupants[ChessEngine::BitboardUtil::GetSquareIndex(i, j)];
                 if (type == ChessEngine::PieceType::None) // Empty tile.
                     continue;
-                if (isHolding && fromPos.x == i && fromPos.y == j) // holding piece
+
+                auto findCurrPos = std::find(ignorePos.begin(), ignorePos.end(), sf::Vector2i(i,j));
+                if(findCurrPos != ignorePos.end()){
                     continue;
+                }
 
                 auto currSprite = ChessFrontend::TextureManager::GetPieceSprite(color, type);
                 ScalePieceSprite(currSprite, tileSize);
@@ -112,6 +117,44 @@ namespace ChessFrontend::RenderingUtil {
             shape.setRadius(currentRadius);
             window.draw(shape);
         }
+    }
+
+    float LerpF(float a, float b, float t){
+        if(t <= 0)
+            t = 0;
+        if(t >= 1)
+            t = 1;
+
+        return a + t*(b-a);
+    }
+
+    bool PlayMoveAnimation(sf::RenderWindow &window, ChessEngine::MoveGeneration::Move move, ChessEngine::Color color, float lerpTime){
+        // Returns false if animation is done.
+
+        ChessEngine::Color moveColor = ChessEngine::InvertColor(color);
+        sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
+
+        auto [fromX , fromY] = ChessEngine::BitboardUtil::GetCoordinates(move.fromSquareIndex);
+        auto [toX , toY] = ChessEngine::BitboardUtil::GetCoordinates(move.toSquareIndex);
+
+        float currX = LerpF(fromX, toX, lerpTime);
+        float currY = LerpF(fromY, toY, lerpTime);
+
+        if(move.enemyType != ChessEngine::PieceType::None) {
+            auto enemySprite = ChessFrontend::TextureManager::GetPieceSprite(color, move.enemyType);
+            ScalePieceSprite(enemySprite, tileSize);
+            enemySprite.setPosition(toX * tileSize.x, (8 - toY - 1) * tileSize.y);
+
+            window.draw(enemySprite);
+        }
+
+        auto selfSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, move.selfType);
+        ScalePieceSprite(selfSprite, tileSize);
+        selfSprite.setPosition(currX * tileSize.x, (8 - currY - 1) * tileSize.y);
+
+        window.draw(selfSprite);
+
+        return (currX != toX || currY != toY);
     }
 
 }

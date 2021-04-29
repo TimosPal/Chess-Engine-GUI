@@ -25,7 +25,7 @@ int main() {
     sf::Time dt{};
     while (game.IsRunning()) {
         game.HandleEvents();
-        game.Render();
+        game.Render(dt);
         game.PlayMove();
 
         dt = deltaClock.restart();
