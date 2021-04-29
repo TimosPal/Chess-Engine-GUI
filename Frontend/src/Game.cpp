@@ -58,7 +58,7 @@ namespace ChessFrontend {
             }
 
             if(playMoveAnimation) {
-                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, lastPlayedMove, board.GetState().turnOf, elapsedAnimTime / 0.3f);
+                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, lastPlayedMove, board.GetState().turnOf, elapsedAnimTime / 0.25f);
 
                 if(playMoveAnimation)
                     elapsedAnimTime += dt.asSeconds();

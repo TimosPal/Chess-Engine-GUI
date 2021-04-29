@@ -129,32 +129,47 @@ namespace ChessFrontend::RenderingUtil {
     }
 
     bool PlayMoveAnimation(sf::RenderWindow &window, ChessEngine::MoveGeneration::Move move, ChessEngine::Color color, float lerpTime){
+        using namespace ChessEngine::MoveGeneration;
+        using namespace ChessEngine::BitboardUtil;
         // Returns false if animation is done.
 
         ChessEngine::Color moveColor = ChessEngine::InvertColor(color);
         sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
 
-        auto [fromX , fromY] = ChessEngine::BitboardUtil::GetCoordinates(move.fromSquareIndex);
-        auto [toX , toY] = ChessEngine::BitboardUtil::GetCoordinates(move.toSquareIndex);
+        auto [fromX , fromY] = GetCoordinates(move.fromSquareIndex);
+        auto [toX , toY] = GetCoordinates(move.toSquareIndex);
 
-        float currX = LerpF(fromX, toX, lerpTime);
-        float currY = LerpF(fromY, toY, lerpTime);
+        if(IsMoveType(move.flags, MoveType::Capture)) {
+            float enemyX = toX , enemyY = toY;
+            if(IsMoveType(move.flags, MoveType::EnPassant)) {
+                // Find en passant piece.
+                enemyY += moveColor == ChessEngine::Color::White ? -1 : 1;
+            }
 
-        if(move.enemyType != ChessEngine::PieceType::None) {
             auto enemySprite = ChessFrontend::TextureManager::GetPieceSprite(color, move.enemyType);
+            auto tempColor = enemySprite.getColor();
+            tempColor.a = LerpF(255, 0, lerpTime);
+            enemySprite.setColor(tempColor);
+
             ScalePieceSprite(enemySprite, tileSize);
-            enemySprite.setPosition(toX * tileSize.x, (8 - toY - 1) * tileSize.y);
+            enemySprite.setPosition(enemyX * tileSize.x, (8 - enemyY - 1) * tileSize.y);
 
             window.draw(enemySprite);
+        }
+        if(IsMoveType(move.flags, MoveType::KingSideCastling)) {
+
         }
 
         auto selfSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, move.selfType);
         ScalePieceSprite(selfSprite, tileSize);
+
+        float currX = LerpF(fromX, toX, lerpTime);
+        float currY = LerpF(fromY, toY, lerpTime);
         selfSprite.setPosition(currX * tileSize.x, (8 - currY - 1) * tileSize.y);
 
         window.draw(selfSprite);
 
-        return (currX != toX || currY != toY);
+        return (currX != toX || currY != toY); // Stop when the position is reached.
     }
 
 }
