@@ -11,12 +11,15 @@
 
 namespace ChessFrontend {
 
-    class Game{
+    class Game {
     public:
-        Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, int width, int height, const std::string& title);
+        Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, int width, int height,
+             const std::string &title);
 
         void HandleEvents();
+
         void PlayMove();
+
         void Render(sf::Time dt);
 
         bool IsRunning() { return window.isOpen(); }
@@ -46,6 +49,9 @@ namespace ChessFrontend {
         // Returns true if player made a move
         bool HumanTurn();
         bool AiTurn();
+
+        std::vector<sf::Vector2i> GetIgnoreList();
+
 
     };
 

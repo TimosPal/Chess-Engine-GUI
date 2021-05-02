@@ -30,8 +30,6 @@ namespace ChessFrontend {
         }
 
         void Game::Render(sf::Time dt){
-            using namespace ChessEngine::MoveGeneration;
-
             // Console rendering.
             // Print only once per change.
             if(boardHasChanged) {
@@ -42,34 +40,17 @@ namespace ChessFrontend {
             // SFML rendering.
             window.clear();
 
-            // A list with ignored positions when drawing pieces.
-            std::vector<sf::Vector2i> ignoreList = {};
-            if(isHolding)
-                ignoreList.push_back(fromPos);
-            if(playMoveAnimation) {
-                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(lastPlayedMove.toSquareIndex);
-                ignoreList.emplace_back(toX, toY);
-            }
-            if(IsMoveType(lastPlayedMove.flags, (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling))){
-                uint8_t rookNewIndex;
-                if(IsMoveType(lastPlayedMove.flags, MoveType::QueenSideCastling)){
-                    rookNewIndex = lastPlayedMove.toSquareIndex + 1;
-                }else{
-                    rookNewIndex = lastPlayedMove.toSquareIndex - 1;
-                }
-                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(rookNewIndex);
-                ignoreList.emplace_back(toX, toY);
-            }
-
             RenderingUtil::DrawCheckerBoard(window);
-            RenderingUtil::DrawPieces(window, board.GetUtilities(), ignoreList);
+            RenderingUtil::DrawPieces(window, board.GetUtilities(), GetIgnoreList());
 
+            // Draw available moves and the holding piece.
             if(activePiece) {
                 RenderingUtil::DrawActivePieceMoves(window, activePieceMoves);
                 if (isHolding)
                     RenderingUtil::DrawHoldingPiece(window, holdingSprite);
             }
 
+            // Handle the move animations.
             if(playMoveAnimation) {
                 playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, lastPlayedMove, board.GetState().turnOf, elapsedAnimTime / 0.25f);
 
@@ -80,6 +61,31 @@ namespace ChessFrontend {
             }
 
             window.display();
+        }
+
+        std::vector<sf::Vector2i> Game::GetIgnoreList(){
+            // A list with ignored positions when drawing pieces.
+            // Useful for when playing animations , or holding a piece.
+            using namespace ChessEngine::MoveGeneration;
+
+            std::vector<sf::Vector2i> ignoreList = {};
+            if(isHolding)
+                ignoreList.push_back(fromPos);
+            if(playMoveAnimation) {
+                // If animation is playing exclude end position from showing.
+                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(lastPlayedMove.toSquareIndex);
+                ignoreList.emplace_back(toX, toY);
+            }
+            if(IsMoveType(lastPlayedMove.flags, (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling))){
+                // If castling move , exclude rook move during animation.
+                uint8_t rookNewIndex = IsMoveType(lastPlayedMove.flags, MoveType::QueenSideCastling) ?
+                                       lastPlayedMove.toSquareIndex + 1 : lastPlayedMove.toSquareIndex - 1;
+
+                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(rookNewIndex);
+                ignoreList.emplace_back(toX, toY);
+            }
+
+            return ignoreList;
         }
 
         void Game::PlayMove(){
