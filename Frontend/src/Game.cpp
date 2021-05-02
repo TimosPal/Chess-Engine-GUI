@@ -16,6 +16,7 @@ namespace ChessFrontend {
                 board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI),
                 isHolding(false), activePiece(false), playMoveAnimation(false), elapsedAnimTime(0.0f)
         {
+            lastPlayedMove.flags = ChessEngine::MoveGeneration::MoveType::None;
             window.setFramerateLimit(120);
         }
 
@@ -29,6 +30,8 @@ namespace ChessFrontend {
         }
 
         void Game::Render(sf::Time dt){
+            using namespace ChessEngine::MoveGeneration;
+
             // Console rendering.
             // Print only once per change.
             if(boardHasChanged) {
@@ -45,6 +48,16 @@ namespace ChessFrontend {
                 ignoreList.push_back(fromPos);
             if(playMoveAnimation) {
                 auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(lastPlayedMove.toSquareIndex);
+                ignoreList.emplace_back(toX, toY);
+            }
+            if(IsMoveType(lastPlayedMove.flags, (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling))){
+                uint8_t rookNewIndex;
+                if(IsMoveType(lastPlayedMove.flags, MoveType::QueenSideCastling)){
+                    rookNewIndex = lastPlayedMove.toSquareIndex + 1;
+                }else{
+                    rookNewIndex = lastPlayedMove.toSquareIndex - 1;
+                }
+                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(rookNewIndex);
                 ignoreList.emplace_back(toX, toY);
             }
 

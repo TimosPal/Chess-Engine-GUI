@@ -167,6 +167,7 @@ namespace ChessFrontend::RenderingUtil {
         using namespace ChessEngine::MoveGeneration;
         using namespace ChessEngine::BitboardUtil;
         // Returns false if animation is done.
+        // NOTE: color is the opposite color of the move's color.
 
         ChessEngine::Color moveColor = ChessEngine::InvertColor(color);
 
@@ -181,6 +182,21 @@ namespace ChessFrontend::RenderingUtil {
 
             auto enemySprite = ChessFrontend::TextureManager::GetPieceSprite(color, move.enemyType);
             FadeAnimation(window, GetSquareIndex(enemyX, enemyY), enemySprite, lerpTime);
+        }
+        if(IsMoveType(move.flags, (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling))){
+            uint8_t rookNewIndex;
+            bool kingSide;
+            if(IsMoveType(move.flags, MoveType::QueenSideCastling)){
+                rookNewIndex = move.toSquareIndex + 1;
+                kingSide = false;
+            }else{
+                rookNewIndex = move.toSquareIndex - 1;
+                kingSide = true;
+            }
+            uint8_t rookOldIndex = GetStartingRookIndex(moveColor, kingSide);
+
+            auto rookSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, ChessEngine::PieceType::Rook);
+            MoveAnimation(window, rookOldIndex, rookNewIndex, rookSprite, lerpTime);
         }
 
         auto selfSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, move.selfType);
