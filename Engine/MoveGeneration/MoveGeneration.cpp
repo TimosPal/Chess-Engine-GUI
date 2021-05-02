@@ -49,19 +49,17 @@ namespace ChessEngine::MoveGeneration {
         // We know the rook has to go right of the king when castling queen side
         // and left of the king when castling king side.
 
-        uint8_t rookOldIndex;
         uint8_t rookNewIndex;
-        Bitboard kingRankMask = (color == Color::White) ? r1_Mask : r8_Mask;
+        bool kingSide;
         if(IsMoveType(move.flags, MoveType::QueenSideCastling)){
-            rookOldIndex = GetLSBIndex(BitboardUtil::queenRooksBoard & kingRankMask);
-            uint8_t rightOfKing = move.toSquareIndex + 1;
-            rookNewIndex = rightOfKing;
+            rookNewIndex = move.toSquareIndex + 1;
+            kingSide = false;
         }else{
             assert(IsMoveType(move.flags, MoveType::KingSideCastling));
-            rookOldIndex = GetLSBIndex(BitboardUtil::kingRooksBoard & kingRankMask);
-            uint8_t leftOfKing = move.toSquareIndex - 1;
-            rookNewIndex = leftOfKing;
+            rookNewIndex = move.toSquareIndex - 1;
+            kingSide = true;
         }
+        uint8_t rookOldIndex = BitboardUtil::GetStartingRookIndex(color, kingSide);
 
         // Update rook piece board.
         Bitboard& rookBoard = state.pieceBoards[color][PieceType::Rook];

@@ -128,15 +128,48 @@ namespace ChessFrontend::RenderingUtil {
         return a + t*(b-a);
     }
 
+    bool MoveAnimation(sf::RenderWindow &window, uint8_t fromIndex, uint8_t toIndex, sf::Sprite sprite, float lerpTime){
+        using namespace ChessEngine::BitboardUtil;
+
+        sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
+
+        auto [fromX , fromY] = GetCoordinates(fromIndex);
+        auto [toX , toY] = GetCoordinates(toIndex);
+
+        float xVal = LerpF(fromX, toX, lerpTime);
+        float yVal = LerpF(fromY, toY, lerpTime);
+
+        ScalePieceSprite(sprite, tileSize);
+        sprite.setPosition(xVal * tileSize.x, (8 - yVal - 1) * tileSize.y);
+
+        window.draw(sprite);
+
+        return (xVal != toX || yVal != toY); // Returns false when the position is reached.
+    }
+
+    bool FadeAnimation(sf::RenderWindow &window, uint8_t posIndex, sf::Sprite sprite, float lerpTime){
+        using namespace ChessEngine::BitboardUtil;
+
+        sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
+        auto [posX , posY] = GetCoordinates(posIndex);
+
+        auto tempColor = sprite.getColor();
+        tempColor.a = LerpF(255, 0, lerpTime);
+        sprite.setColor(tempColor);
+
+        ScalePieceSprite(sprite, tileSize);
+        sprite.setPosition(posX * tileSize.x, (8 - posY - 1) * tileSize.y);
+
+        window.draw(sprite);
+    }
+
     bool PlayMoveAnimation(sf::RenderWindow &window, ChessEngine::MoveGeneration::Move move, ChessEngine::Color color, float lerpTime){
         using namespace ChessEngine::MoveGeneration;
         using namespace ChessEngine::BitboardUtil;
         // Returns false if animation is done.
 
         ChessEngine::Color moveColor = ChessEngine::InvertColor(color);
-        sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
 
-        auto [fromX , fromY] = GetCoordinates(move.fromSquareIndex);
         auto [toX , toY] = GetCoordinates(move.toSquareIndex);
 
         if(IsMoveType(move.flags, MoveType::Capture)) {
@@ -147,29 +180,11 @@ namespace ChessFrontend::RenderingUtil {
             }
 
             auto enemySprite = ChessFrontend::TextureManager::GetPieceSprite(color, move.enemyType);
-            auto tempColor = enemySprite.getColor();
-            tempColor.a = LerpF(255, 0, lerpTime);
-            enemySprite.setColor(tempColor);
-
-            ScalePieceSprite(enemySprite, tileSize);
-            enemySprite.setPosition(enemyX * tileSize.x, (8 - enemyY - 1) * tileSize.y);
-
-            window.draw(enemySprite);
-        }
-        if(IsMoveType(move.flags, MoveType::KingSideCastling)) {
-
+            FadeAnimation(window, GetSquareIndex(enemyX, enemyY), enemySprite, lerpTime);
         }
 
         auto selfSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, move.selfType);
-        ScalePieceSprite(selfSprite, tileSize);
-
-        float currX = LerpF(fromX, toX, lerpTime);
-        float currY = LerpF(fromY, toY, lerpTime);
-        selfSprite.setPosition(currX * tileSize.x, (8 - currY - 1) * tileSize.y);
-
-        window.draw(selfSprite);
-
-        return (currX != toX || currY != toY); // Stop when the position is reached.
+        return MoveAnimation(window, move.fromSquareIndex, move.toSquareIndex, selfSprite, lerpTime);
     }
 
 }

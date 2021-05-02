@@ -163,6 +163,12 @@ namespace ChessEngine::BitboardUtil {
             SetBit(BITBOARD_EMPTY, GetSquareIndex(File::H, Rank::R1)) |
             SetBit(BITBOARD_EMPTY, GetSquareIndex(File::H, Rank::R8));
 
+    constexpr Bitboard GetStartingRookIndex(Color color, bool kingSide){
+        Bitboard pieceBoard = kingSide ? kingRooksBoard : queenRooksBoard;
+        Bitboard kingRankMask = (color == Color::White) ? r1_Mask : r8_Mask;
+        return GetLSBIndex(pieceBoard & kingRankMask);
+    }
+
 
 }
 
