@@ -170,9 +170,9 @@ namespace ChessEngine::MoveGeneration {
         using namespace ChessEngine::BitboardUtil;
 
         // We check if the king is attacked by enemy knights , bishops , rooks or pawns.
-        // Since queens are bishop + rooks , this is accounted for.
-        // This is done by seeing if appropriate attacks from the king's point of view would result
-        // in an attacked enemy piece of the attack's type.
+        // Since queens do bishop and rook attacks combined , this is accounted for by considering queens
+        // as both piece types when calculating the appropriate piece occupancy boards.
+        // If a king can attack an enemy piece with an attack pattern then that piece is causing a check.
         // Eg: if a king can attack a knight with a knight pattern move, then the king is checked by a knight.
 
         Color enemyColor = InvertColor(color);
@@ -180,8 +180,9 @@ namespace ChessEngine::MoveGeneration {
 
         Bitboard occupancies = utilities.occupancies[Color::Both];
 
-        Bitboard enemyRookOCP = state.pieceBoards[enemyColor][PieceType::Rook];
-        Bitboard enemyBishopOCP = state.pieceBoards[enemyColor][PieceType::Bishop];
+        Bitboard enemyQueenOCP = state.pieceBoards[enemyColor][PieceType::Queen];
+        Bitboard enemyRookOCP = state.pieceBoards[enemyColor][PieceType::Rook] | enemyQueenOCP;
+        Bitboard enemyBishopOCP = state.pieceBoards[enemyColor][PieceType::Bishop] | enemyQueenOCP;
         Bitboard enemyKnightOCP = state.pieceBoards[enemyColor][PieceType::Knight];
         Bitboard enemyPawnOCP = state.pieceBoards[enemyColor][PieceType::Pawn];
 
