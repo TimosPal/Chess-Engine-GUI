@@ -11,10 +11,11 @@
 
 namespace ChessFrontend {
 
-        Game::Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, int width, int height, const std::string& title)
+        Game::Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, float secPerMove, int width, int height, const std::string& title)
                 : window(sf::VideoMode(width, height), title) ,
                 board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI),
-                isHolding(false), activePiece(false), playMoveAnimation(false), elapsedAnimTime(0.0f)
+                isHolding(false), activePiece(false), playMoveAnimation(false), elapsedAnimTime(0.0f),
+                secPerMove(secPerMove)
         {
             lastPlayedMove.flags = ChessEngine::MoveGeneration::MoveType::None;
             window.setFramerateLimit(120);
@@ -35,6 +36,10 @@ namespace ChessFrontend {
             if(boardHasChanged) {
                 board.Draw();
                 std::cout << std::endl;
+                std:: cout << "White : ";
+                std:: cout << ChessEngine::MoveGeneration::NumberOfChecks(ChessEngine::Color::White, board.GetState(), board.GetUtilities()) << std::endl;
+                std:: cout << "Black : " ;
+                std:: cout << ChessEngine::MoveGeneration::NumberOfChecks(ChessEngine::Color::Black, board.GetState(), board.GetUtilities()) << std::endl;
             }
 
             // SFML rendering.
@@ -52,7 +57,9 @@ namespace ChessFrontend {
 
             // Handle the move animations.
             if(playMoveAnimation) {
-                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, lastPlayedMove, board.GetState().turnOf, elapsedAnimTime / 0.25f);
+                float lerpTime = elapsedAnimTime / secPerMove;
+                ChessEngine::Color turnOf = board.GetState().turnOf;
+                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window,lastPlayedMove, turnOf, lerpTime);
 
                 if(playMoveAnimation)
                     elapsedAnimTime += dt.asSeconds();

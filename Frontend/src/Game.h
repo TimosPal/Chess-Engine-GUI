@@ -13,7 +13,7 @@ namespace ChessFrontend {
 
     class Game {
     public:
-        Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, int width, int height,
+        Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, float secPerMove, int width, int height,
              const std::string &title);
 
         void HandleEvents();
@@ -32,6 +32,8 @@ namespace ChessFrontend {
         bool blackAI;
 
         bool boardHasChanged; // Since last frame.
+
+        float secPerMove;
 
         // Information about the current human player.
         // Used for graphics.

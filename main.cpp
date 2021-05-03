@@ -8,18 +8,22 @@
 constexpr int width = 800;
 constexpr int height = 800;
 
+constexpr float moveTime = 0.25f;
+
 int main() {
+    srand((unsigned) time(0));
+
     ChessEngine::Init();
     ChessFrontend::TextureManager::Init("../Frontend/Sprites"); // NOTE: Path is from the executable.
 
     ChessEngine::BoardState state = {};
-    std::string fenPosition = "rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 1 1";
+    std::string fenPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     if(!ParseFenString(fenPosition, state)){
         std::cout << "Incorrect fen string" << std::endl;
         return -1;
     }
 
-    ChessFrontend::Game game(state,false, true, width, height, "Chess");
+    ChessFrontend::Game game(state,false, true, moveTime, width, height, "Chess");
 
     sf::Clock deltaClock;
     sf::Time dt{};

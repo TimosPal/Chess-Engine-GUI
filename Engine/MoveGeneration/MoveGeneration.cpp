@@ -1,5 +1,7 @@
 #include "MoveGeneration.h"
 
+#include "Engine/MoveGeneration/MoveTables.h"
+
 #include <iostream>
 #include <cassert>
 
@@ -161,6 +163,40 @@ namespace ChessEngine::MoveGeneration {
 
         // Update turn
         state.turnOf = opponentColor;
+    }
+
+    int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities){
+        using namespace ChessEngine::MoveGeneration::MoveTables;
+        using namespace ChessEngine::BitboardUtil;
+
+        // We check if the king is attacked by enemy knights , bishops , rooks or pawns.
+        // Since queens are bishop + rooks , this is accounted for.
+        // This is done by seeing if appropriate attacks from the king's point of view would result
+        // in an attacked enemy piece of the attack's type.
+        // Eg: if a king can attack a knight with a knight pattern move, then the king is checked by a knight.
+
+        Color enemyColor = InvertColor(color);
+        uint8_t kingIndex = GetLSBIndex(state.pieceBoards[color][PieceType::King]);
+
+        Bitboard occupancies = utilities.occupancies[Color::Both];
+
+        Bitboard enemyRookOCP = state.pieceBoards[enemyColor][PieceType::Rook];
+        Bitboard enemyBishopOCP = state.pieceBoards[enemyColor][PieceType::Bishop];
+        Bitboard enemyKnightOCP = state.pieceBoards[enemyColor][PieceType::Knight];
+        Bitboard enemyPawnOCP = state.pieceBoards[enemyColor][PieceType::Pawn];
+
+        Bitboard kingRookAttacks = GetRookMoves(kingIndex, occupancies);
+        Bitboard kingBishopAttacks = GetBishopMoves(kingIndex, occupancies);
+        Bitboard kingKnightAttacks = GetKnightMoves(kingIndex);
+        Bitboard kingPawnAttacks = GetPawnAttacks(color, kingIndex);
+
+        Bitboard attackSources =
+                (kingRookAttacks & enemyRookOCP) |
+                (kingBishopAttacks & enemyBishopOCP) |
+                (kingKnightAttacks & enemyKnightOCP) |
+                (kingPawnAttacks & enemyPawnOCP);
+
+        return GetBitCount(attackSources);
     }
 
     void PrintMoves(const std::list<Move>& moveList){

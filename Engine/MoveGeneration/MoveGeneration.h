@@ -11,6 +11,8 @@ namespace ChessEngine::MoveGeneration {
 
     void MakeMove(const Move& move, Color color, BoardState& state, BoardUtilities& utilities);
 
+    int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities);
+
     void PrintMoves(const std::list<Move>& moveList);
 
     // Find the move with the specific from and to indices.
