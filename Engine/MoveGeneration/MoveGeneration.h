@@ -13,6 +13,8 @@ namespace ChessEngine::MoveGeneration {
 
     int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities);
 
+    std::list<Move> GetValidMoves(const BoardState& state, Color color, const BoardUtilities& utilities);
+
     void PrintMoves(const std::list<Move>& moveList);
 
     // Find the move with the specific from and to indices.

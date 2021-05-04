@@ -266,7 +266,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    std::list<Move> GetAllMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetPseudoMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
         std::list<Move> moveList;
 
         // Pawns.

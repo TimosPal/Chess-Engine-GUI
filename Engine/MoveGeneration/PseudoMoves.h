@@ -10,7 +10,7 @@
 namespace ChessEngine::MoveGeneration::Pseudo {
 
     /* The pseudo moves should be checked for validity afterwards. */
-    std::list<Move> GetAllMoves(const BoardState &state, Color color, const BoardUtilities& utilities);
+    std::list<Move> GetPseudoMoves(const BoardState &state, Color color, const BoardUtilities& utilities);
     std::list<Move> GetPawnMoves(const BoardState &state, Color color, const BoardUtilities& utilities);
     std::list<Move> GetKingMoves(const BoardState &state, Color color, const BoardUtilities& utilities);
     std::list<Move> GetCastlingMoves(const BoardState &state, Color color, const BoardUtilities& utilities);

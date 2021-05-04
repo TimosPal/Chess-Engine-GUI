@@ -1,6 +1,7 @@
 #include "MoveGeneration.h"
 
 #include "Engine/MoveGeneration/MoveTables.h"
+#include "Engine/MoveGeneration/PseudoMoves.h"
 
 #include <iostream>
 #include <cassert>
@@ -185,19 +186,40 @@ namespace ChessEngine::MoveGeneration {
         Bitboard enemyBishopOCP = state.pieceBoards[enemyColor][PieceType::Bishop] | enemyQueenOCP;
         Bitboard enemyKnightOCP = state.pieceBoards[enemyColor][PieceType::Knight];
         Bitboard enemyPawnOCP = state.pieceBoards[enemyColor][PieceType::Pawn];
+        Bitboard enemyKingOCP = state.pieceBoards[enemyColor][PieceType::King];
 
         Bitboard kingRookAttacks = GetRookMoves(kingIndex, occupancies);
         Bitboard kingBishopAttacks = GetBishopMoves(kingIndex, occupancies);
         Bitboard kingKnightAttacks = GetKnightMoves(kingIndex);
         Bitboard kingPawnAttacks = GetPawnAttacks(color, kingIndex);
+        Bitboard kingKingAttacks = GetKingMoves(kingIndex);
 
         Bitboard attackSources =
                 (kingRookAttacks & enemyRookOCP) |
                 (kingBishopAttacks & enemyBishopOCP) |
                 (kingKnightAttacks & enemyKnightOCP) |
-                (kingPawnAttacks & enemyPawnOCP);
+                (kingPawnAttacks & enemyPawnOCP) |
+                (kingKingAttacks & enemyKingOCP);
 
         return GetBitCount(attackSources);
+    }
+
+    bool IsValid(const Move& move, BoardState state, Color color, BoardUtilities utilities){
+        MakeMove(move, color, state, utilities);
+        return NumberOfChecks(color, state, utilities) == 0;
+    }
+
+    std::list<Move> GetValidMoves(const BoardState& state, Color color, const BoardUtilities& utilities){
+        auto pseudoMoves = ChessEngine::MoveGeneration::Pseudo::GetPseudoMoves(state, color, utilities);
+
+        std::list<Move> validMoves;
+        for(auto move : pseudoMoves){
+            if(IsValid(move, state, color, utilities)){
+                validMoves.push_back(move);
+            }
+        }
+
+        return validMoves;
     }
 
     void PrintMoves(const std::list<Move>& moveList){

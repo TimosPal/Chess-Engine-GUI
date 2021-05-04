@@ -23,7 +23,7 @@ int main() {
         return -1;
     }
 
-    ChessFrontend::Game game(state,false, true, moveTime, width, height, "Chess");
+    ChessFrontend::Game game(state, false, true, moveTime, width, height, "Chess");
 
     sf::Clock deltaClock;
     sf::Time dt{};

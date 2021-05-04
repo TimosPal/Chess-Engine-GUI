@@ -110,7 +110,7 @@ namespace ChessFrontend {
         bool Game::AiTurn(){
             using namespace ChessEngine::MoveGeneration;
 
-            auto moves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+            auto moves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
 
             Move mv;
             int rng = rand() % moves.size();
@@ -171,8 +171,8 @@ namespace ChessFrontend {
                         holdingSprite = TextureManager::GetPieceSprite(color, type);
                         fromPos = tilePos;
 
-                        auto pseudoMoves = Pseudo::GetAllMoves(board.GetState(), board.GetState().turnOf,
-                                                               board.GetUtilities());
+                        auto pseudoMoves = GetValidMoves(board.GetState(), board.GetState().turnOf,
+                                                                  board.GetUtilities());
                         activePieceMoves = FromIndexMoves(GetSquareIndex(fromPos.x, fromPos.y), pseudoMoves);
 
                         activePiece = true;
