@@ -41,6 +41,7 @@ namespace ChessFrontend {
         bool isHolding;
         bool shouldMoveAnimation;
         bool playMoveAnimation;
+        bool promotionMenu;
 
         sf::Sprite holdingSprite;
         sf::Vector2i fromPos;
@@ -51,6 +52,8 @@ namespace ChessFrontend {
 
         bool DropPieceMove(uint8_t fromIndex, uint8_t toIndex);
         bool ClickPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
+        bool PickMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
+
         ChessEngine::PieceType PromotionSelection();
 
         // Returns true if player made a move

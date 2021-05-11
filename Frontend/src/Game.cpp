@@ -15,7 +15,7 @@ namespace ChessFrontend {
                 : window(sf::VideoMode(width, height), title) ,
                   board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI),
                   isHolding(false), activePiece(false), shouldMoveAnimation(false), playMoveAnimation(false),
-                  elapsedAnimTime(0.0f), secPerMove(secPerMove)
+                  elapsedAnimTime(0.0f), secPerMove(secPerMove), promotionMenu(false)
         {
             lastPlayedMove.flags = ChessEngine::MoveGeneration::MoveType::None;
             window.setFramerateLimit(120);
@@ -139,27 +139,48 @@ namespace ChessFrontend {
             uint8_t fromIndex = GetSquareIndex(fromPos.x, fromPos.y);
             uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
 
-            bool madeMove;
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                // Drag or click a piece.
-                madeMove = ClickPieceMove(fromIndex, toIndex, tilePos);
+            bool shouldMove;
+            if(!promotionMenu) {
+                shouldMove = PickMove(fromIndex, toIndex, tilePos);
             }else{
-                // Drop a dragged piece.
-                madeMove = DropPieceMove(fromIndex, toIndex);
+                shouldMove = false; // TODO: promo pick.
             }
 
-            if(madeMove){
-                // Check for promotions so the player can choose.
-                if(IsMoveType(lastPlayedMove.flags, MoveType::Promotion)){
-                    lastPlayedMove.promotionType = PromotionSelection();
-                }
-
+            if(shouldMove){
                 MakeMove(lastPlayedMove, board.GetState().turnOf, board.GetState(), board.GetUtilities());
                 playMoveAnimation = shouldMoveAnimation;
                 return true;
             }else{
                 return false;
             }
+        }
+
+        bool Game::PickMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos){
+            using namespace ChessEngine::BitboardUtil;
+            using namespace ChessEngine::MoveGeneration;
+
+            bool pickedMove;
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                // Drag or click a piece.
+                pickedMove = ClickPieceMove(fromIndex, toIndex, tilePos);
+            }else{
+                // Drop a dragged piece.
+                pickedMove = DropPieceMove(fromIndex, toIndex);
+            }
+
+            bool shouldMove = false;
+            if(pickedMove){
+                // Check for promotions so the player can choose.
+                if(IsMoveType(lastPlayedMove.flags, MoveType::Promotion)) {
+                    lastPlayedMove.promotionType = PromotionSelection();
+                    shouldMove = false; // Need to pick first.
+                    promotionMenu = true;
+                } else {
+                    shouldMove = true;
+                }
+            }
+
+            return shouldMove;
         }
 
         ChessEngine::PieceType Game::PromotionSelection(){
@@ -171,7 +192,7 @@ namespace ChessFrontend {
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
-            bool madeMove = false;
+            bool pickedMove = false;
 
             if(!isHolding){
                 auto[type, color] = board.GetState().GetPosType(GetSquareIndex(tilePos.x, tilePos.y));
@@ -185,7 +206,7 @@ namespace ChessFrontend {
 
                     activePiece = false;
                     isHolding = false;
-                    madeMove = true;
+                    pickedMove = true;
                 } else if (type == ChessEngine::PieceType::None || color != board.GetState().turnOf) {
                     // Clicked an invalid move , empty tile.
                     activePiece = false;
@@ -204,14 +225,14 @@ namespace ChessFrontend {
                 }
             }
 
-            return madeMove;
+            return pickedMove;
         }
 
         bool Game::DropPieceMove(uint8_t fromIndex, uint8_t toIndex){
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
-            bool madeMove = false;
+            bool pickedMove = false;
 
             if(isHolding) {
                 // Stop holding the piece , even if the move is invalid.
@@ -223,11 +244,11 @@ namespace ChessFrontend {
                     shouldMoveAnimation = false; // Disable animations for drag n drop.
 
                     activePiece = false;
-                    madeMove = true;
+                    pickedMove = true;
                 }
             }
 
-            return madeMove;
+            return pickedMove;
         }
 
 }
