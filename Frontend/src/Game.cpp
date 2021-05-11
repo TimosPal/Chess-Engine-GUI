@@ -13,9 +13,9 @@ namespace ChessFrontend {
 
         Game::Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, float secPerMove, int width, int height, const std::string& title)
                 : window(sf::VideoMode(width, height), title) ,
-                board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI),
-                isHolding(false), activePiece(false), playMoveAnimation(false), elapsedAnimTime(0.0f),
-                secPerMove(secPerMove)
+                  board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI),
+                  isHolding(false), activePiece(false), shouldMoveAnimation(false), playMoveAnimation(false),
+                  elapsedAnimTime(0.0f), secPerMove(secPerMove)
         {
             lastPlayedMove.flags = ChessEngine::MoveGeneration::MoveType::None;
             window.setFramerateLimit(120);
@@ -55,7 +55,7 @@ namespace ChessFrontend {
             if(playMoveAnimation) {
                 float lerpTime = elapsedAnimTime / secPerMove;
                 ChessEngine::Color turnOf = board.GetState().turnOf;
-                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window,lastPlayedMove, turnOf, lerpTime);
+                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, lastPlayedMove, turnOf, lerpTime);
 
                 if(playMoveAnimation)
                     elapsedAnimTime += dt.asSeconds();
@@ -141,19 +141,32 @@ namespace ChessFrontend {
 
             bool madeMove;
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                madeMove = DragPieceMove(fromIndex, toIndex, tilePos);
+                // Drag or click a piece.
+                madeMove = ClickPieceMove(fromIndex, toIndex, tilePos);
             }else{
-                madeMove = CLickTileMove(fromIndex, toIndex);
+                // Drop a dragged piece.
+                madeMove = DropPieceMove(fromIndex, toIndex);
             }
 
             if(madeMove){
-                MakeMove(lastPlayedMove, board.GetState().turnOf, board.GetState(), board.GetUtilities());
-            }
+                // Check for promotions so the player can choose.
+                if(IsMoveType(lastPlayedMove.flags, MoveType::Promotion)){
+                    lastPlayedMove.promotionType = PromotionSelection();
+                }
 
-            return madeMove;
+                MakeMove(lastPlayedMove, board.GetState().turnOf, board.GetState(), board.GetUtilities());
+                playMoveAnimation = shouldMoveAnimation;
+                return true;
+            }else{
+                return false;
+            }
         }
 
-        bool Game::DragPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos){
+        ChessEngine::PieceType Game::PromotionSelection(){
+            return ChessEngine::PieceType::Queen;
+        }
+
+        bool Game::ClickPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos){
             // If already holding , dont do anything.
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
@@ -168,7 +181,7 @@ namespace ChessFrontend {
 
                 if (validMove) {
                     lastPlayedMove = move;
-                    playMoveAnimation = true;
+                    shouldMoveAnimation = true;
 
                     activePiece = false;
                     isHolding = false;
@@ -194,7 +207,7 @@ namespace ChessFrontend {
             return madeMove;
         }
 
-        bool Game::CLickTileMove(uint8_t fromIndex, uint8_t toIndex){
+        bool Game::DropPieceMove(uint8_t fromIndex, uint8_t toIndex){
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
@@ -207,7 +220,7 @@ namespace ChessFrontend {
                 Move move{};
                 if(IndecesToMove(fromIndex, toIndex, activePieceMoves, move)) {
                     lastPlayedMove = move;
-                    playMoveAnimation = false; // Disable animations for drag n drop.
+                    shouldMoveAnimation = false; // Disable animations for drag n drop.
 
                     activePiece = false;
                     madeMove = true;

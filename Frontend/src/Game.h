@@ -39,6 +39,7 @@ namespace ChessFrontend {
         // Used for graphics.
         bool activePiece;
         bool isHolding;
+        bool shouldMoveAnimation;
         bool playMoveAnimation;
 
         sf::Sprite holdingSprite;
@@ -48,8 +49,9 @@ namespace ChessFrontend {
         ChessEngine::MoveGeneration::Move lastPlayedMove;
         std::list<ChessEngine::MoveGeneration::Move> activePieceMoves;
 
-        bool CLickTileMove(uint8_t fromIndex, uint8_t toIndex);
-        bool DragPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
+        bool DropPieceMove(uint8_t fromIndex, uint8_t toIndex);
+        bool ClickPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
+        ChessEngine::PieceType PromotionSelection();
 
         // Returns true if player made a move
         bool HumanTurn();
