@@ -48,6 +48,9 @@ namespace ChessFrontend {
         ChessEngine::MoveGeneration::Move lastPlayedMove;
         std::list<ChessEngine::MoveGeneration::Move> activePieceMoves;
 
+        bool CLickTileMove(uint8_t fromIndex, uint8_t toIndex);
+        bool DragPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
+
         // Returns true if player made a move
         bool HumanTurn();
         bool AiTurn();

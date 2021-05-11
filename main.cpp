@@ -17,7 +17,7 @@ int main() {
     ChessFrontend::TextureManager::Init("../Frontend/Sprites"); // NOTE: Path is from the executable.
 
     ChessEngine::BoardState state = {};
-    std::string fenPosition = "5k2/8/3q1q2/8/8/8/8/R3K2R w KQ - 0 1";
+    std::string fenPosition = "8/3P4/3K4/8/8/5k2/5p2/8 w - - 0 1";
     if(!ParseFenString(fenPosition, state)){
         std::cout << "Incorrect fen string" << std::endl;
         return -1;

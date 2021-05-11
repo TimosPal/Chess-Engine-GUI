@@ -231,6 +231,7 @@ namespace ChessEngine::MoveGeneration {
                 return false;
         }
 
+        // Play the move and check if the king is still in check.
         MakeMove(move, color, state, utilities);
         return NumberOfChecks(color, state, utilities) == 0;
     }
