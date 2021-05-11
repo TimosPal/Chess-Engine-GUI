@@ -166,7 +166,7 @@ namespace ChessEngine::MoveGeneration {
         state.turnOf = opponentColor;
     }
 
-    int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities){
+    int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities, uint8_t kingIndex){
         using namespace ChessEngine::MoveGeneration::MoveTables;
         using namespace ChessEngine::BitboardUtil;
 
@@ -177,7 +177,6 @@ namespace ChessEngine::MoveGeneration {
         // Eg: if a king can attack a knight with a knight pattern move, then the king is checked by a knight.
 
         Color enemyColor = InvertColor(color);
-        uint8_t kingIndex = GetLSBIndex(state.pieceBoards[color][PieceType::King]);
 
         Bitboard occupancies = utilities.occupancies[Color::Both];
 
@@ -204,12 +203,40 @@ namespace ChessEngine::MoveGeneration {
         return GetBitCount(attackSources);
     }
 
-    bool IsValid(const Move& move, BoardState state, Color color, BoardUtilities utilities){
+    int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities){
+        uint8_t kingIndex = GetLSBIndex(state.pieceBoards[color][PieceType::King]);
+        return NumberOfChecks(color, state, utilities, kingIndex);
+    }
+
+    bool IsValid(const Move& move, BoardState state, Color color, BoardUtilities utilities) {
+        bool isCastling = false;
+        uint8_t intermediateIndexPos;
+        if (IsMoveType(move.flags, MoveType::KingSideCastling)) {
+            isCastling = true;
+            intermediateIndexPos = move.toSquareIndex - 1;
+        }
+        if (IsMoveType(move.flags, MoveType::QueenSideCastling)) {
+            isCastling = true;
+            intermediateIndexPos = move.toSquareIndex + 1;
+        }
+
+        if(isCastling) {
+            // For castling , we have to check 2 positions for checks.
+            // since the king cant pass through a check.
+            if (NumberOfChecks(color, state, utilities, intermediateIndexPos) != 0)
+                return false;
+
+            // We cant castle away from a check.
+            if (NumberOfChecks(color, state, utilities, move.fromSquareIndex) != 0)
+                return false;
+        }
+
         MakeMove(move, color, state, utilities);
         return NumberOfChecks(color, state, utilities) == 0;
     }
 
     std::list<Move> GetValidMoves(const BoardState& state, Color color, const BoardUtilities& utilities){
+        // TODO: possibly very slow to copy the board each time.
         auto pseudoMoves = ChessEngine::MoveGeneration::Pseudo::GetPseudoMoves(state, color, utilities);
 
         std::list<Move> validMoves;
