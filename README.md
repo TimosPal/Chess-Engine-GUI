@@ -1,5 +1,7 @@
 # Chess-Engine
-A chess engine implemented with bitboards.
+A chess engine implemented with bitboards. This project is split into 2 sections.
+The backend / chess engine , which is compiled into a library. A frontend gui that links to the
+engine.
 
 ## Bitboards
 Bitboards are used to represent the board and its properties. The basic idea
@@ -27,6 +29,14 @@ pseudo moves for a given position without needing to calculate them on the fly.
 
 Exception : pawn pushes are calculated on the spot due to their simplicity and strong correlation
 to the occupancy bitboards when calculating double pushes on the 2nd or 7th ranks.
+
+A pseudo move is considered legal if after being applied it leaves no checks. This approach is 
+possibly expensive since we have to copy the board for each pseudo move so it can be further optimized.
+
+## Human player
+A human player can make a move by :
+- Dragging a piece to a destination square.
+- Selecting a piece and a destination square.
 
 ## Dependencies
 SFML , neither the package or the dlls are included in this repo.
