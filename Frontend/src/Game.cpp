@@ -18,16 +18,12 @@ namespace ChessFrontend {
                          options.windowSettings.title),
                          board(state), options(options)
         {
-            promotionMenu = false;
             playMoveAnimation = false;
             shouldMoveAnimation = false;
-            activePiece = false;
-            isHolding = false;
             boardHasChanged = true;
 
             elapsedAnimTime = 0.0f;
 
-            lastPlayedMove.flags = ChessEngine::MoveGeneration::MoveType::None;
             window.setFramerateLimit(options.windowSettings.frameLimit);
         }
 
@@ -54,22 +50,22 @@ namespace ChessFrontend {
             RenderingUtil::DrawCheckerBoard(window);
             RenderingUtil::DrawPieces(window, board.GetUtilities(), GetIgnoreList());
 
-            if(promotionMenu){
-                RenderingUtil::DrawPromotionMenu(window, fromPos);
+            if(humanState.promotionMenu){
+                RenderingUtil::DrawPromotionMenu(window, humanState.fromPos);
             }
 
             // Draw available moves and the holding piece.
-            if(activePiece) {
-                RenderingUtil::DrawActivePieceMoves(window, activePieceMoves);
-                if (isHolding)
-                    RenderingUtil::DrawHoldingPiece(window, holdingSprite);
+            if(humanState.activePiece) {
+                RenderingUtil::DrawActivePieceMoves(window, humanState.activePieceMoves);
+                if (humanState.isHolding)
+                    RenderingUtil::DrawHoldingPiece(window, humanState.holdingSprite);
             }
 
             // Handle the move animations.
             if(playMoveAnimation) {
                 float lerpTime = elapsedAnimTime / options.secPerMove;
                 ChessEngine::Color turnOf = board.GetState().turnOf;
-                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, lastPlayedMove, turnOf, lerpTime);
+                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, humanState.selectedMove, turnOf, lerpTime);
 
                 if(playMoveAnimation)
                     elapsedAnimTime += dt.asSeconds();
@@ -86,17 +82,17 @@ namespace ChessFrontend {
             using namespace ChessEngine::MoveGeneration;
 
             std::vector<sf::Vector2i> ignoreList = {};
-            if(isHolding)
-                ignoreList.push_back(fromPos);
+            if(humanState.isHolding)
+                ignoreList.push_back(humanState.fromPos);
             if(playMoveAnimation) {
                 // If animation is playing exclude end position from showing.
-                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(lastPlayedMove.toSquareIndex);
+                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(humanState.selectedMove.toSquareIndex);
                 ignoreList.emplace_back(toX, toY);
             }
-            if(IsMoveType(lastPlayedMove.flags, (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling))){
+            if(IsMoveType(humanState.selectedMove.flags, (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling))){
                 // If castling move , exclude rook move during animation.
-                uint8_t rookNewIndex = IsMoveType(lastPlayedMove.flags, MoveType::QueenSideCastling) ?
-                                       lastPlayedMove.toSquareIndex + 1 : lastPlayedMove.toSquareIndex - 1;
+                uint8_t rookNewIndex = IsMoveType(humanState.selectedMove.flags, MoveType::QueenSideCastling) ?
+                                       humanState.selectedMove.toSquareIndex + 1 : humanState.selectedMove.toSquareIndex - 1;
 
                 auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(rookNewIndex);
                 ignoreList.emplace_back(toX, toY);
@@ -136,7 +132,7 @@ namespace ChessFrontend {
 
             MakeMove(mv, board.GetState().turnOf, board.GetState(), board.GetUtilities());
 
-            lastPlayedMove = mv;
+            humanState.selectedMove = mv;
             playMoveAnimation = true;
 
             return true; // Plays move instantly.
@@ -150,18 +146,18 @@ namespace ChessFrontend {
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
             sf::Vector2i tilePos(mousePos.x / tileSize.x, 8 - 1 - mousePos.y / tileSize.y);
 
-            uint8_t fromIndex = GetSquareIndex(fromPos.x, fromPos.y);
+            uint8_t fromIndex = GetSquareIndex(humanState.fromPos.x, humanState.fromPos.y);
             uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
 
             bool shouldMove;
-            if(!promotionMenu) {
+            if(!humanState.promotionMenu) {
                 shouldMove = PickMove(fromIndex, toIndex, tilePos);
             }else{
                 shouldMove = PickPromotion(board.GetState().turnOf);
             }
 
             if(shouldMove){
-                MakeMove(lastPlayedMove, board.GetState().turnOf, board.GetState(), board.GetUtilities());
+                MakeMove(humanState.selectedMove, board.GetState().turnOf, board.GetState(), board.GetUtilities());
                 playMoveAnimation = shouldMoveAnimation;
                 return true;
             }else{
@@ -172,7 +168,7 @@ namespace ChessFrontend {
         bool Game::PickPromotion(ChessEngine::Color color){
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                 // We need to find the appropriate menu bounds based on the color.
-                promotionMenu = false;
+                humanState.promotionMenu = false;
             }
 
             return false;
@@ -194,10 +190,10 @@ namespace ChessFrontend {
             bool shouldMove = false;
             if(pickedMove){
                 // Check for promotions so the player can choose.
-                if(IsMoveType(lastPlayedMove.flags, MoveType::Promotion)) {
-                    lastPlayedMove.promotionType = PromotionSelection();
+                if(IsMoveType(humanState.selectedMove.flags, MoveType::Promotion)) {
+                    humanState.selectedMove.promotionType = PromotionSelection();
                     shouldMove = false; // Need to pick first.
-                    promotionMenu = true;
+                    humanState.promotionMenu = true;
                 } else {
                     shouldMove = true;
                 }
@@ -217,34 +213,34 @@ namespace ChessFrontend {
 
             bool pickedMove = false;
 
-            if(!isHolding){
+            if(!humanState.isHolding){
                 auto[type, color] = board.GetState().GetPosType(GetSquareIndex(tilePos.x, tilePos.y));
 
                 Move move{};
-                bool validMove = activePiece && IndecesToMove(fromIndex, toIndex, activePieceMoves, move);
+                bool validMove = humanState.activePiece && IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move);
 
                 if (validMove) {
-                    lastPlayedMove = move;
+                    humanState.selectedMove = move;
                     shouldMoveAnimation = true;
 
-                    activePiece = false;
-                    isHolding = false;
+                    humanState.activePiece = false;
+                    humanState.isHolding = false;
                     pickedMove = true;
                 } else if (type == ChessEngine::PieceType::None || color != board.GetState().turnOf) {
                     // Clicked an invalid move , empty tile.
-                    activePiece = false;
-                    isHolding = false;
+                    humanState.activePiece = false;
+                    humanState.isHolding = false;
                 } else if (color == board.GetState().turnOf) {
                     // Clicked another owned piece.
-                    holdingSprite = TextureManager::GetPieceSprite(color, type);
-                    fromPos = tilePos;
+                    humanState.holdingSprite = TextureManager::GetPieceSprite(color, type);
+                    humanState.fromPos = tilePos;
 
-                    auto pseudoMoves = GetValidMoves(board.GetState(), board.GetState().turnOf,
-                                                     board.GetUtilities());
-                    activePieceMoves = FromIndexMoves(GetSquareIndex(fromPos.x, fromPos.y), pseudoMoves);
+                    auto pseudoMoves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+                    uint8_t index = GetSquareIndex(humanState.fromPos.x, humanState.fromPos.y);
+                    humanState.activePieceMoves = FromIndexMoves(index, pseudoMoves);
 
-                    activePiece = true;
-                    isHolding = true;
+                    humanState.activePiece = true;
+                    humanState.isHolding = true;
                 }
             }
 
@@ -257,16 +253,16 @@ namespace ChessFrontend {
 
             bool pickedMove = false;
 
-            if(isHolding) {
+            if(humanState.isHolding) {
                 // Stop holding the piece , even if the move is invalid.
-                isHolding = false;
+                humanState.isHolding = false;
 
                 Move move{};
-                if(IndecesToMove(fromIndex, toIndex, activePieceMoves, move)) {
-                    lastPlayedMove = move;
+                if(IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move)) {
+                    humanState.selectedMove = move;
                     shouldMoveAnimation = false; // Disable animations for drag n drop.
 
-                    activePiece = false;
+                    humanState.activePiece = false;
                     pickedMove = true;
                 }
             }

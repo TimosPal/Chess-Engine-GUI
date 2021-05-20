@@ -8,6 +8,7 @@
 #include <Engine/MoveGeneration/Move.h>
 
 #include "Options.h"
+#include "HumanState.h"
 
 #include <list>
 
@@ -28,39 +29,32 @@ namespace ChessFrontend {
     private:
         sf::RenderWindow window;
         ChessEngine::Board board;
-
         Options options;
 
-        bool boardHasChanged; // Since last frame.
+        // Used for human move selection.
+        // Describes current active player.
+        // Not used for AIs.
+        HumanState humanState;
 
-        // Information about the current human player.
-        // Used for graphics.
-        bool activePiece;
-        bool isHolding;
+        // Used for printing the board in the console
+        // or playing move animations.
+        bool boardHasChanged; // Since last frame.
         bool shouldMoveAnimation;
         bool playMoveAnimation;
-        bool promotionMenu;
 
-        sf::Sprite holdingSprite;
-        sf::Vector2i fromPos;
         float elapsedAnimTime;
-
-        ChessEngine::MoveGeneration::Move lastPlayedMove;
-        std::list<ChessEngine::MoveGeneration::Move> activePieceMoves;
 
         bool DropPieceMove(uint8_t fromIndex, uint8_t toIndex);
         bool ClickPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
         bool PickMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
         bool PickPromotion(ChessEngine::Color color);
 
-        ChessEngine::PieceType PromotionSelection();
-
         // Returns true if player made a move
         bool HumanTurn();
-        bool AiTurn();
+        bool AiTurn(); // Handles AI moves.
 
+        ChessEngine::PieceType PromotionSelection();
         std::vector<sf::Vector2i> GetIgnoreList();
-
 
     };
 

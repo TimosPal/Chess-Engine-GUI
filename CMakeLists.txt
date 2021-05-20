@@ -24,5 +24,5 @@ add_executable(
         Frontend/src/RenderingUtil.h
         Frontend/src/RenderingUtil.cpp
         Frontend/src/Options.h
-        Frontend/src/WindowSettings.h)
+        Frontend/src/WindowSettings.h Frontend/src/HumanState.h)
 target_link_libraries(Chess Engine sfml-graphics sfml-audio sfml-window sfml-system)

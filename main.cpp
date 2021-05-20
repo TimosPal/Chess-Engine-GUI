@@ -25,7 +25,7 @@ int main() {
     }
 
     ChessFrontend::WindowSettings windowSettings(height, width, frameLimit, "Chess");
-    ChessFrontend::Options options(true, true, moveTime, windowSettings);
+    ChessFrontend::Options options(false, true, moveTime, windowSettings);
     ChessFrontend::Game game(state, options);
 
     sf::Clock deltaClock;
