@@ -11,14 +11,24 @@
 
 namespace ChessFrontend {
 
-        Game::Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, float secPerMove, int width, int height, const std::string& title)
-                : window(sf::VideoMode(width, height), title) ,
-                  board(state), boardHasChanged(true), whiteAI(whiteAI), blackAI(blackAI),
-                  isHolding(false), activePiece(false), shouldMoveAnimation(false), playMoveAnimation(false),
-                  elapsedAnimTime(0.0f), secPerMove(secPerMove), promotionMenu(false)
+        Game::Game(ChessEngine::BoardState state, const Options& options)
+                : window(sf::VideoMode(
+                         options.windowSettings.width,
+                         options.windowSettings.height),
+                         options.windowSettings.title),
+                         board(state), options(options)
         {
+            promotionMenu = false;
+            playMoveAnimation = false;
+            shouldMoveAnimation = false;
+            activePiece = false;
+            isHolding = false;
+            boardHasChanged = true;
+
+            elapsedAnimTime = 0.0f;
+
             lastPlayedMove.flags = ChessEngine::MoveGeneration::MoveType::None;
-            window.setFramerateLimit(120);
+            window.setFramerateLimit(options.windowSettings.frameLimit);
         }
 
         void Game::HandleEvents(){
@@ -44,6 +54,10 @@ namespace ChessFrontend {
             RenderingUtil::DrawCheckerBoard(window);
             RenderingUtil::DrawPieces(window, board.GetUtilities(), GetIgnoreList());
 
+            if(promotionMenu){
+                RenderingUtil::DrawPromotionMenu(window, fromPos);
+            }
+
             // Draw available moves and the holding piece.
             if(activePiece) {
                 RenderingUtil::DrawActivePieceMoves(window, activePieceMoves);
@@ -53,7 +67,7 @@ namespace ChessFrontend {
 
             // Handle the move animations.
             if(playMoveAnimation) {
-                float lerpTime = elapsedAnimTime / secPerMove;
+                float lerpTime = elapsedAnimTime / options.secPerMove;
                 ChessEngine::Color turnOf = board.GetState().turnOf;
                 playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, lastPlayedMove, turnOf, lerpTime);
 
@@ -99,7 +113,7 @@ namespace ChessFrontend {
             if(playMoveAnimation)
                 return;
 
-            bool isAI = (board.GetState().turnOf == ChessEngine::Color::White) ? whiteAI : blackAI;
+            bool isAI = (board.GetState().turnOf == ChessEngine::Color::White) ? options.whiteAI : options.blackAI;
             boardHasChanged = (isAI) ? AiTurn() : HumanTurn();
         }
 
@@ -143,7 +157,7 @@ namespace ChessFrontend {
             if(!promotionMenu) {
                 shouldMove = PickMove(fromIndex, toIndex, tilePos);
             }else{
-                shouldMove = false; // TODO: promo pick.
+                shouldMove = PickPromotion(board.GetState().turnOf);
             }
 
             if(shouldMove){
@@ -153,6 +167,15 @@ namespace ChessFrontend {
             }else{
                 return false;
             }
+        }
+
+        bool Game::PickPromotion(ChessEngine::Color color){
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                // We need to find the appropriate menu bounds based on the color.
+                promotionMenu = false;
+            }
+
+            return false;
         }
 
         bool Game::PickMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos){

@@ -7,14 +7,15 @@
 
 #include <Engine/MoveGeneration/Move.h>
 
+#include "Options.h"
+
 #include <list>
 
 namespace ChessFrontend {
 
     class Game {
     public:
-        Game(ChessEngine::BoardState state, bool whiteAI, bool blackAI, float secPerMove, int width, int height,
-             const std::string &title);
+        Game(ChessEngine::BoardState state, const Options& options);
 
         void HandleEvents();
 
@@ -28,12 +29,9 @@ namespace ChessFrontend {
         sf::RenderWindow window;
         ChessEngine::Board board;
 
-        bool whiteAI;
-        bool blackAI;
+        Options options;
 
         bool boardHasChanged; // Since last frame.
-
-        float secPerMove;
 
         // Information about the current human player.
         // Used for graphics.
@@ -53,6 +51,7 @@ namespace ChessFrontend {
         bool DropPieceMove(uint8_t fromIndex, uint8_t toIndex);
         bool ClickPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
         bool PickMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
+        bool PickPromotion(ChessEngine::Color color);
 
         ChessEngine::PieceType PromotionSelection();
 

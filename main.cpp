@@ -7,6 +7,7 @@
 
 constexpr int width = 800;
 constexpr int height = 800;
+constexpr int frameLimit = 120;
 
 constexpr float moveTime = 0.25f;
 
@@ -23,7 +24,9 @@ int main() {
         return -1;
     }
 
-    ChessFrontend::Game game(state, false, true, moveTime, width, height, "Chess");
+    ChessFrontend::WindowSettings windowSettings(height, width, frameLimit, "Chess");
+    ChessFrontend::Options options(true, true, moveTime, windowSettings);
+    ChessFrontend::Game game(state, options);
 
     sf::Clock deltaClock;
     sf::Time dt{};

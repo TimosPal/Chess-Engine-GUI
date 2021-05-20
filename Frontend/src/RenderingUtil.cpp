@@ -119,6 +119,44 @@ namespace ChessFrontend::RenderingUtil {
         }
     }
 
+    void DrawPromotionMenu(sf::RenderWindow &window, sf::Vector2i fromPos){ // Make it work for both sides
+        using namespace ChessEngine;
+
+        sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
+
+        // Find color side based on from pos.
+        Color color = fromPos.y == 6 ? Color::White : Color::Black;
+
+        // Draw basic window.
+        sf::RectangleShape rectangle(sf::Vector2f(tileSize.x, tileSize.y * 4));
+
+        int rectY = color == Color::White ? 0 : (8 - 4) * tileSize.y;
+        rectangle.setPosition(fromPos.x * tileSize.x, rectY);
+        rectangle.setFillColor(sf::Color::White);
+        rectangle.setOutlineThickness(- tileSize.x * 0.05);
+        rectangle.setOutlineColor(sf::Color::Black);
+
+        window.draw(rectangle);
+
+        // Draw each piece option.
+        PieceType options[] = {PieceType::Queen, PieceType::Knight, PieceType::Rook, PieceType::Bishop};
+        for (int i = 0; i < 4; i++) {
+            auto currSprite = ChessFrontend::TextureManager::GetPieceSprite(color, options[i]);
+            ScalePieceSprite(currSprite, tileSize);
+
+            int yPos;
+            if(color == Color::White){
+                yPos = i * tileSize.y;
+            }else{
+                yPos = (8 -1 -i) * tileSize.y;
+            }
+
+            currSprite.setPosition(fromPos.x * tileSize.x, yPos);
+
+            window.draw(currSprite);
+        }
+    }
+
     float LerpF(float a, float b, float t){
         if(t <= 0)
             t = 0;
@@ -202,5 +240,7 @@ namespace ChessFrontend::RenderingUtil {
         auto selfSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, move.selfType);
         return MoveAnimation(window, move.fromSquareIndex, move.toSquareIndex, selfSprite, lerpTime);
     }
+
+
 
 }
