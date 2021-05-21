@@ -44,16 +44,19 @@ namespace ChessFrontend {
 
         float elapsedAnimTime;
 
+        // Used for handling single clicks.
+        bool singleClick;
+        bool clickRelease;
+
         bool DropPieceMove(uint8_t fromIndex, uint8_t toIndex);
         bool ClickPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
-        bool PickMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
+        bool PickMove();
         bool PickPromotion(ChessEngine::Color color);
 
         // Returns true if player made a move
         bool HumanTurn();
         bool AiTurn(); // Handles AI moves.
 
-        ChessEngine::PieceType PromotionSelection();
         std::vector<sf::Vector2i> GetIgnoreList();
 
     };

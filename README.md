@@ -24,7 +24,7 @@ We differentiate between two piece categories. Leaper pieces and sliding pieces.
 - **Leaper pieces** : pawns , king , knights
 - **Sliding pieces** : queen , rook , bishop
 
-Attack / move tables are pre-generated at compilation. This way we can get all the possible
+Attack / move tables are pre-generated at startup. This way we can get all the possible
 pseudo moves for a given position without needing to calculate them on the fly.
 
 Exception : pawn pushes are calculated on the spot due to their simplicity and strong correlation

@@ -2,9 +2,7 @@
 
 #include <SFML/Window/Event.hpp>
 
-#include <Engine/MoveGeneration/PseudoMoves.h>
 #include <Engine/MoveGeneration/MoveGeneration.h>
-#include <unistd.h>
 
 #include "./RenderingUtil.h"
 #include "TextureManager.h"
@@ -28,11 +26,22 @@ namespace ChessFrontend {
         }
 
         void Game::HandleEvents(){
+            singleClick = false;
+            clickRelease = false;
+
             sf::Event event{};
             while (window.pollEvent(event)) {
                 // Request for closing the window
                 if (event.type == sf::Event::Closed)
                     window.close();
+                if (event.type == sf::Event::MouseButtonPressed) {
+                    if (event.mouseButton.button == sf::Mouse::Left)
+                        singleClick = true;
+                }
+                if (event.type == sf::Event::MouseButtonReleased) {
+                    if (event.mouseButton.button == sf::Mouse::Left)
+                        clickRelease = true;
+                }
             }
         }
 
@@ -142,16 +151,9 @@ namespace ChessFrontend {
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
-            sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
-            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            sf::Vector2i tilePos(mousePos.x / tileSize.x, 8 - 1 - mousePos.y / tileSize.y);
-
-            uint8_t fromIndex = GetSquareIndex(humanState.fromPos.x, humanState.fromPos.y);
-            uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
-
             bool shouldMove;
             if(!humanState.promotionMenu) {
-                shouldMove = PickMove(fromIndex, toIndex, tilePos);
+                shouldMove = PickMove();
             }else{
                 shouldMove = PickPromotion(board.GetState().turnOf);
             }
@@ -166,7 +168,7 @@ namespace ChessFrontend {
         }
 
         bool Game::PickPromotion(ChessEngine::Color color){
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            if(singleClick) {
                 // We need to find the appropriate menu bounds based on the color.
                 humanState.promotionMenu = false;
             }
@@ -174,24 +176,32 @@ namespace ChessFrontend {
             return false;
         }
 
-        bool Game::PickMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos){
+        bool Game::PickMove(){
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
+            sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            sf::Vector2i tilePos(mousePos.x / tileSize.x, 8 - 1 - mousePos.y / tileSize.y);
+
+            uint8_t fromIndex = GetSquareIndex(humanState.fromPos.x, humanState.fromPos.y);
+            uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
+
             bool pickedMove;
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            if(singleClick) {
                 // Drag or click a piece.
                 pickedMove = ClickPieceMove(fromIndex, toIndex, tilePos);
-            }else{
+            } else if(clickRelease && humanState.isHolding){
                 // Drop a dragged piece.
                 pickedMove = DropPieceMove(fromIndex, toIndex);
+            } else {
+                pickedMove = false;
             }
 
             bool shouldMove = false;
             if(pickedMove){
                 // Check for promotions so the player can choose.
                 if(IsMoveType(humanState.selectedMove.flags, MoveType::Promotion)) {
-                    humanState.selectedMove.promotionType = PromotionSelection();
                     shouldMove = false; // Need to pick first.
                     humanState.promotionMenu = true;
                 } else {
@@ -202,46 +212,42 @@ namespace ChessFrontend {
             return shouldMove;
         }
 
-        ChessEngine::PieceType Game::PromotionSelection(){
-            return ChessEngine::PieceType::Queen;
-        }
-
         bool Game::ClickPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos){
             // If already holding , dont do anything.
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
+            if(humanState.isHolding){
+                return false;
+            }
+
+            Move move{};
+            auto[type, color] = board.GetState().GetPosType(GetSquareIndex(tilePos.x, tilePos.y));
+            bool validMove = humanState.activePiece && IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move);
+
             bool pickedMove = false;
+            if (validMove) {
+                humanState.selectedMove = move;
+                shouldMoveAnimation = true;
 
-            if(!humanState.isHolding){
-                auto[type, color] = board.GetState().GetPosType(GetSquareIndex(tilePos.x, tilePos.y));
+                humanState.activePiece = false;
+                humanState.isHolding = false;
+                pickedMove = true;
+            } else if (type == ChessEngine::PieceType::None || color != board.GetState().turnOf) {
+                // Clicked an invalid move , empty tile.
+                humanState.activePiece = false;
+                humanState.isHolding = false;
+            } else if (color == board.GetState().turnOf) {
+                // Clicked another owned piece.
+                humanState.holdingSprite = TextureManager::GetPieceSprite(color, type);
+                humanState.fromPos = tilePos;
 
-                Move move{};
-                bool validMove = humanState.activePiece && IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move);
+                auto pseudoMoves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+                uint8_t index = GetSquareIndex(humanState.fromPos.x, humanState.fromPos.y);
+                humanState.activePieceMoves = FromIndexMoves(index, pseudoMoves);
 
-                if (validMove) {
-                    humanState.selectedMove = move;
-                    shouldMoveAnimation = true;
-
-                    humanState.activePiece = false;
-                    humanState.isHolding = false;
-                    pickedMove = true;
-                } else if (type == ChessEngine::PieceType::None || color != board.GetState().turnOf) {
-                    // Clicked an invalid move , empty tile.
-                    humanState.activePiece = false;
-                    humanState.isHolding = false;
-                } else if (color == board.GetState().turnOf) {
-                    // Clicked another owned piece.
-                    humanState.holdingSprite = TextureManager::GetPieceSprite(color, type);
-                    humanState.fromPos = tilePos;
-
-                    auto pseudoMoves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
-                    uint8_t index = GetSquareIndex(humanState.fromPos.x, humanState.fromPos.y);
-                    humanState.activePieceMoves = FromIndexMoves(index, pseudoMoves);
-
-                    humanState.activePiece = true;
-                    humanState.isHolding = true;
-                }
+                humanState.activePiece = true;
+                humanState.isHolding = true;
             }
 
             return pickedMove;
@@ -251,23 +257,23 @@ namespace ChessFrontend {
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
-            bool pickedMove = false;
-
-            if(humanState.isHolding) {
-                // Stop holding the piece , even if the move is invalid.
-                humanState.isHolding = false;
-
-                Move move{};
-                if(IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move)) {
-                    humanState.selectedMove = move;
-                    shouldMoveAnimation = false; // Disable animations for drag n drop.
-
-                    humanState.activePiece = false;
-                    pickedMove = true;
-                }
+            if(!humanState.isHolding){
+                return false;
             }
 
-            return pickedMove;
+            // Stop holding the piece , even if the move is invalid.
+            humanState.isHolding = false;
+
+            Move move{};
+            if(IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move)) {
+                humanState.selectedMove = move;
+                shouldMoveAnimation = false; // Disable animations for drag n drop.
+
+                humanState.activePiece = false;
+                return true;
+            }else{
+                return false;
+            }
         }
 
 }
