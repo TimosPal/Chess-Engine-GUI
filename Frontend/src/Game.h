@@ -50,8 +50,8 @@ namespace ChessFrontend {
 
         bool DropPieceMove(uint8_t fromIndex, uint8_t toIndex);
         bool ClickPieceMove(uint8_t fromIndex, uint8_t toIndex, sf::Vector2i tilePos);
-        bool PickMove();
-        bool PickPromotion(ChessEngine::Color color);
+        bool PickMove(sf::Vector2i tilePos);
+        bool PickPromotion(ChessEngine::Color color, sf::Vector2i tilePos);
 
         // Returns true if player made a move
         bool HumanTurn();

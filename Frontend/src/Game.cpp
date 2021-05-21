@@ -151,11 +151,15 @@ namespace ChessFrontend {
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
 
+            sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            sf::Vector2i tilePos(mousePos.x / tileSize.x, 8 - 1 - mousePos.y / tileSize.y);
+
             bool shouldMove;
             if(!humanState.promotionMenu) {
-                shouldMove = PickMove();
+                shouldMove = PickMove(tilePos);
             }else{
-                shouldMove = PickPromotion(board.GetState().turnOf);
+                shouldMove = PickPromotion(board.GetState().turnOf, tilePos);
             }
 
             if(shouldMove){
@@ -167,22 +171,46 @@ namespace ChessFrontend {
             }
         }
 
-        bool Game::PickPromotion(ChessEngine::Color color){
-            if(singleClick) {
-                // We need to find the appropriate menu bounds based on the color.
-                humanState.promotionMenu = false;
+        bool Game::PickPromotion(ChessEngine::Color color, sf::Vector2i tilePos){
+            if(!singleClick){
+                return false;
             }
 
-            return false;
+            int queenSelection, knightSelection, rookSelection, bishopSelection;
+            if(color == ChessEngine::Color::White){
+                queenSelection = 7;
+                knightSelection = 6;
+                rookSelection = 5;
+                bishopSelection = 4;
+            }else{
+                queenSelection = 0;
+                knightSelection = 1;
+                rookSelection = 2;
+                bishopSelection = 3;
+            }
+
+            // We need to find the appropriate menu bounds based on the color.
+            bool pickedPromotion = true;
+            bool correctColumn = tilePos.x == humanState.fromPos.x;
+            if(tilePos.y == queenSelection && correctColumn){
+                humanState.selectedMove.promotionType = ChessEngine::PieceType::Queen;
+            }else if(tilePos.y == knightSelection && correctColumn){
+                humanState.selectedMove.promotionType = ChessEngine::PieceType::Knight;
+            }else if(tilePos.y == rookSelection && correctColumn){
+                humanState.selectedMove.promotionType = ChessEngine::PieceType::Rook;
+            }else if(tilePos.y == bishopSelection && correctColumn){
+                humanState.selectedMove.promotionType = ChessEngine::PieceType::Bishop;
+            }else{
+                pickedPromotion = false; // Out of bounds click.
+            }
+
+            humanState.promotionMenu = false; // Always turns off after a click.
+            return pickedPromotion;
         }
 
-        bool Game::PickMove(){
+        bool Game::PickMove(sf::Vector2i tilePos){
             using namespace ChessEngine::BitboardUtil;
             using namespace ChessEngine::MoveGeneration;
-
-            sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
-            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            sf::Vector2i tilePos(mousePos.x / tileSize.x, 8 - 1 - mousePos.y / tileSize.y);
 
             uint8_t fromIndex = GetSquareIndex(humanState.fromPos.x, humanState.fromPos.y);
             uint8_t toIndex = GetSquareIndex(tilePos.x, tilePos.y);
@@ -221,9 +249,14 @@ namespace ChessFrontend {
                 return false;
             }
 
-            Move move{};
             auto[type, color] = board.GetState().GetPosType(GetSquareIndex(tilePos.x, tilePos.y));
-            bool validMove = humanState.activePiece && IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move);
+
+            // Check if a valid destination.
+            bool validMove = false;
+            Move move{};
+            if(humanState.activePiece){
+                validMove = IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move);
+            }
 
             bool pickedMove = false;
             if (validMove) {
