@@ -39,7 +39,7 @@ namespace ChessFrontend::RenderingUtil {
         sprite.setScale(scalingFactor, scalingFactor);
     }
 
-    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardUtilities& utilities, std::vector<sf::Vector2i> ignorePos) {
+    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardUtilities& utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide) {
         int width = window.getView().getSize().x;
         int height = window.getView().getSize().y;
         auto tileSize = sf::Vector2(width / 8, height / 8);
@@ -57,7 +57,10 @@ namespace ChessFrontend::RenderingUtil {
 
                 auto currSprite = ChessFrontend::TextureManager::GetPieceSprite(color, type);
                 ScalePieceSprite(currSprite, tileSize);
-                currSprite.setPosition(i * tileSize.x, (8 - j - 1) * tileSize.y);
+                // Draw based on viewSide view.
+                int yPos = viewSide == ChessEngine::Color::White ? 7 - j : j;
+                int xPos = viewSide == ChessEngine::Color::White ? i : 7 - i;
+                currSprite.setPosition(xPos * tileSize.x, yPos * tileSize.y);
 
                 window.draw(currSprite);
             }
@@ -74,7 +77,7 @@ namespace ChessFrontend::RenderingUtil {
         window.draw(holdingSprite);
     }
 
-    void DrawActivePieceMoves(sf::RenderWindow &window, std::list<ChessEngine::MoveGeneration::Move> activePieceMoves){
+    void DrawActivePieceMoves(sf::RenderWindow &window, std::list<ChessEngine::MoveGeneration::Move> activePieceMoves, ChessEngine::Color viewSide){
         using namespace ChessEngine::MoveGeneration;
         using namespace ChessEngine::BitboardUtil;
 
@@ -105,9 +108,10 @@ namespace ChessFrontend::RenderingUtil {
                 shape.setOutlineColor(sf::Color::Transparent);
             }
 
+            // Based on color side view.
             // Tile positions.
-            float newPosX = tileSize.x * posX;
-            float newPosY = tileSize.y * (8 - posY - 1);
+            float newPosX = (viewSide == ChessEngine::Color::White ? posX : 7 - posX) * tileSize.x;
+            float newPosY = (viewSide == ChessEngine::Color::White ? 7 - posY : posY) * tileSize.y;
 
             // Center circle.
             newPosX = newPosX + tileSize.x / 2 - currentRadius;
@@ -122,10 +126,12 @@ namespace ChessFrontend::RenderingUtil {
     void DrawPromotionMenu(sf::RenderWindow &window, sf::Vector2i fromPos){ // Make it work for both sides
         using namespace ChessEngine;
 
+        // TODO : fix spawn position for attacks to be based on to not form.
+
         sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
 
         // Find color side based on from pos.
-        Color color = fromPos.y == 6 ? Color::White : Color::Black;
+        Color color = fromPos.y == 7 ? Color::White : Color::Black;
 
         // Draw basic window.
         sf::RectangleShape rectangle(sf::Vector2f(tileSize.x, tileSize.y * 4));
@@ -199,6 +205,8 @@ namespace ChessFrontend::RenderingUtil {
         sprite.setPosition(posX * tileSize.x, (8 - posY - 1) * tileSize.y);
 
         window.draw(sprite);
+
+        return tempColor.a != 0;
     }
 
     bool PlayMoveAnimation(sf::RenderWindow &window, ChessEngine::MoveGeneration::Move move, ChessEngine::Color color, float lerpTime){

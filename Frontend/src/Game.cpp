@@ -14,7 +14,8 @@ namespace ChessFrontend {
                          options.windowSettings.width,
                          options.windowSettings.height),
                          options.windowSettings.title),
-                         board(state), options(options)
+                         board(state), options(options),
+                         humanState(options.startingView)
         {
             playMoveAnimation = false;
             shouldMoveAnimation = false;
@@ -57,15 +58,19 @@ namespace ChessFrontend {
             window.clear();
 
             RenderingUtil::DrawCheckerBoard(window);
-            RenderingUtil::DrawPieces(window, board.GetUtilities(), GetIgnoreList());
+            RenderingUtil::DrawPieces(window, board.GetUtilities(), GetIgnoreList(), humanState.sideView);
 
             if(humanState.promotionMenu){
-                RenderingUtil::DrawPromotionMenu(window, humanState.fromPos);
+                // Create vector for the origin of the window.
+                auto [x,y] = ChessEngine::BitboardUtil::GetCoordinates(humanState.selectedMove.toSquareIndex);
+                sf::Vector2i windowOrigin(x,y);
+
+                RenderingUtil::DrawPromotionMenu(window, windowOrigin);
             }
 
             // Draw available moves and the holding piece.
             if(humanState.activePiece) {
-                RenderingUtil::DrawActivePieceMoves(window, humanState.activePieceMoves);
+                RenderingUtil::DrawActivePieceMoves(window, humanState.activePieceMoves, humanState.sideView);
                 if (humanState.isHolding)
                     RenderingUtil::DrawHoldingPiece(window, humanState.holdingSprite);
             }
@@ -78,11 +83,20 @@ namespace ChessFrontend {
 
                 if(playMoveAnimation)
                     elapsedAnimTime += dt.asSeconds();
-                else
+                else {
                     elapsedAnimTime = 0;
+                    SwapSides();
+                }
             }
 
             window.display();
+        }
+
+        void Game::SwapSides(){
+            if(options.sideSwap){
+                // Swap view. TODO: only do if set in the optioons.
+                humanState.sideView = ChessEngine::InvertColor(humanState.sideView);
+            }
         }
 
         std::vector<sf::Vector2i> Game::GetIgnoreList(){
@@ -153,13 +167,20 @@ namespace ChessFrontend {
 
             sf::Vector2i tileSize(window.getSize().x / 8, window.getSize().y / 8);
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            sf::Vector2i tilePos(mousePos.x / tileSize.x, 8 - 1 - mousePos.y / tileSize.y);
+
+            // Color side view.
+            ChessEngine::Color sideView = humanState.sideView;
+            int tilePosX = mousePos.x / tileSize.x;
+            int tilePosY = mousePos.y / tileSize.y;
+            int posX = (sideView == ChessEngine::Color::White ? tilePosX : 7 - tilePosX);
+            int posY = (sideView == ChessEngine::Color::White ? 7 - tilePosY : tilePosY);
+            sf::Vector2i relativeTilePos(posX, posY);
 
             bool shouldMove;
             if(!humanState.promotionMenu) {
-                shouldMove = PickMove(tilePos);
+                shouldMove = PickMove(relativeTilePos);
             }else{
-                shouldMove = PickPromotion(board.GetState().turnOf, tilePos);
+                shouldMove = PickPromotion(board.GetState().turnOf, relativeTilePos);
             }
 
             if(shouldMove){
@@ -191,7 +212,8 @@ namespace ChessFrontend {
 
             // We need to find the appropriate menu bounds based on the color.
             bool pickedPromotion = true;
-            bool correctColumn = tilePos.x == humanState.fromPos.x;
+            auto [x,y] = ChessEngine::BitboardUtil::GetCoordinates(humanState.selectedMove.toSquareIndex);
+            bool correctColumn = tilePos.x == x;
             if(tilePos.y == queenSelection && correctColumn){
                 humanState.selectedMove.promotionType = ChessEngine::PieceType::Queen;
             }else if(tilePos.y == knightSelection && correctColumn){
@@ -301,6 +323,8 @@ namespace ChessFrontend {
             if(IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move)) {
                 humanState.selectedMove = move;
                 shouldMoveAnimation = false; // Disable animations for drag n drop.
+
+                SwapSides();
 
                 humanState.activePiece = false;
                 return true;

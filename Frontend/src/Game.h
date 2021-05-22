@@ -58,6 +58,7 @@ namespace ChessFrontend {
         bool AiTurn(); // Handles AI moves.
 
         std::vector<sf::Vector2i> GetIgnoreList();
+        void SwapSides();
 
     };
 
