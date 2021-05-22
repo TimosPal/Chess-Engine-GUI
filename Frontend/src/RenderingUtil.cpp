@@ -172,7 +172,7 @@ namespace ChessFrontend::RenderingUtil {
         return a + t*(b-a);
     }
 
-    bool MoveAnimation(sf::RenderWindow &window, uint8_t fromIndex, uint8_t toIndex, sf::Sprite sprite, float lerpTime){
+    bool TransformAnimation(sf::RenderWindow &window, uint8_t fromIndex, uint8_t toIndex, sf::Sprite sprite, float lerpTime, ChessEngine::Color sideView){
         using namespace ChessEngine::BitboardUtil;
 
         sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
@@ -180,22 +180,36 @@ namespace ChessFrontend::RenderingUtil {
         auto [fromX , fromY] = GetCoordinates(fromIndex);
         auto [toX , toY] = GetCoordinates(toIndex);
 
+        if(sideView == ChessEngine::Color::Black){
+            // Needed for animations to work with side flipping.
+            toX = 7 - toX;
+            toY = 7 - toY;
+            fromX = 7 - fromX;
+            fromY = 7 - fromY;
+        }
+
         float xVal = LerpF(fromX, toX, lerpTime);
         float yVal = LerpF(fromY, toY, lerpTime);
 
         ScalePieceSprite(sprite, tileSize);
-        sprite.setPosition(xVal * tileSize.x, (8 - yVal - 1) * tileSize.y);
+        sprite.setPosition(xVal * tileSize.x, (7 - yVal) * tileSize.y);
 
         window.draw(sprite);
 
         return (xVal != toX || yVal != toY); // Returns false when the position is reached.
     }
 
-    bool FadeAnimation(sf::RenderWindow &window, uint8_t posIndex, sf::Sprite sprite, float lerpTime){
+    bool FadeAnimation(sf::RenderWindow &window, uint8_t posIndex, sf::Sprite sprite, float lerpTime, ChessEngine::Color sideView){
         using namespace ChessEngine::BitboardUtil;
 
         sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
         auto [posX , posY] = GetCoordinates(posIndex);
+
+        if(sideView == ChessEngine::Color::Black){
+            // Needed for animations to work with side flipping.
+            posX = 7 - posX;
+            posY = 7 - posY;
+        }
 
         auto tempColor = sprite.getColor();
         tempColor.a = LerpF(255, 0, lerpTime);
@@ -209,7 +223,7 @@ namespace ChessFrontend::RenderingUtil {
         return tempColor.a != 0;
     }
 
-    bool PlayMoveAnimation(sf::RenderWindow &window, ChessEngine::MoveGeneration::Move move, ChessEngine::Color color, float lerpTime){
+    bool PlayMoveAnimation(sf::RenderWindow &window, ChessEngine::MoveGeneration::Move move, ChessEngine::Color color, ChessEngine::Color sideView, float lerpTime){
         using namespace ChessEngine::MoveGeneration;
         using namespace ChessEngine::BitboardUtil;
         // Returns false if animation is done.
@@ -227,7 +241,7 @@ namespace ChessFrontend::RenderingUtil {
             }
 
             auto enemySprite = ChessFrontend::TextureManager::GetPieceSprite(color, move.enemyType);
-            FadeAnimation(window, GetSquareIndex(enemyX, enemyY), enemySprite, lerpTime);
+            FadeAnimation(window, GetSquareIndex(enemyX, enemyY), enemySprite, lerpTime, sideView);
         }
         if(IsMoveType(move.flags, (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling))){
             uint8_t rookNewIndex;
@@ -242,11 +256,11 @@ namespace ChessFrontend::RenderingUtil {
             uint8_t rookOldIndex = GetStartingRookIndex(moveColor, kingSide);
 
             auto rookSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, ChessEngine::PieceType::Rook);
-            MoveAnimation(window, rookOldIndex, rookNewIndex, rookSprite, lerpTime);
+            TransformAnimation(window, rookOldIndex, rookNewIndex, rookSprite, lerpTime, sideView);
         }
 
         auto selfSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, move.selfType);
-        return MoveAnimation(window, move.fromSquareIndex, move.toSquareIndex, selfSprite, lerpTime);
+        return TransformAnimation(window, move.fromSquareIndex, move.toSquareIndex, selfSprite, lerpTime, sideView);
     }
 
 

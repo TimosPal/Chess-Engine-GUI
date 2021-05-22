@@ -79,7 +79,7 @@ namespace ChessFrontend {
             if(playMoveAnimation) {
                 float lerpTime = elapsedAnimTime / options.secPerMove;
                 ChessEngine::Color turnOf = board.GetState().turnOf;
-                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, humanState.selectedMove, turnOf, lerpTime);
+                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, humanState.selectedMove, turnOf, humanState.sideView, lerpTime);
 
                 if(playMoveAnimation)
                     elapsedAnimTime += dt.asSeconds();
@@ -94,7 +94,6 @@ namespace ChessFrontend {
 
         void Game::SwapSides(){
             if(options.sideSwap){
-                // Swap view. TODO: only do if set in the optioons.
                 humanState.sideView = ChessEngine::InvertColor(humanState.sideView);
             }
         }
@@ -109,16 +108,18 @@ namespace ChessFrontend {
                 ignoreList.push_back(humanState.fromPos);
             if(playMoveAnimation) {
                 // If animation is playing exclude end position from showing.
-                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(humanState.selectedMove.toSquareIndex);
+                auto[toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(humanState.selectedMove.toSquareIndex);
                 ignoreList.emplace_back(toX, toY);
-            }
-            if(IsMoveType(humanState.selectedMove.flags, (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling))){
-                // If castling move , exclude rook move during animation.
-                uint8_t rookNewIndex = IsMoveType(humanState.selectedMove.flags, MoveType::QueenSideCastling) ?
-                                       humanState.selectedMove.toSquareIndex + 1 : humanState.selectedMove.toSquareIndex - 1;
+                if (IsMoveType(humanState.selectedMove.flags,
+                               (MoveType) (MoveType::QueenSideCastling | MoveType::KingSideCastling))) {
+                    // If castling move , exclude rook move during animation.
+                    uint8_t rookNewIndex = IsMoveType(humanState.selectedMove.flags, MoveType::QueenSideCastling) ?
+                                           humanState.selectedMove.toSquareIndex + 1 :
+                                           humanState.selectedMove.toSquareIndex - 1;
 
-                auto [toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(rookNewIndex);
-                ignoreList.emplace_back(toX, toY);
+                    auto[toX, toY] = ChessEngine::BitboardUtil::GetCoordinates(rookNewIndex);
+                    ignoreList.emplace_back(toX, toY);
+                }
             }
 
             return ignoreList;

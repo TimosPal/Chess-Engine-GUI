@@ -22,7 +22,7 @@ namespace ChessFrontend::RenderingUtil {
 
     void DrawActivePieceMoves(sf::RenderWindow &window, std::list<ChessEngine::MoveGeneration::Move> activePieceMoves, ChessEngine::Color viewSide);
 
-    bool PlayMoveAnimation(sf::RenderWindow &window, ChessEngine::MoveGeneration::Move move, ChessEngine::Color color, float lerpTime);
+    bool PlayMoveAnimation(sf::RenderWindow &window, ChessEngine::MoveGeneration::Move move, ChessEngine::Color color, ChessEngine::Color sideView, float lerpTime);
 
     void DrawPromotionMenu(sf::RenderWindow &window, sf::Vector2i fromPos);
 
