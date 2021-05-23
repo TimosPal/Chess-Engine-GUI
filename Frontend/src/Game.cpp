@@ -65,7 +65,7 @@ namespace ChessFrontend {
                 auto [x,y] = ChessEngine::BitboardUtil::GetCoordinates(humanState.selectedMove.toSquareIndex);
                 sf::Vector2i windowOrigin(x,y);
 
-                RenderingUtil::DrawPromotionMenu(window, windowOrigin);
+                RenderingUtil::DrawPromotionMenu(window, windowOrigin, humanState.sideView);
             }
 
             // Draw available moves and the holding piece.
@@ -85,7 +85,7 @@ namespace ChessFrontend {
                     elapsedAnimTime += dt.asSeconds();
                 else {
                     elapsedAnimTime = 0;
-                    SwapSides();
+                    SwapSides(); // Swap sides when animation is over.
                 }
             }
 
@@ -187,6 +187,11 @@ namespace ChessFrontend {
             if(shouldMove){
                 MakeMove(humanState.selectedMove, board.GetState().turnOf, board.GetState(), board.GetUtilities());
                 playMoveAnimation = shouldMoveAnimation;
+
+                // If we got no animation swap instantly.
+                if(!shouldMoveAnimation)
+                    SwapSides();
+
                 return true;
             }else{
                 return false;
@@ -324,8 +329,6 @@ namespace ChessFrontend {
             if(IndecesToMove(fromIndex, toIndex, humanState.activePieceMoves, move)) {
                 humanState.selectedMove = move;
                 shouldMoveAnimation = false; // Disable animations for drag n drop.
-
-                SwapSides();
 
                 humanState.activePiece = false;
                 return true;

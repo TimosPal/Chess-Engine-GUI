@@ -18,14 +18,14 @@ int main() {
     ChessFrontend::TextureManager::Init("../Frontend/Sprites"); // NOTE: Path is from the executable.
 
     ChessEngine::BoardState state = {};
-    std::string fenPosition = "r3k2r/8/8/3pP3/8/8/8/R3K2R w KQkq d6 1 1";
+    std::string fenPosition = "8/3P4/8/8/8/8/3p4/8 w - - 0 1";
     if(!ParseFenString(fenPosition, state)){
         std::cout << "Incorrect fen string" << std::endl;
         return -1;
     }
 
     ChessFrontend::WindowSettings windowSettings(height, width, frameLimit, "Chess");
-    ChessFrontend::Options options(false, false, moveTime, false, ChessEngine::Color::White , windowSettings);
+    ChessFrontend::Options options(false, false, moveTime, true, ChessEngine::Color::White, windowSettings);
     ChessFrontend::Game game(state, options);
 
     sf::Clock deltaClock;

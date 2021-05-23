@@ -123,21 +123,21 @@ namespace ChessFrontend::RenderingUtil {
         }
     }
 
-    void DrawPromotionMenu(sf::RenderWindow &window, sf::Vector2i fromPos){ // Make it work for both sides
+    void DrawPromotionMenu(sf::RenderWindow &window, sf::Vector2i originPos, ChessEngine::Color sideView){
         using namespace ChessEngine;
-
-        // TODO : fix spawn position for attacks to be based on to not form.
 
         sf::Vector2i tileSize(window.getView().getSize().x / 8, window.getView().getSize().y / 8);
 
         // Find color side based on from pos.
-        Color color = fromPos.y == 7 ? Color::White : Color::Black;
+        Color color = originPos.y == 7 ? Color::White : Color::Black;
 
         // Draw basic window.
         sf::RectangleShape rectangle(sf::Vector2f(tileSize.x, tileSize.y * 4));
 
-        int rectY = color == Color::White ? 0 : (8 - 4) * tileSize.y;
-        rectangle.setPosition(fromPos.x * tileSize.x, rectY);
+        int rectX = sideView == Color::White ? originPos.x : 7 - originPos.x;
+        int rectY = sideView == color ? 0 : (8 - 4) * tileSize.y;
+
+        rectangle.setPosition(rectX * tileSize.x, rectY);
         rectangle.setFillColor(sf::Color::White);
         rectangle.setOutlineThickness(- tileSize.x * 0.05);
         rectangle.setOutlineColor(sf::Color::Black);
@@ -150,14 +150,8 @@ namespace ChessFrontend::RenderingUtil {
             auto currSprite = ChessFrontend::TextureManager::GetPieceSprite(color, options[i]);
             ScalePieceSprite(currSprite, tileSize);
 
-            int yPos;
-            if(color == Color::White){
-                yPos = i * tileSize.y;
-            }else{
-                yPos = (8 -1 -i) * tileSize.y;
-            }
-
-            currSprite.setPosition(fromPos.x * tileSize.x, yPos);
+            int yPos = (sideView == color ? i : (7-i)) * tileSize.y;
+            currSprite.setPosition(rectX * tileSize.x, yPos);
 
             window.draw(currSprite);
         }

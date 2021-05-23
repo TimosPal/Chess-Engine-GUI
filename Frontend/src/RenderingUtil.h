@@ -24,7 +24,7 @@ namespace ChessFrontend::RenderingUtil {
 
     bool PlayMoveAnimation(sf::RenderWindow &window, ChessEngine::MoveGeneration::Move move, ChessEngine::Color color, ChessEngine::Color sideView, float lerpTime);
 
-    void DrawPromotionMenu(sf::RenderWindow &window, sf::Vector2i fromPos);
+    void DrawPromotionMenu(sf::RenderWindow &window, sf::Vector2i originPos, ChessEngine::Color sideView);
 
 }
 
