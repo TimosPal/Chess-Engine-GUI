@@ -17,6 +17,7 @@
 #define CIRCLE_OUTLINE_PERCENTAGE 0.07
 
 #define FONT_SIZE_PERCENTAGE 0.2
+#define FONT_OFFSET_PERCENTAGE 0.05
 
 namespace ChessFrontend::RenderingUtil {
 
@@ -268,19 +269,36 @@ namespace ChessFrontend::RenderingUtil {
 
         sf::Text text;
         text.setFont(ResourceManager::GetFont());
-        text.setCharacterSize(tileSize.x * FONT_SIZE_PERCENTAGE);
+        int fontSize = tileSize.x * FONT_SIZE_PERCENTAGE;
+        text.setCharacterSize(fontSize);
 
-        // Numbers.
+        // Ranks.
         for (int i = 0; i < 8; i++) {
-            std::string numStr = ChessEngine::RankToString((ChessEngine::Rank)i);
+            int tilePos = (sideView == ChessEngine::Color::White) ? i : 7 - i;
+            std::string numStr = ChessEngine::RankToString((ChessEngine::Rank)tilePos);
             text.setString(numStr);
             text.setFillColor((i % 2 == 0 % 2) ? sf::Color(WHITE_TILE_COLOR) : sf::Color(BLACK_TILE_COLOR));
-            text.setPosition(0, tileSize.x * i);
+
+            int posX = tileSize.x * FONT_OFFSET_PERCENTAGE;
+            int posY = tileSize.x * i + tileSize.y * FONT_OFFSET_PERCENTAGE;
+
+            text.setPosition(posX, posY);
             window.draw(text);
         }
 
-        // Leters.
+        // Files.
+        for (int i = 0; i < 8; i++) {
+            int tilePos = (sideView == ChessEngine::Color::White) ? 7 - i : i;
+            std::string numStr = ChessEngine::FileToString((ChessEngine::File)tilePos);
+            text.setString(numStr);
+            text.setFillColor((i % 2 != 0 % 2) ? sf::Color(WHITE_TILE_COLOR) : sf::Color(BLACK_TILE_COLOR));
 
+            int posX = (tileSize.x * (i + 1)) - fontSize - tileSize.x * FONT_OFFSET_PERCENTAGE;
+            int posY = 8 * tileSize.y - fontSize - tileSize.y * FONT_OFFSET_PERCENTAGE;
+
+            text.setPosition(posX, posY);
+            window.draw(text);
+        }
     }
 
 }
