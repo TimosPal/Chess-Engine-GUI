@@ -4,8 +4,9 @@
 
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Text.hpp>
 
-#include "./TextureManager.h"
+#include "./ResourceManager.h"
 
 #define BLACK_TILE_COLOR 238, 238, 210
 #define WHITE_TILE_COLOR 118, 150, 86
@@ -14,6 +15,8 @@
 #define CIRCLE_QUIET_PERCENTAGE 0.20
 #define CIRCLE_ATTACK_PERCENTAGE 1.0
 #define CIRCLE_OUTLINE_PERCENTAGE 0.07
+
+#define FONT_SIZE_PERCENTAGE 0.2
 
 namespace ChessFrontend::RenderingUtil {
 
@@ -35,7 +38,7 @@ namespace ChessFrontend::RenderingUtil {
 
     void ScalePieceSprite(sf::Sprite& sprite, sf::Vector2i targetScale){
         int spritePixelSize = sprite.getTexture()->getSize().x / 6;
-        float scalingFactor = ChessFrontend::TextureManager::GetScalingFactor(targetScale.x, spritePixelSize);
+        float scalingFactor = ChessFrontend::ResourceManager::GetScalingFactor(targetScale.x, spritePixelSize);
         sprite.setScale(scalingFactor, scalingFactor);
     }
 
@@ -55,7 +58,7 @@ namespace ChessFrontend::RenderingUtil {
                     continue;
                 }
 
-                auto currSprite = ChessFrontend::TextureManager::GetPieceSprite(color, type);
+                auto currSprite = ChessFrontend::ResourceManager::GetPieceSprite(color, type);
                 ScalePieceSprite(currSprite, tileSize);
                 // Draw based on viewSide view.
                 int yPos = viewSide == ChessEngine::Color::White ? 7 - j : j;
@@ -147,7 +150,7 @@ namespace ChessFrontend::RenderingUtil {
         // Draw each piece option.
         PieceType options[] = {PieceType::Queen, PieceType::Knight, PieceType::Rook, PieceType::Bishop};
         for (int i = 0; i < 4; i++) {
-            auto currSprite = ChessFrontend::TextureManager::GetPieceSprite(color, options[i]);
+            auto currSprite = ChessFrontend::ResourceManager::GetPieceSprite(color, options[i]);
             ScalePieceSprite(currSprite, tileSize);
 
             int yPos = (sideView == color ? i : (7-i)) * tileSize.y;
@@ -234,7 +237,7 @@ namespace ChessFrontend::RenderingUtil {
                 enemyY += moveColor == ChessEngine::Color::White ? -1 : 1;
             }
 
-            auto enemySprite = ChessFrontend::TextureManager::GetPieceSprite(color, move.enemyType);
+            auto enemySprite = ChessFrontend::ResourceManager::GetPieceSprite(color, move.enemyType);
             FadeAnimation(window, GetSquareIndex(enemyX, enemyY), enemySprite, lerpTime, sideView);
         }
         if(IsMoveType(move.flags, (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling))){
@@ -249,14 +252,35 @@ namespace ChessFrontend::RenderingUtil {
             }
             uint8_t rookOldIndex = GetStartingRookIndex(moveColor, kingSide);
 
-            auto rookSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, ChessEngine::PieceType::Rook);
+            auto rookSprite = ChessFrontend::ResourceManager::GetPieceSprite(moveColor, ChessEngine::PieceType::Rook);
             TransformAnimation(window, rookOldIndex, rookNewIndex, rookSprite, lerpTime, sideView);
         }
 
-        auto selfSprite = ChessFrontend::TextureManager::GetPieceSprite(moveColor, move.selfType);
+        auto selfSprite = ChessFrontend::ResourceManager::GetPieceSprite(moveColor, move.selfType);
         return TransformAnimation(window, move.fromSquareIndex, move.toSquareIndex, selfSprite, lerpTime, sideView);
     }
 
+    void DrawCoordinates(sf::RenderWindow &window, ChessEngine::Color sideView){
+        int width = window.getView().getSize().x;
+        int height = window.getView().getSize().y;
 
+        auto tileSize = sf::Vector2f(width / 8, height / 8);
+
+        sf::Text text;
+        text.setFont(ResourceManager::GetFont());
+        text.setCharacterSize(tileSize.x * FONT_SIZE_PERCENTAGE);
+
+        // Numbers.
+        for (int i = 0; i < 8; i++) {
+            std::string numStr = ChessEngine::RankToString((ChessEngine::Rank)i);
+            text.setString(numStr);
+            text.setFillColor((i % 2 == 0 % 2) ? sf::Color(WHITE_TILE_COLOR) : sf::Color(BLACK_TILE_COLOR));
+            text.setPosition(0, tileSize.x * i);
+            window.draw(text);
+        }
+
+        // Leters.
+
+    }
 
 }

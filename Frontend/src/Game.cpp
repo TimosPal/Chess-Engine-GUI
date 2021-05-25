@@ -5,7 +5,7 @@
 #include <Engine/MoveGeneration/MoveGeneration.h>
 
 #include "./RenderingUtil.h"
-#include "TextureManager.h"
+#include "ResourceManager.h"
 
 namespace ChessFrontend {
 
@@ -58,6 +58,7 @@ namespace ChessFrontend {
             window.clear();
 
             RenderingUtil::DrawCheckerBoard(window);
+            RenderingUtil::DrawCoordinates(window, humanState.sideView);
             RenderingUtil::DrawPieces(window, board.GetUtilities(), GetIgnoreList(), humanState.sideView);
 
             if(humanState.promotionMenu){
@@ -300,7 +301,7 @@ namespace ChessFrontend {
                 humanState.isHolding = false;
             } else if (color == board.GetState().turnOf) {
                 // Clicked another owned piece.
-                humanState.holdingSprite = TextureManager::GetPieceSprite(color, type);
+                humanState.holdingSprite = ResourceManager::GetPieceSprite(color, type);
                 humanState.fromPos = tilePos;
 
                 auto pseudoMoves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());

@@ -26,6 +26,8 @@ namespace ChessFrontend::RenderingUtil {
 
     void DrawPromotionMenu(sf::RenderWindow &window, sf::Vector2i originPos, ChessEngine::Color sideView);
 
+    void DrawCoordinates(sf::RenderWindow &window, ChessEngine::Color sideView);
+
 }
 
 #endif

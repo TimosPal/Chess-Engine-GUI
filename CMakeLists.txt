@@ -18,8 +18,8 @@ add_subdirectory(Engine)
 add_executable(
         Chess
         main.cpp
-        Frontend/src/TextureManager.h
-        Frontend/src/TextureManager.cpp
+        Frontend/src/ResourceManager.h
+        Frontend/src/ResourceManager.cpp
         Frontend/src/Game.h Frontend/src/Game.cpp
         Frontend/src/RenderingUtil.h
         Frontend/src/RenderingUtil.cpp

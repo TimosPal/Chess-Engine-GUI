@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Frontend/src/TextureManager.h"
+#include "Frontend/src/ResourceManager.h"
 #include "Frontend/src/Game.h"
 
 #include <Engine/FenParser/FenParser.h>
@@ -11,11 +11,13 @@ constexpr int frameLimit = 120;
 
 constexpr float moveTime = 0.25f;
 
+//TODO : bug when knight vs rook promotion ?
+
 int main() {
     srand((unsigned) time(0));
 
     ChessEngine::Init();
-    ChessFrontend::TextureManager::Init("../Frontend/Sprites"); // NOTE: Path is from the executable.
+    ChessFrontend::ResourceManager::Init("../Frontend/sprites", "../Frontend/fonts"); // NOTE: Path is from the executable.
 
     ChessEngine::BoardState state = {};
     std::string fenPosition = "8/3P4/8/8/8/8/3p4/8 w - - 0 1";
