@@ -12,7 +12,7 @@ great computation speeds.
 In this engine instead of using such long types an alias called "Bitboard" is used.
 
 ## Fen strings
-The board is initialized with a fen string. Fen strings describe a board state , whose turn it is ,
+The board is initialized with a fen string provided as an argument. Fen strings describe a board state , whose turn it is ,
 if en passant is available , castling rights , piece positions and half/full move counters. 
 A fen string parser is implemented with proper error checking support.
 

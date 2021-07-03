@@ -11,23 +11,30 @@ constexpr int frameLimit = 120;
 
 constexpr float moveTime = 0.25f;
 
-//TODO : bug when knight vs rook promotion ?
+std::string ArgumentToString(int argc, char* argv[]){
+    std::string temp;
+    for (int i = 1; i < argc; i++) {
+        temp += argv[i] + std::string(" ");
+    }
 
-int main() {
+    return temp;
+}
+
+int main(int argc, char* argv[]) {
     srand((unsigned) time(0));
 
     ChessEngine::Init();
     ChessFrontend::ResourceManager::Init("../Frontend/sprites", "../Frontend/fonts"); // NOTE: Path is from the executable.
 
     ChessEngine::BoardState state = {};
-    std::string fenPosition = "8/3P4/8/8/8/8/3p4/8 w - - 0 1";
+    std::string fenPosition = ArgumentToString(argc, argv);
     if(!ParseFenString(fenPosition, state)){
         std::cout << "Incorrect fen string" << std::endl;
         return -1;
     }
 
     ChessFrontend::WindowSettings windowSettings(height, width, frameLimit, "Chess");
-    ChessFrontend::Options options(false, false, moveTime, true, ChessEngine::Color::White, windowSettings);
+    ChessFrontend::Options options(false, false, moveTime, false, ChessEngine::Color::White, windowSettings);
     ChessFrontend::Game game(state, options);
 
     sf::Clock deltaClock;
