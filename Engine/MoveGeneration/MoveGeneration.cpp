@@ -204,8 +204,13 @@ namespace ChessEngine::MoveGeneration {
     }
 
     int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities){
-        uint8_t kingIndex = GetLSBIndex(state.pieceBoards[color][PieceType::King]);
-        return NumberOfChecks(color, state, utilities, kingIndex);
+        auto kingBoard = state.pieceBoards[color][PieceType::King];
+        if(kingBoard) { // If not checked , an empty board will still give an index of 0.
+            uint8_t kingIndex = GetLSBIndex(state.pieceBoards[color][PieceType::King]);
+            return NumberOfChecks(color, state, utilities, kingIndex);
+        }else{
+            return 0; // Avoids invalid checks when king is missing in the board.
+        }
     }
 
     bool IsValid(const Move& move, BoardState state, Color color, BoardUtilities utilities) {

@@ -17,7 +17,9 @@
 #define CIRCLE_OUTLINE_PERCENTAGE 0.07
 
 #define FONT_SIZE_PERCENTAGE 0.2
-#define FONT_OFFSET_PERCENTAGE 0.05
+#define FONT_OFFSET_PERCENTAGE 0.03
+
+#define SHADE_OPACITY 0.35
 
 namespace ChessFrontend::RenderingUtil {
 
@@ -134,6 +136,13 @@ namespace ChessFrontend::RenderingUtil {
 
         // Find color side based on from pos.
         Color color = originPos.y == 7 ? Color::White : Color::Black;
+
+        // Draw shade.
+        sf::RectangleShape shade(window.getView().getSize());
+        sf::Color shadeColor = sf::Color::Black;
+        shadeColor.a = SHADE_OPACITY * 255;
+        shade.setFillColor(shadeColor);
+        window.draw(shade);
 
         // Draw basic window.
         sf::RectangleShape rectangle(sf::Vector2f(tileSize.x, tileSize.y * 4));

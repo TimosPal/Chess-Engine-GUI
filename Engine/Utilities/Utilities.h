@@ -24,6 +24,10 @@ namespace ChessEngine {
         King, Queen, Bishop, Knight, Rook, Pawn, None
     };
 
+    enum class GameState{
+        Win, Defeat, Stalemate, Forfiet, Playing
+    };
+
     std::string FileToString(File file);
     std::string RankToString(Rank rank);
     char PieceTypeToChar(PieceType type, Color color);
