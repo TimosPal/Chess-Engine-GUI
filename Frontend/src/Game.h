@@ -19,9 +19,7 @@ namespace ChessFrontend {
         Game(ChessEngine::BoardState state, const Options& options);
 
         void HandleEvents();
-
-        void PlayMove();
-
+        void Update();
         void Render(sf::Time dt);
 
         bool IsRunning() { return window.isOpen(); }
@@ -59,6 +57,9 @@ namespace ChessFrontend {
 
         std::vector<sf::Vector2i> GetIgnoreList();
         void SwapSides();
+
+        void PlayMove();
+
 
     };
 

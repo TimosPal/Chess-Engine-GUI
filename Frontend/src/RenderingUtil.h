@@ -7,14 +7,14 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-#include <Engine/Board/BoardUtilities.h>
+#include <Engine/Board/BoardOccupancies.h>
 #include <Engine/MoveGeneration/Move.h>
 
 namespace ChessFrontend::RenderingUtil {
 
     void DrawCheckerBoard(sf::RenderWindow &window);
 
-    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardUtilities &utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide);
+    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardOccupancies &utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide);
 
     void ScalePieceSprite(sf::Sprite &sprite, sf::Vector2i targetScale);
 

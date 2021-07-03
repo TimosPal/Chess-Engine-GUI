@@ -30,10 +30,13 @@ namespace ChessEngine {
 
     std::string FileToString(File file);
     std::string RankToString(Rank rank);
+    std::string GameStateToString(GameState state);
+
     char PieceTypeToChar(PieceType type, Color color);
     char PieceTypeToChar(PieceType type);
 
-    bool StringToCoord(const std::string& str, std::tuple<uint8_t , uint8_t >& coords);
+    bool StringToCoord(const std::string& str, std::tuple<uint8_t , uint8_t>& coords);
+
     Color InvertColor(Color color);
 
     /* Init engine tables etc */

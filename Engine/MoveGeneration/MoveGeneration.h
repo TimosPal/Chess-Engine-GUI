@@ -5,15 +5,15 @@
 
 #include "Move.h"
 #include "../Board/BoardState.h"
-#include "../Board/BoardUtilities.h"
+#include "../Board/BoardOccupancies.h"
 
 namespace ChessEngine::MoveGeneration {
 
-    void MakeMove(const Move& move, Color color, BoardState& state, BoardUtilities& utilities);
+    void MakeMove(const Move& move, Color color, BoardState& state, BoardOccupancies& boardOccupancies);
 
-    int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities);
+    int NumberOfChecks(Color color, const BoardState& state, BoardOccupancies& boardOccupancies);
 
-    std::list<Move> GetValidMoves(const BoardState& state, Color color, const BoardUtilities& utilities);
+    std::list<Move> GetValidMoves(const BoardState& state, Color color, const BoardOccupancies& boardOccupancies);
 
     void PrintMoves(const std::list<Move>& moveList);
 

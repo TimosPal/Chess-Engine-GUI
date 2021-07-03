@@ -16,6 +16,21 @@ namespace ChessEngine {
         return std::string(1, rank + 1 + '0');
     }
 
+    std::string GameStateToString(GameState state){
+        switch (state) {
+            case GameState::Win:
+                return "Win";
+            case GameState::Defeat:
+                return "Defeat";
+            case GameState::Stalemate:
+                return "Stalemate";
+            case GameState::Forfiet:
+                return "Forfiet";
+            case GameState::Playing:
+                return "Playing";
+        }
+    }
+
     Color InvertColor(Color color) { return (Color) ((color + 1) % 2); }
 
     bool StringToCoord(const std::string &str, std::tuple<uint8_t, uint8_t> &coords) {

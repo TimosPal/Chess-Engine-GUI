@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include "BoardState.h"
-#include "BoardUtilities.h"
+#include "BoardOccupancies.h"
 
 #include <iostream>
 
@@ -20,14 +20,14 @@ namespace ChessEngine {
             return state;
         }
 
-        BoardUtilities& GetUtilities(){
-            return utilities;
+        BoardOccupancies& GetUtilities(){
+            return boardOccupancies;
         }
 
     private:
 
         BoardState state;
-        BoardUtilities utilities;
+        BoardOccupancies boardOccupancies;
     };
 
 }

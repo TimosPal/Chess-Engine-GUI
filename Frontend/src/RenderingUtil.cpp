@@ -45,7 +45,7 @@ namespace ChessFrontend::RenderingUtil {
         sprite.setScale(scalingFactor, scalingFactor);
     }
 
-    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardUtilities& utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide) {
+    void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardOccupancies& utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide) {
         int width = window.getView().getSize().x;
         int height = window.getView().getSize().y;
         auto tileSize = sf::Vector2(width / 8, height / 8);

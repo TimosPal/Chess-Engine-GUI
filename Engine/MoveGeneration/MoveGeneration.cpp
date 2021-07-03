@@ -10,7 +10,7 @@ namespace ChessEngine::MoveGeneration {
 
     using namespace BitboardUtil;
 
-    static void MakeMove_EnPassant(const Move &move,Color color, Color opponentColor, BoardState &state, BoardUtilities &utilities) {
+    static void MakeMove_EnPassant(const Move &move,Color color, Color opponentColor, BoardState &state, BoardOccupancies &boardOccupancies) {
         // The en passant square is behind the pawn so we need to go
         // up or down 1 tile to find the appropriate position.
         // For this to work we assume the turn orders are correct.
@@ -34,11 +34,11 @@ namespace ChessEngine::MoveGeneration {
             Bitboard &enemyPawnBoard = state.pieceBoards[opponentColor][PieceType::Pawn];
             enemyPawnBoard = PopBit(enemyPawnBoard, pawnIndex);
 
-            // Update square occupancies for said pawn
-            utilities.squaresOccupants[pawnIndex] = {PieceType::None, Color::Both};
+            // Update square boardOccupancies for said pawn
+            boardOccupancies.squaresOccupants[pawnIndex] = {PieceType::None, Color::Both};
 
-            // Update occupancies board.
-            Bitboard& enemyOccupancies = utilities.occupancies[opponentColor];
+            // Update boardOccupancies board.
+            Bitboard& enemyOccupancies = boardOccupancies.occupancies[opponentColor];
             enemyOccupancies = PopBit(enemyOccupancies, pawnIndex);
 
             // Reset en passant.
@@ -46,7 +46,7 @@ namespace ChessEngine::MoveGeneration {
         }
     }
 
-    static void MakeMove_Castling(const Move &move,Color color, BoardState &state, BoardUtilities &utilities){
+    static void MakeMove_Castling(const Move &move,Color color, BoardState &state, BoardOccupancies &boardOccupancies){
         // The king has already moved , we need to handle the rook.
 
         // We know the rook has to go right of the king when castling queen side
@@ -69,12 +69,12 @@ namespace ChessEngine::MoveGeneration {
         rookBoard = PopBit(rookBoard, rookOldIndex);
         rookBoard = SetBit(rookBoard, rookNewIndex);
 
-        // Update square occupancies
-        utilities.squaresOccupants[rookOldIndex] = {PieceType::None, Color::Both};
-        utilities.squaresOccupants[rookNewIndex] = {PieceType::Rook, color};
+        // Update square boardOccupancies
+        boardOccupancies.squaresOccupants[rookOldIndex] = {PieceType::None, Color::Both};
+        boardOccupancies.squaresOccupants[rookNewIndex] = {PieceType::Rook, color};
 
-        // Update occupancies board.
-        Bitboard& selfOccupancies = utilities.occupancies[color];
+        // Update boardOccupancies board.
+        Bitboard& selfOccupancies = boardOccupancies.occupancies[color];
         selfOccupancies = PopBit(selfOccupancies, rookOldIndex);
         selfOccupancies = SetBit(selfOccupancies, rookNewIndex);
     }
@@ -110,7 +110,7 @@ namespace ChessEngine::MoveGeneration {
         }
     }
 
-    void MakeMove(const Move& move, Color color, BoardState& state, BoardUtilities& utilities){
+    void MakeMove(const Move& move, Color color, BoardState& state, BoardOccupancies& boardOccupancies){
         Color opponentColor = InvertColor(color);
 
         // Update self piece bitboard.
@@ -129,7 +129,7 @@ namespace ChessEngine::MoveGeneration {
 
         // EnPassant can mean either a capture or a double pawn move.
         if (IsMoveType(move.flags, MoveType::EnPassant)) {
-            MakeMove_EnPassant(move,color , opponentColor, state, utilities);
+            MakeMove_EnPassant(move, color , opponentColor, state, boardOccupancies);
         }else {
             // Reset en passant.
             state.enPassantBoard = BITBOARD_EMPTY;
@@ -138,7 +138,7 @@ namespace ChessEngine::MoveGeneration {
         // Castling.
         auto castlingFlags = (MoveType)(MoveType::QueenSideCastling | MoveType::KingSideCastling);
         if (IsMoveType(move.flags, castlingFlags)) {
-            MakeMove_Castling(move, color, state, utilities);
+            MakeMove_Castling(move, color, state, boardOccupancies);
         }
 
         // Check if any moves disabled any castling rights.
@@ -147,26 +147,26 @@ namespace ChessEngine::MoveGeneration {
 
         // Update squaresOccupants.
         // Doesn't catch rook on castling / promotions.
-        utilities.squaresOccupants[move.fromSquareIndex] = {PieceType::None, Color::Both};
-        utilities.squaresOccupants[move.toSquareIndex] = {promotionType, color};
+        boardOccupancies.squaresOccupants[move.fromSquareIndex] = {PieceType::None, Color::Both};
+        boardOccupancies.squaresOccupants[move.toSquareIndex] = {promotionType, color};
 
-        // Update self occupancies.
-        Bitboard& selfOccupancies = utilities.occupancies[color];
+        // Update self boardOccupancies.
+        Bitboard& selfOccupancies = boardOccupancies.occupancies[color];
         selfOccupancies = SwapBit(selfOccupancies, move.fromSquareIndex, move.toSquareIndex);
 
-        // Update enemy occupancies.
+        // Update enemy boardOccupancies.
         // If not a capture , does nothing.
-        Bitboard& enemyOccupancies = utilities.occupancies[opponentColor];
+        Bitboard& enemyOccupancies = boardOccupancies.occupancies[opponentColor];
         enemyOccupancies = PopBit(enemyOccupancies, move.toSquareIndex);
 
-        // Update global occupancies.
-        utilities.occupancies[Color::Both] = selfOccupancies | enemyOccupancies;
+        // Update global boardOccupancies.
+        boardOccupancies.occupancies[Color::Both] = selfOccupancies | enemyOccupancies;
 
         // Update turn
         state.turnOf = opponentColor;
     }
 
-    int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities, uint8_t kingIndex){
+    int NumberOfChecks(Color color, const BoardState& state, BoardOccupancies& boardOccupancies, uint8_t kingIndex){
         using namespace ChessEngine::MoveGeneration::MoveTables;
         using namespace ChessEngine::BitboardUtil;
 
@@ -178,7 +178,7 @@ namespace ChessEngine::MoveGeneration {
 
         Color enemyColor = InvertColor(color);
 
-        Bitboard occupancies = utilities.occupancies[Color::Both];
+        Bitboard occupancies = boardOccupancies.occupancies[Color::Both];
 
         Bitboard enemyQueenOCP = state.pieceBoards[enemyColor][PieceType::Queen];
         Bitboard enemyRookOCP = state.pieceBoards[enemyColor][PieceType::Rook] | enemyQueenOCP;
@@ -203,17 +203,17 @@ namespace ChessEngine::MoveGeneration {
         return GetBitCount(attackSources);
     }
 
-    int NumberOfChecks(Color color, const BoardState& state, BoardUtilities& utilities){
+    int NumberOfChecks(Color color, const BoardState& state, BoardOccupancies& boardOccupancies){
         auto kingBoard = state.pieceBoards[color][PieceType::King];
         if(kingBoard) { // If not checked , an empty board will still give an index of 0.
             uint8_t kingIndex = GetLSBIndex(state.pieceBoards[color][PieceType::King]);
-            return NumberOfChecks(color, state, utilities, kingIndex);
+            return NumberOfChecks(color, state, boardOccupancies, kingIndex);
         }else{
             return 0; // Avoids invalid checks when king is missing in the board.
         }
     }
 
-    bool IsValid(const Move& move, BoardState state, Color color, BoardUtilities utilities) {
+    bool IsValid(const Move& move, BoardState state, Color color, BoardOccupancies boardOccupancies) {
         bool isCastling = false;
         uint8_t intermediateIndexPos;
         if (IsMoveType(move.flags, MoveType::KingSideCastling)) {
@@ -228,26 +228,26 @@ namespace ChessEngine::MoveGeneration {
         if(isCastling) {
             // For castling , we have to check 2 positions for checks.
             // since the king cant pass through a check.
-            if (NumberOfChecks(color, state, utilities, intermediateIndexPos) != 0)
+            if (NumberOfChecks(color, state, boardOccupancies, intermediateIndexPos) != 0)
                 return false;
 
             // We cant castle away from a check.
-            if (NumberOfChecks(color, state, utilities, move.fromSquareIndex) != 0)
+            if (NumberOfChecks(color, state, boardOccupancies, move.fromSquareIndex) != 0)
                 return false;
         }
 
         // Play the move and check if the king is still in check.
-        MakeMove(move, color, state, utilities);
-        return NumberOfChecks(color, state, utilities) == 0;
+        MakeMove(move, color, state, boardOccupancies);
+        return NumberOfChecks(color, state, boardOccupancies) == 0;
     }
 
-    std::list<Move> GetValidMoves(const BoardState& state, Color color, const BoardUtilities& utilities){
+    std::list<Move> GetValidMoves(const BoardState& state, Color color, const BoardOccupancies& boardOccupancies){
         // TODO: possibly very slow to copy the board each time.
-        auto pseudoMoves = ChessEngine::MoveGeneration::Pseudo::GetPseudoMoves(state, color, utilities);
+        auto pseudoMoves = ChessEngine::MoveGeneration::Pseudo::GetPseudoMoves(state, color, boardOccupancies);
 
         std::list<Move> validMoves;
         for(auto move : pseudoMoves){
-            if(IsValid(move, state, color, utilities)){
+            if(IsValid(move, state, color, boardOccupancies)){
                 validMoves.push_back(move);
             }
         }

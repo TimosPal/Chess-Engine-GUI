@@ -18,7 +18,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
     /* Generate a mask based on an initial position and direction */
     BitboardUtil::Bitboard GetDirectionalBlockerMask(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY, bool checkX, bool checkY);
 
-    /* Generate an attack mask based on an initial position , direction and occupancies */
+    /* Generate an attack mask based on an initial position , direction and boardOccupancies */
     BitboardUtil::Bitboard GetDirectionalMoves(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY, BitboardUtil::Bitboard occupancies);
 
 

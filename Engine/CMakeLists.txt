@@ -20,10 +20,10 @@ add_library(
         MoveGeneration/SlidingPieces.cpp
         MoveGeneration/Move.h
         MoveGeneration/Move.cpp
-        Board/BoardUtilities.h
-        Board/BoardUtilities.cpp
+        Board/BoardOccupancies.h
+        Board/BoardOccupancies.cpp
         MoveGeneration/MoveGeneration.h
         MoveGeneration/MoveGeneration.cpp
-)
+        MoveGeneration/Draw.h MoveGeneration/Draw.cpp)
 
 target_include_directories(Engine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")

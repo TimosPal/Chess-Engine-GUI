@@ -126,6 +126,16 @@ namespace ChessFrontend {
             return ignoreList;
         }
 
+        void Game::Update(){
+            auto& gameState = board.GetState().gameState;
+            if(gameState == ChessEngine::GameState::Playing) {
+                PlayMove();
+            }else{
+                std::cout << ChessEngine::GameStateToString(gameState) << std::endl;
+                window.close(); // TODO: temporary solution.
+            }
+        }
+
         void Game::PlayMove(){
             using namespace ChessEngine::MoveGeneration;
 

@@ -47,7 +47,7 @@ namespace ChessEngine::MoveGeneration::SlidingPieces {
         return mask;
     }
 
-    /* Generate an attack mask based on an initial position , direction and occupancies */
+    /* Generate an attack mask based on an initial position , direction and boardOccupancies */
     Bitboard GetDirectionalMoves(uint8_t file, uint8_t rank, int8_t dirX, int8_t dirY, Bitboard occupancies){
         // Include outer edges if not blocked till that point.
         Bitboard mask = BITBOARD_EMPTY;

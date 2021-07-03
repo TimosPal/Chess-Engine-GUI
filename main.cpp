@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     while (game.IsRunning()) {
         game.HandleEvents();
         game.Render(dt);
-        game.PlayMove();
+        game.Update();
 
         dt = deltaClock.restart();
     }

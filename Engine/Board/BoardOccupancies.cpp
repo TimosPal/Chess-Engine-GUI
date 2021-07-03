@@ -1,10 +1,10 @@
-#include "BoardUtilities.h"
+#include "BoardOccupancies.h"
 
 namespace ChessEngine {
 
     using namespace BitboardUtil;
 
-    BoardUtilities::BoardUtilities(const BoardState& state) {
+    BoardOccupancies::BoardOccupancies(const BoardState& state) {
         InitOccupancies(Color::White, state);
         InitOccupancies(Color::Black, state);
         occupancies[Color::Both] = occupancies[Color::White] | occupancies[Color::Black];
@@ -17,7 +17,7 @@ namespace ChessEngine {
         }
     }
 
-    void BoardUtilities::InitOccupancies(Color color, const BoardState& state) {
+    void BoardOccupancies::InitOccupancies(Color color, const BoardState& state) {
         BitboardUtil::Bitboard temp = BITBOARD_EMPTY;
         for (int i = 0; i < 6; i++) {
             temp |= state.pieceBoards[color][i];

@@ -36,7 +36,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, MoveType flags, const BoardUtilities& utilities) {
+    static std::list<Move> ExtractMoves(Bitboard moves, uint8_t fromSquareIndex, MoveType flags, const BoardOccupancies& utilities) {
         std::list<Move> moveList;
 
         // iterate over the bitboard , for each isolated bit find the corresponding moves.
@@ -68,7 +68,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    std::list<Move> GetPawnMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetPawnMoves(const BoardState &state, Color color, const BoardOccupancies& utilities) {
         std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
@@ -115,7 +115,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    std::list<Move> GetEnPassantMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetEnPassantMoves(const BoardState &state, Color color, const BoardOccupancies& utilities) {
         std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
 
@@ -148,7 +148,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    std::list<Move> GetCastlingMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetCastlingMoves(const BoardState &state, Color color, const BoardOccupancies& utilities) {
         std::list<Move> moveList;
         // Check whether or not there are pieces between the king and the rook.
         Bitboard globalOccupancies = utilities.occupancies[Color::Both];
@@ -178,7 +178,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    std::list<Move> GetKnightMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetKnightMoves(const BoardState &state, Color color, const BoardOccupancies& utilities) {
         std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
@@ -206,7 +206,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    std::list<Move> GetKingMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetKingMoves(const BoardState &state, Color color, const BoardOccupancies& utilities) {
         std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
@@ -231,7 +231,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    std::list<Move> GetSlidingMoves(const BoardState &state, Color color, PieceType type, const BoardUtilities& utilities) {
+    std::list<Move> GetSlidingMoves(const BoardState &state, Color color, PieceType type, const BoardOccupancies& utilities) {
         std::list<Move> moveList;
         Color enemyColor = InvertColor(color);
         Bitboard enemyOccupancies = utilities.occupancies[enemyColor];
@@ -266,7 +266,7 @@ namespace ChessEngine::MoveGeneration::Pseudo {
         return moveList;
     }
 
-    std::list<Move> GetPseudoMoves(const BoardState &state, Color color, const BoardUtilities& utilities) {
+    std::list<Move> GetPseudoMoves(const BoardState &state, Color color, const BoardOccupancies& utilities) {
         std::list<Move> moveList;
 
         // Pawns.
