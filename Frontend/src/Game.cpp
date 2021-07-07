@@ -3,6 +3,7 @@
 #include <SFML/Window/Event.hpp>
 
 #include <Engine/MoveGeneration/MoveGeneration.h>
+#include <Engine/MoveGeneration/Draw.h>
 
 #include "./RenderingUtil.h"
 #include "ResourceManager.h"
@@ -59,7 +60,7 @@ namespace ChessFrontend {
 
             RenderingUtil::DrawCheckerBoard(window);
             RenderingUtil::DrawCoordinates(window, humanState.sideView);
-            RenderingUtil::DrawPieces(window, board.GetUtilities(), GetIgnoreList(), humanState.sideView);
+            RenderingUtil::DrawPieces(window, board.GetOccupancies(), GetIgnoreList(), humanState.sideView);
 
             if(humanState.promotionMenu){
                 // Create vector for the origin of the window.
@@ -69,7 +70,7 @@ namespace ChessFrontend {
                 RenderingUtil::DrawPromotionMenu(window, windowOrigin, humanState.sideView);
             }
 
-            // Draw available moves and the holding piece.
+            // IsDraw available moves and the holding piece.
             if(humanState.activePiece) {
                 RenderingUtil::DrawActivePieceMoves(window, humanState.activePieceMoves, humanState.sideView);
                 if (humanState.isHolding)
@@ -151,7 +152,7 @@ namespace ChessFrontend {
         bool Game::AiTurn(){
             using namespace ChessEngine::MoveGeneration;
 
-            auto moves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+            auto moves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetOccupancies());
 
             Move mv;
             int rng = rand() % moves.size();
@@ -165,7 +166,7 @@ namespace ChessFrontend {
                 i++;
             }
 
-            MakeMove(mv, board.GetState().turnOf, board.GetState(), board.GetUtilities());
+            MakeMove(mv, board.GetState().turnOf, board.GetState(), board.GetOccupancies());
 
             humanState.selectedMove = mv;
             playMoveAnimation = true;
@@ -196,12 +197,21 @@ namespace ChessFrontend {
             }
 
             if(shouldMove){
-                MakeMove(humanState.selectedMove, board.GetState().turnOf, board.GetState(), board.GetUtilities());
+                MakeMove(humanState.selectedMove, board.GetState().turnOf, board.GetState(), board.GetOccupancies());
                 playMoveAnimation = shouldMoveAnimation;
 
                 // If we got no animation swap instantly.
                 if(!shouldMoveAnimation)
                     SwapSides();
+
+                // TODO: maybbe too slow.
+                auto moves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetOccupancies());
+                if(Draw::IsDraw(board, moves)){
+                    board.GetState().gameState = ChessEngine::GameState::Draw;
+                }
+                if(Draw::IsCheckmate(board, moves)){
+                    board.GetState().gameState = ChessEngine::GameState::Win;
+                }
 
                 return true;
             }else{
@@ -314,9 +324,9 @@ namespace ChessFrontend {
                 humanState.holdingSprite = ResourceManager::GetPieceSprite(color, type);
                 humanState.fromPos = tilePos;
 
-                auto pseudoMoves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetUtilities());
+                auto moves = GetValidMoves(board.GetState(), board.GetState().turnOf, board.GetOccupancies());
                 uint8_t index = GetSquareIndex(humanState.fromPos.x, humanState.fromPos.y);
-                humanState.activePieceMoves = FromIndexMoves(index, pseudoMoves);
+                humanState.activePieceMoves = FromIndexMoves(index, moves);
 
                 humanState.activePiece = true;
                 humanState.isHolding = true;

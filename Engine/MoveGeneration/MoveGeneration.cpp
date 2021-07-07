@@ -2,6 +2,7 @@
 
 #include "Engine/MoveGeneration/MoveTables.h"
 #include "Engine/MoveGeneration/PseudoMoves.h"
+#include "Engine/MoveGeneration/Draw.h"
 
 #include <iostream>
 #include <cassert>

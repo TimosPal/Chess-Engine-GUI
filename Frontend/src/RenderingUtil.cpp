@@ -63,7 +63,7 @@ namespace ChessFrontend::RenderingUtil {
 
                 auto currSprite = ChessFrontend::ResourceManager::GetPieceSprite(color, type);
                 ScalePieceSprite(currSprite, tileSize);
-                // Draw based on viewSide view.
+                // IsDraw based on viewSide view.
                 int yPos = viewSide == ChessEngine::Color::White ? 7 - j : j;
                 int xPos = viewSide == ChessEngine::Color::White ? i : 7 - i;
                 currSprite.setPosition(xPos * tileSize.x, yPos * tileSize.y);
@@ -137,14 +137,14 @@ namespace ChessFrontend::RenderingUtil {
         // Find color side based on from pos.
         Color color = originPos.y == 7 ? Color::White : Color::Black;
 
-        // Draw shade.
+        // IsDraw shade.
         sf::RectangleShape shade(window.getView().getSize());
         sf::Color shadeColor = sf::Color::Black;
         shadeColor.a = SHADE_OPACITY * 255;
         shade.setFillColor(shadeColor);
         window.draw(shade);
 
-        // Draw basic window.
+        // IsDraw basic window.
         sf::RectangleShape rectangle(sf::Vector2f(tileSize.x, tileSize.y * 4));
 
         int rectX = sideView == Color::White ? originPos.x : 7 - originPos.x;
@@ -157,7 +157,7 @@ namespace ChessFrontend::RenderingUtil {
 
         window.draw(rectangle);
 
-        // Draw each piece option.
+        // IsDraw each piece option.
         PieceType options[] = {PieceType::Queen, PieceType::Knight, PieceType::Rook, PieceType::Bishop};
         for (int i = 0; i < 4; i++) {
             auto currSprite = ChessFrontend::ResourceManager::GetPieceSprite(color, options[i]);

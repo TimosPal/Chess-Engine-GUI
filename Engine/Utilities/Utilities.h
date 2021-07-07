@@ -25,7 +25,7 @@ namespace ChessEngine {
     };
 
     enum class GameState{
-        Win, Defeat, Stalemate, Forfiet, Playing
+        Win, Defeat, Draw, Forfiet, Playing
     };
 
     std::string FileToString(File file);

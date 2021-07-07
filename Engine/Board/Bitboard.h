@@ -79,7 +79,7 @@ namespace ChessEngine::BitboardUtil {
     /* Given a board we generate it's index-th permutation. */
     Bitboard GetPermutation(Bitboard board, uint16_t permutationIndex);
 
-    /* Draw the bitboard in a square like form , with '1' and '-'. */
+    /* IsDraw the bitboard in a square like form , with '1' and '-'. */
     /* NOTE: each rank is printed in a Little endian
      * fashion. The origin is located at the bottom left */
     void DrawBitBoard(Bitboard board);

@@ -20,7 +20,7 @@ namespace ChessEngine {
             return state;
         }
 
-        BoardOccupancies& GetUtilities(){
+        BoardOccupancies& GetOccupancies(){
             return boardOccupancies;
         }
 

@@ -22,8 +22,8 @@ namespace ChessEngine {
                 return "Win";
             case GameState::Defeat:
                 return "Defeat";
-            case GameState::Stalemate:
-                return "Stalemate";
+            case GameState::Draw:
+                return "Draw";
             case GameState::Forfiet:
                 return "Forfiet";
             case GameState::Playing:
