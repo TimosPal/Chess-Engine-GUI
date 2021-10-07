@@ -16,6 +16,8 @@ namespace ChessFrontend::RenderingUtil {
 
     void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardOccupancies &utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide);
 
+    void DrawPiecesNumbers(sf::RenderWindow &window, ChessEngine::BoardOccupancies& utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide);
+
     void ScalePieceSprite(sf::Sprite &sprite, sf::Vector2i targetScale);
 
     void DrawHoldingPiece(sf::RenderWindow &window, sf::Sprite &holdingSprite);

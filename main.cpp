@@ -9,7 +9,7 @@ constexpr int width = 800;
 constexpr int height = 800;
 constexpr int frameLimit = 120;
 
-constexpr float moveTime = 0.25f;
+constexpr float moveTime = 0.025f;
 
 std::string ArgumentToString(int argc, char* argv[]){
     std::string temp;

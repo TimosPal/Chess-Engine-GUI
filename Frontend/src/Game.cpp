@@ -60,7 +60,8 @@ namespace ChessFrontend {
 
             RenderingUtil::DrawCheckerBoard(window);
             RenderingUtil::DrawCoordinates(window, humanState.sideView);
-            RenderingUtil::DrawPieces(window, board.GetOccupancies(), GetIgnoreList(), humanState.sideView);
+            //RenderingUtil::DrawPieces(window, board.GetOccupancies(), GetIgnoreList(), humanState.sideView);
+            RenderingUtil::DrawPiecesNumbers(window, board.GetOccupancies(), GetIgnoreList(), humanState.sideView);
 
             if(humanState.promotionMenu){
                 // Create vector for the origin of the window.

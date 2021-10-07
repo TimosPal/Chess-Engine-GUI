@@ -16,7 +16,7 @@
 #define CIRCLE_ATTACK_PERCENTAGE 1.0
 #define CIRCLE_OUTLINE_PERCENTAGE 0.07
 
-#define FONT_SIZE_PERCENTAGE 0.2
+#define FONT_SIZE_PERCENTAGE 0.16
 #define FONT_OFFSET_PERCENTAGE 0.03
 
 #define SHADE_OPACITY 0.35
@@ -69,6 +69,38 @@ namespace ChessFrontend::RenderingUtil {
                 currSprite.setPosition(xPos * tileSize.x, yPos * tileSize.y);
 
                 window.draw(currSprite);
+            }
+        }
+    }
+
+
+    void DrawPiecesNumbers(sf::RenderWindow &window, ChessEngine::BoardOccupancies& utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide) {
+        // Helper function for images.
+        int width = window.getView().getSize().x;
+        int height = window.getView().getSize().y;
+        auto tileSize = sf::Vector2(width / 8, height / 8);
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                auto[type, color] = utilities.squaresOccupants[ChessEngine::BitboardUtil::GetSquareIndex(i, j)];
+
+                // IsDraw based on viewSide view.
+                int yPos = viewSide == ChessEngine::Color::White ? 7 - j : j;
+                int xPos = viewSide == ChessEngine::Color::White ? i : 7 - i;
+
+                sf::Text text;
+                text.setFont(ResourceManager::GetFont());
+                int fontSize = tileSize.x * 0.4;
+                text.setCharacterSize(fontSize);
+                text.setString(std::to_string(type));
+                //center text
+                sf::FloatRect textRect = text.getLocalBounds();
+                text.setOrigin(textRect.left + textRect.width/2.0f,
+                               textRect.top  + textRect.height/2.0f);
+                text.setFillColor(sf::Color::Black);
+                text.setPosition(xPos * tileSize.x + tileSize.x/2, yPos * tileSize.y + tileSize.y/2);
+
+                window.draw(text);
             }
         }
     }
@@ -283,7 +315,7 @@ namespace ChessFrontend::RenderingUtil {
 
         // Ranks.
         for (int i = 0; i < 8; i++) {
-            int tilePos = (sideView == ChessEngine::Color::White) ? i : 7 - i;
+            int tilePos = (sideView == ChessEngine::Color::Black) ? i : 7 - i;
             std::string numStr = ChessEngine::RankToString((ChessEngine::Rank)tilePos);
             text.setString(numStr);
             text.setFillColor((i % 2 == 0 % 2) ? sf::Color(WHITE_TILE_COLOR) : sf::Color(BLACK_TILE_COLOR));
@@ -297,7 +329,7 @@ namespace ChessFrontend::RenderingUtil {
 
         // Files.
         for (int i = 0; i < 8; i++) {
-            int tilePos = (sideView == ChessEngine::Color::White) ? 7 - i : i;
+            int tilePos = (sideView == ChessEngine::Color::Black) ? 7 - i : i;
             std::string numStr = ChessEngine::FileToString((ChessEngine::File)tilePos);
             text.setString(numStr);
             text.setFillColor((i % 2 != 0 % 2) ? sf::Color(WHITE_TILE_COLOR) : sf::Color(BLACK_TILE_COLOR));
