@@ -201,7 +201,7 @@ namespace ChessEngine::MoveGeneration {
                 (kingPawnAttacks & enemyPawnOCP) |
                 (kingKingAttacks & enemyKingOCP);
 
-        return GetBitCount(attackSources);
+        return GetBitCount(attackSources); // TODO: why not bool?
     }
 
     int NumberOfChecks(Color color, const BoardState& state, BoardOccupancies& boardOccupancies){

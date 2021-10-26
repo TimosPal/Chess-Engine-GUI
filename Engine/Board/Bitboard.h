@@ -35,7 +35,7 @@ namespace ChessEngine::BitboardUtil {
         return board & -board;
     }
 
-    constexpr uint8_t GetBitCount(Bitboard board) {
+    constexpr uint8_t GetBitCount(Bitboard board) { // TODO: use C++ stl function for built in usage.
         uint8_t count = 0;
         while (board) {
             count++;
@@ -44,7 +44,7 @@ namespace ChessEngine::BitboardUtil {
         return count;
     }
 
-    constexpr uint8_t GetLSBIndex(Bitboard board) { // NOTE: maybe use built_in_ffs (?)
+    constexpr uint8_t GetLSBIndex(Bitboard board) { // TODO: maybe use built_in_ffs (?)
         /* De Bruijn bitscan algorithm */
         const uint64_t debruijn64 = 0x03f79d71b4cb0a89;
         const uint8_t index64[64] = {

@@ -8,13 +8,15 @@
 #include "./RenderingUtil.h"
 #include "ResourceManager.h"
 
+// TODO : better bitboard array representation , monochrome?
+
 namespace ChessFrontend {
 
         Game::Game(ChessEngine::BoardState state, const Options& options)
                 : window(sf::VideoMode(
                          options.windowSettings.width,
                          options.windowSettings.height),
-                         options.windowSettings.title),
+                         options.windowSettings.title, sf::Style::None),
                          board(state), options(options),
                          humanState(options.startingView)
         {
@@ -59,21 +61,25 @@ namespace ChessFrontend {
             window.clear();
 
             RenderingUtil::DrawCheckerBoard(window);
-            RenderingUtil::DrawCoordinates(window, humanState.sideView);
-            //RenderingUtil::DrawPieces(window, board.GetOccupancies(), GetIgnoreList(), humanState.sideView);
-            RenderingUtil::DrawPiecesNumbers(window, board.GetOccupancies(), GetIgnoreList(), humanState.sideView);
+            RenderingUtil::DrawCoordinates(window, humanState.viewSide);
+
+            auto bitboardW = board.GetState().pieceBoards[ChessEngine::White][ChessEngine::PieceType::Pawn];
+            auto bitboardB = board.GetState().pieceBoards[ChessEngine::Black][ChessEngine::PieceType::Pawn];
+            auto bitboard = bitboardW;
+            RenderingUtil::Draw_Bitboard(window, bitboard, humanState.viewSide);
+            RenderingUtil::DrawPieces(window, board.GetOccupancies(), GetIgnoreList(), humanState.viewSide);
 
             if(humanState.promotionMenu){
                 // Create vector for the origin of the window.
                 auto [x,y] = ChessEngine::BitboardUtil::GetCoordinates(humanState.selectedMove.toSquareIndex);
                 sf::Vector2i windowOrigin(x,y);
 
-                RenderingUtil::DrawPromotionMenu(window, windowOrigin, humanState.sideView);
+                RenderingUtil::DrawPromotionMenu(window, windowOrigin, humanState.viewSide);
             }
 
             // IsDraw available moves and the holding piece.
             if(humanState.activePiece) {
-                RenderingUtil::DrawActivePieceMoves(window, humanState.activePieceMoves, humanState.sideView);
+                RenderingUtil::DrawActivePieceMoves(window, humanState.activePieceMoves, humanState.viewSide);
                 if (humanState.isHolding)
                     RenderingUtil::DrawHoldingPiece(window, humanState.holdingSprite);
             }
@@ -82,7 +88,7 @@ namespace ChessFrontend {
             if(playMoveAnimation) {
                 float lerpTime = elapsedAnimTime / options.secPerMove;
                 ChessEngine::Color turnOf = board.GetState().turnOf;
-                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, humanState.selectedMove, turnOf, humanState.sideView, lerpTime);
+                playMoveAnimation = RenderingUtil::PlayMoveAnimation(window, humanState.selectedMove, turnOf, humanState.viewSide, lerpTime);
 
                 if(playMoveAnimation)
                     elapsedAnimTime += dt.asSeconds();
@@ -97,7 +103,7 @@ namespace ChessFrontend {
 
         void Game::SwapSides(){
             if(options.sideSwap){
-                humanState.sideView = ChessEngine::InvertColor(humanState.sideView);
+                humanState.viewSide = ChessEngine::InvertColor(humanState.viewSide);
             }
         }
 
@@ -183,7 +189,7 @@ namespace ChessFrontend {
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
             // Color side view.
-            ChessEngine::Color sideView = humanState.sideView;
+            ChessEngine::Color sideView = humanState.viewSide;
             int tilePosX = mousePos.x / tileSize.x;
             int tilePosY = mousePos.y / tileSize.y;
             int posX = (sideView == ChessEngine::Color::White ? tilePosX : 7 - tilePosX);

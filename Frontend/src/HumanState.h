@@ -17,14 +17,14 @@ namespace ChessFrontend {
         ChessEngine::MoveGeneration::Move selectedMove; // The move that was chosen to be played.
         std::list<ChessEngine::MoveGeneration::Move> activePieceMoves; // Available moves from active piece.
 
-        ChessEngine::Color sideView; // Side orientation of the board.
+        ChessEngine::Color viewSide; // Side orientation of the board.
 
         HumanState(ChessEngine::Color startingView){
             activePiece = false;
             isHolding = false;
             promotionMenu = false;
 
-            sideView = startingView;
+            viewSide = startingView;
 
             selectedMove.flags = ChessEngine::MoveGeneration::MoveType::None;
         }

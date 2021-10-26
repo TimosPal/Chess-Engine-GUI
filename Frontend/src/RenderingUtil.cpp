@@ -73,12 +73,18 @@ namespace ChessFrontend::RenderingUtil {
         }
     }
 
-
-    void DrawPiecesNumbers(sf::RenderWindow &window, ChessEngine::BoardOccupancies& utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide) {
+    void DrawPiecesEncoding(sf::RenderWindow &window, ChessEngine::BoardOccupancies &utilities, ChessEngine::Color viewSide) {
         // Helper function for images.
+        // Draw the encoded types of the pieces for the array representations.
         int width = window.getView().getSize().x;
         int height = window.getView().getSize().y;
         auto tileSize = sf::Vector2(width / 8, height / 8);
+
+        sf::Text text;
+        text.setFont(ResourceManager::GetFont());
+        int fontSize = tileSize.x * 0.4;
+        text.setCharacterSize(fontSize);
+
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -88,16 +94,125 @@ namespace ChessFrontend::RenderingUtil {
                 int yPos = viewSide == ChessEngine::Color::White ? 7 - j : j;
                 int xPos = viewSide == ChessEngine::Color::White ? i : 7 - i;
 
-                sf::Text text;
-                text.setFont(ResourceManager::GetFont());
-                int fontSize = tileSize.x * 0.4;
-                text.setCharacterSize(fontSize);
-                text.setString(std::to_string(type));
+                sf::Color textColor = sf::Color::Black;
+                int pieceNum = color == ChessEngine::White ? type : type + 6;
+                if (type == ChessEngine::PieceType::None) { // Empty tile.
+                    textColor.a = SHADE_OPACITY * 255;
+                    pieceNum = 6*2;
+                }
+                text.setString(std::to_string(pieceNum));
+
                 //center text
                 sf::FloatRect textRect = text.getLocalBounds();
-                text.setOrigin(textRect.left + textRect.width/2.0f,
-                               textRect.top  + textRect.height/2.0f);
-                text.setFillColor(sf::Color::Black);
+                text.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
+
+                text.setFillColor(textColor);
+                text.setPosition(xPos * tileSize.x + tileSize.x/2, yPos * tileSize.y + tileSize.y/2);
+
+                window.draw(text);
+            }
+        }
+    }
+
+    void Draw_x88_Indices(sf::RenderWindow &window, bool firstHalf, ChessEngine::Color viewSide) {
+        // Helper function for images.
+        // Draws the x88 indices.
+        int width = window.getView().getSize().x;
+        int height = window.getView().getSize().y;
+        auto tileSize = sf::Vector2(width / 8, height / 8);
+
+        sf::Text text;
+        text.setFont(ResourceManager::GetFont());
+        int fontSize = tileSize.x * 0.4;
+        text.setCharacterSize(fontSize);
+        sf::Color textColor = sf::Color::Black;
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // IsDraw based on viewSide view.
+                int yPos = viewSide == ChessEngine::Color::White ? 7 - j : j;
+                int xPos = viewSide == ChessEngine::Color::White ? i : 7 - i;
+
+                int boardOffset = firstHalf ? 8 : 0;
+                uint8_t positionIndex = (i + boardOffset) | (j << 4);
+                text.setString(std::to_string(positionIndex));
+
+                //center text
+                sf::FloatRect textRect = text.getLocalBounds();
+                text.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
+
+                text.setFillColor(textColor);
+                text.setPosition(xPos * tileSize.x + tileSize.x/2, yPos * tileSize.y + tileSize.y/2);
+
+                window.draw(text);
+            }
+        }
+    }
+
+    void Draw_1dArray_Indices(sf::RenderWindow &window, ChessEngine::Color viewSide) {
+        // Helper function for images.
+        // Draws the x88 indices.
+        int width = window.getView().getSize().x;
+        int height = window.getView().getSize().y;
+        auto tileSize = sf::Vector2(width / 8, height / 8);
+
+        sf::Text text;
+        text.setFont(ResourceManager::GetFont());
+        int fontSize = tileSize.x * 0.4;
+        text.setCharacterSize(fontSize);
+        sf::Color textColor = sf::Color::Black;
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // IsDraw based on viewSide view.
+                int yPos = viewSide == ChessEngine::Color::White ? 7 - j : j;
+                int xPos = viewSide == ChessEngine::Color::White ? i : 7 - i;
+
+                uint8_t positionIndex = ChessEngine::BitboardUtil::GetSquareIndex(i, j);
+                text.setString(std::to_string(positionIndex));
+
+                //center text
+                sf::FloatRect textRect = text.getLocalBounds();
+                text.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
+
+                text.setFillColor(textColor);
+                text.setPosition(xPos * tileSize.x + tileSize.x/2, yPos * tileSize.y + tileSize.y/2);
+
+                window.draw(text);
+            }
+        }
+    }
+
+    void Draw_Bitboard(sf::RenderWindow &window, ChessEngine::BitboardUtil::Bitboard &board, ChessEngine::Color viewSide) {
+        // Helper function for images.
+        // Draws the provided bitboard.
+        int width = window.getView().getSize().x;
+        int height = window.getView().getSize().y;
+        auto tileSize = sf::Vector2(width / 8, height / 8);
+
+        sf::Text text;
+        text.setFont(ResourceManager::GetFont());
+        int fontSize = tileSize.x * 0.4;
+        text.setCharacterSize(fontSize);
+        sf::Color textColor1 = sf::Color::Black;
+        sf::Color textColor0 = sf::Color::Black;
+        textColor0.a = SHADE_OPACITY * 255;
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // IsDraw based on viewSide view.
+                int yPos = viewSide == ChessEngine::Color::White ? 7 - j : j;
+                int xPos = viewSide == ChessEngine::Color::White ? i : 7 - i;
+
+                uint8_t index = ChessEngine::BitboardUtil::GetSquareIndex(i, j);
+                auto is0 = ChessEngine::BitboardUtil::GetBit(board, index) == 0;
+                text.setString(is0 ? "0" : "1");
+
+                //center text
+                sf::FloatRect textRect = text.getLocalBounds();
+                text.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
+
+                text.setFillColor(is0 ? textColor0 : textColor1);
                 text.setPosition(xPos * tileSize.x + tileSize.x/2, yPos * tileSize.y + tileSize.y/2);
 
                 window.draw(text);

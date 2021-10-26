@@ -8,7 +8,7 @@ namespace ChessEngine{
     struct BoardState{
         // A board with 6 bitboards for each color , 1 bitboard per unique piece flags.
         // Use Color / PieceType for indexing
-        BitboardUtil::Bitboard pieceBoards[2][6]{};
+        BitboardUtil::Bitboard pieceBoards[2][6]{}; // TODO: maybe 1d array instead?
 
         // Indicates whose turn is it.
         Color turnOf = Color::White;

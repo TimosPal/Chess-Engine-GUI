@@ -16,8 +16,6 @@ namespace ChessFrontend::RenderingUtil {
 
     void DrawPieces(sf::RenderWindow &window, ChessEngine::BoardOccupancies &utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide);
 
-    void DrawPiecesNumbers(sf::RenderWindow &window, ChessEngine::BoardOccupancies& utilities, std::vector<sf::Vector2i> ignorePos, ChessEngine::Color viewSide);
-
     void ScalePieceSprite(sf::Sprite &sprite, sf::Vector2i targetScale);
 
     void DrawHoldingPiece(sf::RenderWindow &window, sf::Sprite &holdingSprite);
@@ -29,6 +27,12 @@ namespace ChessFrontend::RenderingUtil {
     void DrawPromotionMenu(sf::RenderWindow &window, sf::Vector2i originPos, ChessEngine::Color sideView);
 
     void DrawCoordinates(sf::RenderWindow &window, ChessEngine::Color sideView);
+
+    // Special helper functions for image creations.
+    void DrawPiecesEncoding(sf::RenderWindow &window, ChessEngine::BoardOccupancies &utilities, ChessEngine::Color viewSide);
+    void Draw_x88_Indices(sf::RenderWindow &window, bool firstHalf, ChessEngine::Color viewSide);
+    void Draw_Bitboard(sf::RenderWindow &window, ChessEngine::BitboardUtil::Bitboard &board, ChessEngine::Color viewSide);
+    void Draw_1dArray_Indices(sf::RenderWindow &window, ChessEngine::Color viewSide);
 
 }
 

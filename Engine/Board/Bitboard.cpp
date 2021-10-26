@@ -14,7 +14,7 @@ namespace ChessEngine::BitboardUtil {
     }
 
     /* Given a board we generate it's index-th permutation. */
-    Bitboard GetPermutation(Bitboard board, uint16_t permutationIndex) {
+    Bitboard GetPermutation(Bitboard board, uint16_t permutationIndex) { // TODO : better way
         // permutationIndex is some sort of mask that helps us permutate the board.
         // eg: permutationIndex = 101 , 1st mask bit = 1 , 2nd mask bit = 0 etc.
         // It's like projecting permutationIndex on the board map.
